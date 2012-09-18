@@ -3,6 +3,7 @@ require "y_support/version"
 
 require 'mathn'
 require 'set'
+require 'active_support/core_ext/module/delegation'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/object/duplicable'
 require 'active_support/core_ext/string/starts_ends_with'
