@@ -284,19 +284,11 @@ module YSupport
       def ~@; RespondTo.new( self ) end
     } # Symbol.ɱ_exec
     
-    ::Matrix.instance_exec {
-      # #zero ç mτ is upgraded, so that it can also create non-square
-      # zero matrices. Original mτ is preserved as .zero_square_matrix
-      alias :zero_square_matrix :zero
-      def zero(rows, cols = nil)
-        # minimizing interference with the orig. behavior
-        return zero_square_matrix(rows) unless cols
-        return zero_square_matrix(rows) if rows == cols
-        
-        # now we have a non-square matrix, so return it full of zeros:
-        row_array_of_zeros = [0] * cols
-        array_of_rows = [row_array_of_zeros] * rows
-        return self[*array_of_rows]
+    ::Matrix.module_exec {
+      # exposing the :[]= modificator method
+      alias :private_element_assignment :[]=
+      def []=( a, b, newval )
+        private_element_assignment a, b, newval
       end
     } # Matrix.instance_exec
     

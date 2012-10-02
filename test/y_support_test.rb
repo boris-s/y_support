@@ -225,10 +225,9 @@ class YSupportTest < Test::Unit::TestCase
   
   context "Matrix" do
     require 'matrix'
-    should "have #zero class method working for non-square matrices" do
-      assert_equal Matrix[[0, 0, 0], [0, 0, 0]], Matrix.zero(2, 3)
-      assert_equal Matrix[[0, 0], [0, 0]], Matrix.zero(2)
-      assert_equal Matrix[[0, 0], [0, 0]], Matrix.zero(2, 2)
+    should "have exposed #[]= method" do
+      assert_equal ::Matrix[[1, 0, 0], [0, 0, 0]],
+                   ::Matrix.zero(2, 3).tap{ |m| m.[]=(0, 0, 1) }
     end
   end # context Matrix
   
