@@ -70,6 +70,9 @@ module YSupport
       # #local_object? inquirer
       def local_object? s = nil; is_a? LocalObject and signature == s end
       alias :ℓ? :local_object?
+
+      # RespondTo constructor
+      def RespondTo method; RespondTo.create method end
       
       # Create public attributes (ie. with readers) and initialize them with
       # prescribed values. Takes a hash of { symbol => value } pairs. Existing methods
@@ -281,7 +284,7 @@ module YSupport
       alias :ßß :to_normalized_sym
       
       # ~:symbol used for .respond_to? matching in case statements
-      def ~@; RespondTo.new( self ) end
+      def ~@; RespondTo self end
     } # Symbol.ɱ_exec
     
     ::Matrix.module_exec {
@@ -340,9 +343,11 @@ module YSupport
   
   # RespondTo class for easy use of respond_to? in case statements
   class RespondTo
-    def initialize( method_symbol ); @method_symbol = method_symbol end
-    # now redefinition of ===() for case statements
-    def ===( obj ); obj.respond_to?( @method_symbol ) end
+    Matchers = {}
+    attr_reader :method
+    def self.create method; Matchers[method] ||= new method end
+    def initialize method; @method = method end
+    def === obj; obj.respond_to? method end
   end
 
   # # Redefining constants without warnings, useful for mocking.

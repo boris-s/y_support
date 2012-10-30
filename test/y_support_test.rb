@@ -4,6 +4,8 @@
 require 'y_support'
 require 'test/unit'
 require 'shoulda'
+require 'minitest/spec'
+require 'minitest/autorun'
 
 include YSupport
 
@@ -61,6 +63,10 @@ class YSupportTest < Test::Unit::TestCase
     should "Object have constructors #InertRecorder() and #L() (for LocalObject)" do
       assert_equal InertRecorder, InertRecorder().class
       assert_equal LocalObject, ℒ().class
+    end
+
+    should "have " do
+      
     end
   end # context Object
   
@@ -320,8 +326,23 @@ class YSupportTest < Test::Unit::TestCase
     should "have ~@ method for ~:symbol style .respond_to?" \
     'matching in case statements' do
       assert_kind_of RespondTo, ~:hello
+      assert RespondTo(:<<) === "testing"
       assert case ?x; when ~:each_char then 1 else false end
       assert !case ?x; when ~:azapat then 1 else false end
     end
   end # context Symbol
 end # class YSupportTest
+
+class TestRespondTo < MiniTest::Unit::TestCase
+  def test_triple_eq_with_false
+    assert !(RespondTo(:crazytown) === ('testing'))
+  end
+
+  def test_only_one_object
+    assert RespondTo(:crazytown).equal?(RespondTo(:crazytown))
+  end
+
+  def test_with_symbol_tilde
+    assert (~:<< === "testing")
+  end
+end
