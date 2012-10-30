@@ -65,8 +65,8 @@ class YSupportTest < Test::Unit::TestCase
       assert_equal LocalObject, ℒ().class
     end
 
-    should "have " do
-      
+    should "have RespondTo() constructor" do
+      assert_equal RespondTo, RespondTo(:inspect).class
     end
   end # context Object
   
@@ -332,17 +332,3 @@ class YSupportTest < Test::Unit::TestCase
     end
   end # context Symbol
 end # class YSupportTest
-
-class TestRespondTo < MiniTest::Unit::TestCase
-  def test_triple_eq_with_false
-    assert !(RespondTo(:crazytown) === ('testing'))
-  end
-
-  def test_only_one_object
-    assert RespondTo(:crazytown).equal?(RespondTo(:crazytown))
-  end
-
-  def test_with_symbol_tilde
-    assert (~:<< === "testing")
-  end
-end
