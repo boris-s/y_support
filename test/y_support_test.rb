@@ -141,8 +141,8 @@ class YSupportTest < Test::Unit::TestCase
       assert_equal( { a: 11, b: nil, c: 22 }, test.dℲ!( defaults ) )
     end
     
-    should "have #do_with_keys and #modify_keys" do
-      assert_equal( {"a" => :b, "c" => :d}, {a: :b, c: :d}.do_with_keys( &:to_s ) )
+    should "have #with_keys and #modify_keys" do
+      assert_equal( {"a" => :b, "c" => :d}, {a: :b, c: :d}.with_keys( &:to_s ) )
       assert_equal( {"a1" => 1, "c2" => 2}, {a: 1, c: 2}.modify_keys { |k, v|
                       k.to_s + v.to_s } )
       assert_equal( {"a1" => 1, "c2" => 2}, {a: 1, c: 2}.modify_keys {|p|
@@ -153,17 +153,23 @@ class YSupportTest < Test::Unit::TestCase
                       p[0] + p[1] } )
     end
     
-    should "have #do_with_values and #modify_values" do
-      assert_equal( { a: "b", c: "d" }, {a: :b, c: :d}.do_with_values( &:to_s ) )
+    should "have #with_values and #modify_values" do
+      assert_equal( { a: "b", c: "d" }, {a: :b, c: :d}.with_values( &:to_s ) )
       assert_equal( {a: "ab", c: "cd"}, {a: :b, c: :d}.modify_values { |k, v|
                       k.to_s + v.to_s } )
       assert_equal( {a: "ab", c: "cd"}, {a: :b, c: :d}.modify_values { |p|
                       p[0].to_s + p[1].to_s } )
       hh = { a: 1, b: 2 }
-      hh.do_with_values! &:to_s
+      hh.with_values! &:to_s
       assert_equal ["1", "2"], hh.values
       hh.modify_values! &:join
       assert_equal ["a1", "b2"], hh.values
+    end
+
+    should "have #modify" do
+      assert_equal( { ab: "ba", cd: "dc" },
+                    { a: :b, c: :d }
+                      .modify { |k, v| ["#{k}#{v}".to_sym, "#{v}#{k}"] } )
     end
     
     should "have #dot! meta patcher for dotted access to keys" do

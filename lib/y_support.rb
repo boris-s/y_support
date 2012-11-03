@@ -178,20 +178,20 @@ module YSupport
       alias :dℲ! :reverse_merge!
       
       # Applies a block as a mapping on all keys, returning a new hash
-      def do_with_keys; keys.ew◉(ç.new) {|k, ꜧ| ꜧ[yield k] = self[k] } end
-      alias :do_w_keys :do_with_keys
+      def with_keys; keys.ew◉(ç.new) {|k, ꜧ| ꜧ[yield k] = self[k] } end
+      alias :do_with_keys :with_keys
       
       # The difference from do_with_keys is that modify_keys expects block
       # that takes 2 arguments (key: value pair) and returns the new key.
       def modify_keys; ew◉(ç.new) {|pp, ꜧ| ꜧ[yield pp] = self[pp[0]] } end
       
       # Applies a block as a mapping on all values, returning a new hash
-      def do_with_values; ew◉(ç.new) {|pp, ꜧ| ꜧ[pp[0]] = yield pp[1] } end
-      alias :do_w_values :do_with_values
+      def with_values; ew◉(ç.new) {|pp, ꜧ| ꜧ[pp[0]] = yield pp[1] } end
+      alias :do_with_values :with_values
       
       # Like #do_with_values, but modifies the receiver.
-      def do_with_values!; ew◉(self) {|pp, ꜧ| ꜧ[pp[0]] = yield pp[1] } end
-      alias :do_w_values! :do_w_values
+      def with_values!; ew◉(self) {|pp, ꜧ| ꜧ[pp[0]] = yield pp[1] } end
+      alias :do_with_values! :with_values!
       
       # The difference from #do_with_values is that modify_values expects block
       # that takes 2 arguments (key: value pair) and returns the new value.
@@ -199,6 +199,9 @@ module YSupport
       
       # Like #modify_values, but modifies the receiver
       def modify_values!; ew◉ self do |pp, ꜧ| ꜧ[pp[0]] = yield pp end end
+
+      # Like #map that returns a hash.
+      def modify; ew◉(ç.new) {|pp, ꜧ| k, v = yield pp; ꜧ[k] = v } end
       
       # Makes ꜧ keyj accessible as mτj. If the ꜧ key ɴj collide with its
       # mτj, ArgumentError is raised, unless :overwrite_mτs option == true.
