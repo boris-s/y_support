@@ -170,6 +170,11 @@ module YSupport
           end
         end
       end
+
+      # Allows style &[ function, *arguments ]
+      def to_proc
+        proc { |receiver| receiver.send *self[0] }
+      end # def to_proc
     end # Array.ɱ_exec
     
     # and include self

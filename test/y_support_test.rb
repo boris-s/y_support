@@ -126,6 +126,10 @@ class YSupportTest < Test::Unit::TestCase
       assert_equal [[:a, :b]], [:a, :b].each_consecutive_pair.collect{|e| e }
       assert_equal [[:a, :b], [:b, :c]], [:a, :b, :c].each_consecutive_pair.collect{|e| e }
     end
+
+    should "have #to_proc in style &[ function, *arguments ]" do
+      assert_equal [2, 3], [1, 2].map( &[:+, 1] )
+    end
   end # context Array
 
   context "Hash" do
