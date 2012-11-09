@@ -240,10 +240,14 @@ class YSupportTest < Test::Unit::TestCase
   end # context RespondTo
   
   context "Matrix" do
-    require 'matrix'
     should "have exposed #[]= method" do
       assert_equal ::Matrix[[1, 0, 0], [0, 0, 0]],
                    ::Matrix.zero(2, 3).tap{ |m| m.[]=(0, 0, 1) }
+    end
+
+    should "have pp method" do
+      assert_respond_to Matrix[[1, 2], [3, 4]], :pretty_print
+      assert_respond_to Matrix[[1, 2], [3, 4]], :pp
     end
   end # context Matrix
   

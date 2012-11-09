@@ -3,6 +3,7 @@ require "y_support/version"
 
 require 'mathn'
 require 'set'
+require 'matrix'
 require 'active_support/core_ext/module/delegation'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/object/duplicable'
@@ -306,7 +307,7 @@ module YSupport
       def pretty_print
         aa = send(:rows).each.with_object [] do |row, memo|
           memo << row.map( &:to_s ) end
-        width = aa.map{ |row| row.map[ &:size ].max }.max + 1
+        width = aa.map{ |row| row.map( &:size ).max }.max + 1
         aa.each{ |row|
           puts row.map{ |str|
             str << ' ' * ( width - str.size )
