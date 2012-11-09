@@ -308,11 +308,9 @@ module YSupport
         aa = send(:rows).each.with_object [] do |row, memo|
           memo << row.map( &:to_s ) end
         width = aa.map{ |row| row.map( &:size ).max }.max + 1
-        aa.each{ |row|
-          puts row.map{ |str|
-            str << ' ' * ( width - str.size )
-          }.reduce( :+ )
-        }
+        aa.each_with_object "" do |row, memo|
+          row.each{ |e| memo << e << ' ' * ( width - e.size ) << "\n" }
+        end
       end
       alias :pp :pretty_print
     } # Matrix.instance_exec
