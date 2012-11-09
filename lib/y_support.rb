@@ -304,7 +304,7 @@ module YSupport
 
       # Pretty printing
       def pretty_print
-        aa = each.with_object [] do |row, memo| memo << row.map &:to_s end
+        aa = each.with_object [] do |row, memo| memo << row.map( &:to_s ) end
         width = aa.map{ |row| row.map[ &:size ].max }.max + 1
         aa.each{ |row|
           puts row.map{ |str|
@@ -313,7 +313,6 @@ module YSupport
         }
       end
       alias :pp :pretty_print
-    end
     } # Matrix.instance_exec
     
     ::Vector.instance_exec {
