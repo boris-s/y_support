@@ -173,7 +173,7 @@ module YSupport
 
       # Allows style &[ function, *arguments ]
       def to_proc
-        proc { |receiver| receiver.send *self[0] }
+        proc { |receiver| receiver.send *self }
       end # def to_proc
     end # Array.ɱ_exec
     
@@ -296,11 +296,24 @@ module YSupport
     } # Symbol.ɱ_exec
     
     ::Matrix.module_exec {
-      # exposing the :[]= modificator method
+      # exposing the #[]= modificator method
       alias :private_element_assignment :[]=
       def []=( a, b, newval )
         private_element_assignment a, b, newval
       end
+
+      # Pretty printing
+      def pretty_print
+        aa = each.with_object [] do |row, memo| memo << row.map &:to_s end
+        width = aa.map{ |row| row.map[ &:size ].max }.max + 1
+        aa.each{ |row|
+          puts row.map{ |str|
+            str << ' ' * ( width - str.size )
+          }.reduce( :+ )
+        }
+      end
+      alias :pp :pretty_print
+    end
     } # Matrix.instance_exec
     
     ::Vector.instance_exec {
