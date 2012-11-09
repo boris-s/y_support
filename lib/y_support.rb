@@ -304,7 +304,8 @@ module YSupport
 
       # Pretty printing
       def pretty_print
-        aa = each.with_object [] do |row, memo| memo << row.map( &:to_s ) end
+        aa = send(:rows).each.with_object [] do |row, memo|
+          memo << row.map( &:to_s ) end
         width = aa.map{ |row| row.map[ &:size ].max }.max + 1
         aa.each{ |row|
           puts row.map{ |str|
