@@ -303,14 +303,27 @@ module YSupport
         private_element_assignment a, b, newval
       end
 
-      # Pretty printing
-      def pretty_print
+      # Pretty inspect
+      def pretty_inspect
         aa = send(:rows).each.with_object [] do |row, memo|
-          memo << row.map( &:to_s ) end
+          memo << row.map{ |o|
+            os = o.to_s
+            case o
+            when Numeric then os[0] == '-' ? os : ' ' + os
+            else o.to_s end
+          }
+        end
         width = aa.map{ |row| row.map( &:size ).max }.max + 1
         aa.each_with_object "" do |row, memo|
-          row.each{ |e| memo << e << ' ' * ( width - e.size ) << "\n" }
+          row.each{ |e| memo << e << ' ' * ( width - e.size ) }
+          memo << "\n"
         end
+      end
+
+      # Pretty print
+      def pretty_print
+        print pretty_inspect
+        return nil
       end
       alias :pp :pretty_print
     } # Matrix.instance_exec
