@@ -305,6 +305,7 @@ module YSupport
 
       # Pretty inspect
       def pretty_inspect
+        return inspect if row_size == 0 or column_size == 0
         aa = send(:rows).each.with_object [] do |row, memo|
           memo << row.map{ |o|
             os = o.to_s
@@ -336,8 +337,17 @@ module YSupport
       # #=> col_vector_2
       # 
       def self.correspondence_matrix( array1, array2 )
-        Matrix[ *array2.map { |e2| array1.map { |e1| e1 == e2 ? 1 : 0 } } ]
+        self[ *array2.map { |e2| array1.map { |e1| e1 == e2 ? 1 : 0 } } ]
       end
+
+      # Converts a column into array. If argument is given, it chooses
+      # column number, otherwise column 0 is assumed.
+      def column_to_a n=0; ( col = column( n ) ) ? col.to_a : nil end
+
+      # Converts a row into array. If argument is given, it chooses row
+      # number, otherwise row 0 is assumed.
+      def row_to_a n=0; ( r = row( n ) ) ? r.to_a : nil end
+        
     } # Matrix.instance_exec
     
     ::Vector.instance_exec {

@@ -5,8 +5,8 @@ require 'test/unit'
 require 'shoulda'
 require 'minitest/spec'
 require 'minitest/autorun'
-require './../lib/y_support'
-# require 'y_support'
+# require './../lib/y_support'
+require 'y_support'
 include YSupport
 
 class YSupportTest < Test::Unit::TestCase
@@ -257,6 +257,15 @@ class YSupportTest < Test::Unit::TestCase
       assert_equal Matrix.column_vector( [1, 2] ),
                    Matrix.correspondence_matrix( [:a, :b, :c], [:a, :b] ) *
                      Matrix.column_vector( [1, 2, 3] )
+      assert_equal 2, Matrix.correspondence_matrix( [1, 2], [1] ).column_size
+    end
+
+    should "have #column_to_a & #row_to_a" do
+      assert_equal [1, 2, 3], Matrix[[1], [2], [3]].column_to_a
+      assert_equal [2, 3, 4], Matrix[[1, 2], [2, 3], [3, 4]].column_to_a( 1 )
+      assert_equal nil, Matrix.empty( 5, 0 ).column_to_a
+      assert_equal [1], Matrix[[1], [2], [3]].row_to_a
+      assert_equal [3], Matrix[[1], [2], [3]].row_to_a( 2 )
     end
   end # context Matrix
   
