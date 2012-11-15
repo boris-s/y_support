@@ -347,7 +347,10 @@ module YSupport
       # Converts a row into array. If argument is given, it chooses row
       # number, otherwise row 0 is assumed.
       def row_to_a n=0; ( r = row( n ) ) ? r.to_a : nil end
-        
+
+      # Shorter aliases for #row_vector, #column_vector
+      def self.cv *aa, &b; column_vector *aa, &b end
+      def self.rv *aa, &b; row_vector *aa, &b end
     } # Matrix.instance_exec
     
     ::Vector.instance_exec {

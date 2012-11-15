@@ -267,6 +267,13 @@ class YSupportTest < Test::Unit::TestCase
       assert_equal [1], Matrix[[1], [2], [3]].row_to_a
       assert_equal [3], Matrix[[1], [2], [3]].row_to_a( 2 )
     end
+
+    should "have aliased #row_vector, #column_vector methods" do
+      assert_equal Matrix.column_vector( [1, 2, 3] ),
+                   Matrix.cv( [1, 2, 3] )
+      assert_equal Matrix.row_vector( [1, 2, 3] ),
+                   Matrix.rv( [1, 2, 3] )
+    end
   end # context Matrix
   
   context "Vector" do
