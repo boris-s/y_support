@@ -274,6 +274,13 @@ class YSupportTest < Test::Unit::TestCase
       assert_equal Matrix.row_vector( [1, 2, 3] ),
                    Matrix.rv( [1, 2, 3] )
     end
+
+    should "have #join_bottom and #join_right" do
+      assert_equal Matrix[[1, 2], [3, 4]],
+                   Matrix[[1, 2]].join_bottom( Matrix[[3, 4]] )
+      assert_equal Matrix[[1, 2, 3, 4]],
+                   Matrix[[1, 2]].join_right( Matrix[[3, 4]] )
+    end
   end # context Matrix
   
   context "Vector" do

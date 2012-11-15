@@ -351,6 +351,20 @@ module YSupport
       # Shorter aliases for #row_vector, #column_vector
       def self.cv *aa, &b; column_vector *aa, &b end
       def self.rv *aa, &b; row_vector *aa, &b end
+
+      # #join_bottom method
+      def join_bottom other;
+        raise ArgumentError, "Column size mismatch" unless
+          column_size == other.column_size
+        ç[ *( row_vectors + other.row_vectors ) ]
+      end
+
+      #join_right methods
+      def join_right other;
+        raise ArgumentError, "Row size mismatch" unless
+          row_size == other.row_size
+        ( t.join_bottom( other.t ) ).t
+      end
     } # Matrix.instance_exec
     
     ::Vector.instance_exec {
