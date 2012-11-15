@@ -326,6 +326,18 @@ module YSupport
         return nil
       end
       alias :pp :pretty_print
+
+      # Given two arrays, creates correspondence matrix, with no. of cols
+      # equal to the 1st array, and no. of rows to the 2nd. This matrix can
+      # be used eg. for conversion between column vectors corresponding to
+      # the 1st and 2nd array:
+      #
+      # Matrix.correspondence_matrix( array1, array2 ) * col_vector_1
+      # #=> col_vector_2
+      # 
+      def self.correspondence_matrix( array1, array2 )
+        Matrix[ *array2.map { |e2| array1.map { |e1| e1 == e2 ? 1 : 0 } } ]
+      end
     } # Matrix.instance_exec
     
     ::Vector.instance_exec {

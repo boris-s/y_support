@@ -1,12 +1,12 @@
 #! /usr/bin/ruby
 #encoding: utf-8
 
-require 'y_support'
 require 'test/unit'
 require 'shoulda'
 require 'minitest/spec'
 require 'minitest/autorun'
-
+require './../lib/y_support'
+# require 'y_support'
 include YSupport
 
 class YSupportTest < Test::Unit::TestCase
@@ -245,9 +245,18 @@ class YSupportTest < Test::Unit::TestCase
                    ::Matrix.zero(2, 3).tap{ |m| m.[]=(0, 0, 1) }
     end
 
-    should "have pp method" do
+    should "have #pp method" do
       assert_respond_to Matrix[[1, 2], [3, 4]], :pretty_print
       assert_respond_to Matrix[[1, 2], [3, 4]], :pp
+    end
+
+    should "have #correspondence_matrix method" do
+      assert_respond_to Matrix, :correspondence_matrix
+      assert_equal Matrix[[1, 0, 0], [0, 1, 0]],
+                   Matrix.correspondence_matrix( [:a, :b, :c], [:a, :b] )
+      assert_equal Matrix.column_vector( [1, 2] ),
+                   Matrix.correspondence_matrix( [:a, :b, :c], [:a, :b] ) *
+                     Matrix.column_vector( [1, 2, 3] )
     end
   end # context Matrix
   
