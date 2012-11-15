@@ -356,6 +356,8 @@ module YSupport
       def join_bottom other;
         raise ArgumentError, "Column size mismatch" unless
           column_size == other.column_size
+        return other.map &:ɪ if row_size == 0
+        return Matrix.empty row_size + other.row_size, 0 if column_size == 0
         ç[ *( row_vectors + other.row_vectors ) ]
       end
 
