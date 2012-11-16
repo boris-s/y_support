@@ -337,6 +337,8 @@ module YSupport
       # #=> col_vector_2
       # 
       def self.correspondence_matrix( array1, array2 )
+        return Matrix.empty 0, array1.size if array2.empty?
+        return Matrix.empty array2.size, 0 if array1.empty?
         self[ *array2.map { |e2| array1.map { |e1| e1 == e2 ? 1 : 0 } } ]
       end
 
@@ -367,6 +369,12 @@ module YSupport
           row_size == other.row_size
         ( t.join_bottom( other.t ) ).t
       end
+
+      # aliasing #row_size, #column_size
+      alias :number_of_rows :row_size
+      alias :number_of_columns :column_size
+      alias :height :number_of_rows
+      alias :width :number_of_columns
     } # Matrix.instance_exec
     
     ::Vector.instance_exec {

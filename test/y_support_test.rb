@@ -281,6 +281,13 @@ class YSupportTest < Test::Unit::TestCase
       assert_equal Matrix[[1, 2, 3, 4]],
                    Matrix[[1, 2]].join_right( Matrix[[3, 4]] )
     end
+
+    should "have aliased #row_size, #column_size methods" do
+      assert_equal 3, Matrix.zero(3, 2).height
+      assert_equal 3, Matrix.zero(3, 2).number_of_rows
+      assert_equal 2, Matrix.zero(3, 2).width
+      assert_equal 2, Matrix.zero(3, 2).number_of_columns
+    end
   end # context Matrix
   
   context "Vector" do
