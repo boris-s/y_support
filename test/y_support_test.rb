@@ -364,10 +364,10 @@ class YSupportTest < Test::Unit::TestCase
     end
     
     should "have #dℲ! defaulter going through String#dℲ!" do
-      assert_equal :default, "".to_ß.dℲ!(:default)
-      assert_equal :default, "".to_ß.dℲ!("default")
-      assert_equal :default, " ".to_ß.dℲ!("default")
-      assert_equal :default, " \n ".to_ß.dℲ!("default")
+      assert_equal :default, "".to_sym.dℲ!(:default)
+      assert_equal :default, "".to_sym.dℲ!("default")
+      assert_equal :default, " ".to_sym.dℲ!("default")
+      assert_equal :default, " \n ".to_sym.dℲ!("default")
       assert_equal :kokot, :kokot.dℲ!("default")
     end
     

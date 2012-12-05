@@ -93,7 +93,7 @@ module YSupport
       end
       alias :ⓒ_set_attr_w_readers :singleton_set_attr_with_readers
     } # Object.module_exec
-    
+
     ::Module.module_exec do
       def autoreq( *ßs )
         options = ßs.extract_options!
@@ -192,7 +192,7 @@ module YSupport
     # and include self
     ::Hash.module_exec do
       # reversed merge!: defaults.merge( self! )
-      alias :dℲ! :reverse_merge!
+      alias :default! :reverse_merge!
       
       # Applies a block as a mapping on all keys, returning a new hash
       def with_keys; keys.ew◉(ç.new) {|k, ꜧ| ꜧ[yield k] = self[k] } end
@@ -261,13 +261,10 @@ module YSupport
           ᴍ(&:strip).delete_if(&:blank?).join(" ")   # strip and join lines
       end
       
-      # #default replaces an empty ς (acc. to #empty?) with provided dℲ ς.
-      def dℲ!(d); strip.empty? ? clear << d.to_s : self end
-      
-      # #yesno_to_tf converts "yes" ςj to true, and others to false
-      def yesno_to_tf
-        return true if self == "yes" or stripn.downcase == "yes"
-        return false
+      # #default replaces an empty string (#empty?) with provided default
+      # string.
+      def default! default_string
+        strip.empty? ? clear << default_string.to_s : self
       end
       
       # underscores spaces
@@ -278,7 +275,7 @@ module YSupport
         x = self; ",.?!;".each_char{|c| x.gsub!(c, " ")}
         return x.stripn.squeeze(" ").underscore_spaces
       end
-      alias :ßς :symbolize
+      alias :ßize :symbolize
       
       # chains #symbolize and #to_sym
       def to_normalized_sym; symbolize.to_sym end
@@ -287,25 +284,22 @@ module YSupport
     
     Symbol.module_exec {
       # Symbol's method #dℲ! just applies String's #dℲ! to a Symbol. Of
-      # course, ß cannot change, so despite the exclamation mark, new
-      # ß is returned whenever the original is considered "defaulted".
-      # Ordinary #dℲ works not with ßj, as ßj are never considered blank.
-      def dℲ!(d); to_s.dℲ!(d).to_ß  end
-      
-      # Converts ß :yes, as well as those ßj that, as ςj, strip and downcase
-      # to "yes", to true. All other ßj are converted to false.
-      def yesno_to_tf
-        self == :yes ? true : self == :no ? false :
-          to_s.stripn.downcase == "yes" ? true : false
+      # course, a symbol cannot change, so despite the exclamation mark, new
+      # symbol is returned whenever the original is considered "defaulted".
+      # Ordinary #default does not work with symbols, as symbols are never
+      # considered blank.
+      def default!( default_value )
+        to_s.default!( default_value ).to_sym
       end
       
-      # Chains .symbolize and .to_sym
+      # Chains #symbolize and #to_sym
       def to_normalized_sym; to_s.to_normalized_sym end
       alias :ßß :to_normalized_sym
       
-      # ~:symbol used for .respond_to? matching in case statements
+      # Creates a RespondTo object from self. (Usef for ~:symbol style matching
+      # in case statements)
       def ~@; RespondTo self end
-    } # Symbol.module_exec
+    }
     
     ::Matrix.module_exec {
       # exposing the #[]= modificator method
