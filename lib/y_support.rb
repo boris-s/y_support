@@ -112,7 +112,7 @@ module YSupport
       end
       
       # I didn't write this method by myself
-      def attr_accessor_withe_default *symbols, &block
+      def attr_accessor_with_default *symbols, &block
         raise 'Default value in block required' unless block
         symbols.each { |ß|
           module_eval {
@@ -128,6 +128,7 @@ module YSupport
           }
         }
       end
+      alias :attr_accessor_w_default :attr_accessor_with_default
     end # Module.module_exec
     
     ::Enumerable.module_exec do

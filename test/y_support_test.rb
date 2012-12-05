@@ -71,14 +71,14 @@ class YSupportTest < Test::Unit::TestCase
   end # context Object
   
   context "Module" do
-    should "have working #attr_accessor_w_dℲ" do
-      class TestCl; attr_accessor_w_dℲ :hello do "world" end end
-      test_cl = TestCl.new
-      assert_equal( "world", test_cl.hello )
-      test_cl2 = TestCl.new
-      test_cl2.hello
-      test_cl2.hello = "receiver.jpg"
-      assert_equal( "receiver.jpg", test_cl2.hello )
+    should "have working #attr_accessor_with_default" do
+      class TestCl; attr_accessor_with_default :hello do "world" end end
+      testç = TestCl.new
+      assert_equal( "world", testç.hello )
+      testç2 = TestCl.new
+      testç2.hello
+      testç2.hello = "receiver.jpg"
+      assert_equal( "receiver.jpg", testç2.hello )
     end
     
     should "have working autoreq" do
