@@ -311,20 +311,13 @@ class YSupportTest < Test::Unit::TestCase
       assert_equal false, "garbage".can_be_float?
     end
     
-    should "have #dℲ! defaulter" do
-      assert_equal "default", "".dℲ!("default")
-      assert_equal "default", " ".dℲ!(:default)
-      assert_equal "default", " \n ".dℲ!("default")
-      assert_equal "kokot", "kokot".dℲ!("default")
+    should "have #default! defaulter" do
+      assert_equal "default", "".default!("default")
+      assert_equal "default", " ".default!(:default)
+      assert_equal "default", " \n ".default!("default")
+      assert_equal "kokot", "kokot".default!("default")
       a = ""
-      assert_equal a.◉id, a.dℲ!("tata").◉id
-    end
-    
-    should "have #yesno_to_tf converting 'yes'/'no' to true/false" do
-      assert_equal true, "yes".yesno_to_tf
-      assert_equal true, " Yes \n".yesno_to_tf
-      assert_equal false, "no".yesno_to_tf
-      assert_equal false, " ssdfa \n".yesno_to_tf
+      assert_equal a.object_id, a.default!("tata").object_id
     end
     
     should "have #stripn upgrade of #strip, which also strips newlines" do
@@ -356,19 +349,12 @@ class YSupportTest < Test::Unit::TestCase
   end # context String
 
   context "Symbol" do
-    should "have #yesno_to_tf converting :yes/:no to true/false" do
-      assert_equal true, :yes.yesno_to_tf
-      assert_equal true, :Yes.yesno_to_tf
-      assert_equal false, :no.yesno_to_tf
-      assert_equal false, :hovno.yesno_to_tf
-    end
-    
-    should "have #dℲ! defaulter going through String#dℲ!" do
-      assert_equal :default, "".to_sym.dℲ!(:default)
-      assert_equal :default, "".to_sym.dℲ!("default")
-      assert_equal :default, " ".to_sym.dℲ!("default")
-      assert_equal :default, " \n ".to_sym.dℲ!("default")
-      assert_equal :kokot, :kokot.dℲ!("default")
+    should "have #default! defaulter going through String#default!" do
+      assert_equal :default, "".to_sym.default!(:default)
+      assert_equal :default, "".to_sym.default!("default")
+      assert_equal :default, " ".to_sym.default!("default")
+      assert_equal :default, " \n ".to_sym.default!("default")
+      assert_equal :kokot, :kokot.default!("default")
     end
     
     should "have #to_normalized_sym alias #ßß" do

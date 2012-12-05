@@ -97,7 +97,7 @@ module YSupport
     ::Module.module_exec do
       def autoreq( *ßs )
         options = ßs.extract_options!
-        this_ɴspace = self.ɴ
+        this_ɴspace = self.name
         this_ɴspace_path = this_ɴspace.underscore
         ɴspace_chain = this_ɴspace.split "::"
         options.dℲ!( descending_path: '..', ascending_path_prefix: 'lib' )
@@ -220,8 +220,8 @@ module YSupport
       # Like #map that returns a hash.
       def modify; ew◉(ç.new) {|pp, ꜧ| k, v = yield pp; ꜧ[k] = v } end
       
-      # Makes ꜧ keyj accessible as mτj. If the ꜧ key ɴj collide with its
-      # mτj, ArgumentError is raised, unless :overwrite_mτs option == true.
+      # Makes ꜧ keyj accessible as mτj. If the hash keys collide with its
+      # methods, ArgumentError is raised, unless :overwrite_mτs option == true.
       def dot!( oo = {} )
         keys.each { |key|
           msg = "key #{key} of #dot!-ted ꜧ is not convertible to a ß"
@@ -254,11 +254,11 @@ module YSupport
       # #stripn is like #strip, but also strips newlines
       def stripn; encode(universal_newline: true).gsub("\n", "").strip end
       
-      # Joins paragraph of possibly indented, newline separated lines into a
-      # single contiguous ς.
+      # Joins a paragraph of possibly indented, newline separated lines into a
+      # single contiguous string.
       def compact
         encode(universal_newline: true).split("\n"). # split into lines
-          ᴍ(&:strip).delete_if(&:blank?).join(" ")   # strip and join lines
+          map( &:strip ).delete_if( &:blank? ).join " " # strip and join lines
       end
       
       # #default replaces an empty string (#empty?) with provided default
