@@ -100,7 +100,7 @@ module YSupport
         this_ɴspace = self.name
         this_ɴspace_path = this_ɴspace.underscore
         ɴspace_chain = this_ɴspace.split "::"
-        options.dℲ!( descending_path: '..', ascending_path_prefix: 'lib' )
+        options.default!( descending_path: '..', ascending_path_prefix: 'lib' )
         descending_path = options[:descending_path]
         ascending_path_prefix = options[:ascending_path_prefix]
         ascending_path = ascending_path_prefix + '/' + this_ɴspace_path
@@ -112,9 +112,9 @@ module YSupport
       end
       
       # I didn't write this method by myself
-      def attr_accessor_w_dℲ *ßs, &block
+      def attr_accessor_withe_default *symbols, &block
         raise 'Default value in block required' unless block
-        ßs.each { |ß|
+        symbols.each { |ß|
           module_eval {
             attr_writer ß
             define_method ß do
@@ -195,30 +195,59 @@ module YSupport
       alias :default! :reverse_merge!
       
       # Applies a block as a mapping on all keys, returning a new hash
-      def with_keys; keys.ew◉(ç.new) {|k, ꜧ| ꜧ[yield k] = self[k] } end
+      def with_keys
+        keys.each_with_object ç.new do |key, ꜧ|
+          ꜧ[yield k] = self[k]
+        end
+      end
       alias :do_with_keys :with_keys
       
       # The difference from do_with_keys is that modify_keys expects block
       # that takes 2 arguments (key: value pair) and returns the new key.
-      def modify_keys; ew◉(ç.new) {|pp, ꜧ| ꜧ[yield pp] = self[pp[0]] } end
+      def modify_keys
+        each_with_object ç.new do |pair, ꜧ|
+          ꜧ[yield pair] = self[pair[0]]
+        end
+      end
       
       # Applies a block as a mapping on all values, returning a new hash
-      def with_values; ew◉(ç.new) {|pp, ꜧ| ꜧ[pp[0]] = yield pp[1] } end
+      def with_values
+        each_with_object ç.new do |pair, ꜧ|
+          ꜧ[pair[0]] = yield pair[1]
+        end
+      end
       alias :do_with_values :with_values
       
       # Like #do_with_values, but modifies the receiver.
-      def with_values!; ew◉(self) {|pp, ꜧ| ꜧ[pp[0]] = yield pp[1] } end
+      def with_values!
+        each_with_object self do |pair, ꜧ|
+          ꜧ[pair[0]] = yield pair[1]
+        end
+      end
       alias :do_with_values! :with_values!
       
       # The difference from #do_with_values is that modify_values expects block
       # that takes 2 arguments (key: value pair) and returns the new value.
-      def modify_values; ew◉(ç.new) {|pp, ꜧ| ꜧ[pp[0]] = yield pp } end
+      def modify_values
+        each_with_object ç.new do |pair, ꜧ|
+          ꜧ[pair[0]] = yield pair
+        end
+      end
       
       # Like #modify_values, but modifies the receiver
-      def modify_values!; ew◉ self do |pp, ꜧ| ꜧ[pp[0]] = yield pp end end
+      def modify_values!
+        each_with_object self do |pair, ꜧ|
+          ꜧ[pair[0]] = yield pair
+        end
+      end
 
       # Like #map that returns a hash.
-      def modify; ew◉(ç.new) {|pp, ꜧ| k, v = yield pp; ꜧ[k] = v } end
+      def modify
+        each_with_object ç.new do |pair, ꜧ|
+          key, val = yield pair
+          ꜧ[key] = val
+        end
+      end
       
       # Makes ꜧ keyj accessible as mτj. If the hash keys collide with its
       # methods, ArgumentError is raised, unless :overwrite_mτs option == true.
