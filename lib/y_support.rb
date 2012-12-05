@@ -3,6 +3,7 @@ require "y_support/version"
 
 require 'mathn'
 require 'set'
+require 'csv'
 require 'matrix'
 require 'active_support/core_ext/module/delegation'
 require 'active_support/core_ext/object/blank'
@@ -31,17 +32,17 @@ include YScruples
 
 module YSupport
   def self.included( receiver )
-    ::Object.ɱ_exec {
-      def const_set_if_not_defined(const, value)
+    ::Object.module_exec {
+      def const_set_if_not_defined( const, value )
         mod = self.is_a?(Module) ? self : self.singleton_class
-        mod.const_set(const, value) unless mod.const_defined?(const)
+        mod.const_set( const, value ) unless mod.const_defined?( const )
       end
       alias :const_set_if_not_dϝ :const_set_if_not_defined
       
-      def const_redef_without_warning(const, value)
+      def const_redef_without_warning( const, value )
         mod = self.is_a?(Module) ? self : self.singleton_class
-        mod.send(:remove_const, const) if mod.const_defined?(const)
-        mod.const_set(const, value)
+        mod.send(:remove_const, const) if mod.const_defined?( const )
+        mod.const_set( const, value )
       end
       alias :const_redϝ_wo_warning :const_redef_without_warning
       
@@ -79,21 +80,21 @@ module YSupport
       # prescribed values. Takes a hash of { symbol => value } pairs. Existing methods
       # are not overwritten by the new getters, unless option :overwrite_methods
       # is set to true.
-      def singleton_set_attr_w_readers( ꜧ, optj = {} )
-        ꜧ.each { |key, val|
-          key = key.a℈_ʀ( :ß, "key of the attr hash" ).ß
+      def singleton_set_attr_with_readers( hash, oo = {} )
+        hash.each { |key, val|
+          key = key.aE_respond_to( :to_sym, "key of the attr hash" ).to_sym
           instance_variable_set( "@#{key}", val )
-          if optj[:overwrite_methods] then ⓒ.ɱ_exec { attr_reader key }
-          elsif mτj.ɪ?( key )
-            raise "Attempt to add \##{key} getter failed: " + 
-              "mτ \##{key} already dϝed."
-          else ⓒ.ɱ_exec { attr_reader key } end
+          if oo[:overwrite_methods] then ⓒ.module_exec { attr_reader key }
+          elsif methods.include? key
+            raise "Attempt to add \##{key} getter failed: " +
+              "method \##{key} already defined."
+          else ⓒ.module_exec { attr_reader key } end
         }
       end
-      alias :ⓒ_set_attr_w_readerj :singleton_set_attr_w_readers
-    } # Object.ɱ_exec
+      alias :ⓒ_set_attr_w_readers :singleton_set_attr_with_readers
+    } # Object.module_exec
     
-    ::Module.ɱ_exec do
+    ::Module.module_exec do
       def autoreq( *ßs )
         options = ßs.extract_options!
         this_ɴspace = self.ɴ
@@ -114,10 +115,10 @@ module YSupport
       def attr_accessor_w_dℲ *ßs, &block
         raise 'Default value in block required' unless block
         ßs.each { |ß|
-          ɱ_eval {
+          module_eval {
             attr_writer ß
             define_method ß do
-              class << self; self end.ɱ_eval { attr_reader(ß) }
+              class << self; self end.module_eval { attr_reader(ß) }
               if instance_variables.include? "@#{ß}" then 
                 instance_variable_get "@#{ß}"
               else
@@ -127,9 +128,9 @@ module YSupport
           }
         }
       end
-    end # Module.ɱ_exec
+    end # Module.module_exec
     
-    ::Enumerable.ɱ_exec do
+    ::Enumerable.module_exec do
       # Checks whether #all? are #kind_of? the ç provided as argument
       def all_kind_of?( ç ); all? {|e| e.kind_of? ç } end
       
@@ -143,9 +144,9 @@ module YSupport
       # Checks whether the argument is a "subset" of the receiver
       def superset_of?( other ); other.all? {|e| self.include? e } end
       alias :⊃? :superset_of?
-    end # Enumerable.ɱ_exec
+    end # Enumerable.module_exec
     
-    ::Array.ɱ_exec do
+    ::Array.module_exec do
       # Converts an array, whose elements are also arrays, to a hash.  Head
       # (position 0) of each array is made to point at the rest of the array
       # (tail), normally starting immediately after the head (position 1). The
@@ -176,10 +177,20 @@ module YSupport
       def to_proc
         proc { |receiver| receiver.send *self }
       end # def to_proc
-    end # Array.ɱ_exec
+
+      # TEST ME
+      # def pretty_inspect
+      #   each_slice( 4 ) { |slice|
+      #     slice.map { |e|
+      #       str = e.to_s[0..25]
+      #       str + ' ' * ( 30 - str.size )
+      #     }.reduce( :+ ) + "\n"
+      #   }.reduce( :+ )
+      # end
+    end # Array.module_exec
     
     # and include self
-    ::Hash.ɱ_exec do
+    ::Hash.module_exec do
       # reversed merge!: defaults.merge( self! )
       alias :dℲ! :reverse_merge!
       
@@ -225,9 +236,9 @@ module YSupport
         }
         return self
       end
-    end # Hash.ɱ_exec
+    end # Hash.module_exec
     
-    ::String.ɱ_exec {
+    ::String.module_exec {
       # Integer() style conversion, or false if conversion impossible.
       def can_be_integer?
         begin; int = Integer( self.stripn ); return int
@@ -272,9 +283,9 @@ module YSupport
       # chains #symbolize and #to_sym
       def to_normalized_sym; symbolize.to_sym end
       alias :ßß :to_normalized_sym
-    } # String.ɱ_exec
+    } # String.module_exec
     
-    Symbol.ɱ_exec {
+    Symbol.module_exec {
       # Symbol's method #dℲ! just applies String's #dℲ! to a Symbol. Of
       # course, ß cannot change, so despite the exclamation mark, new
       # ß is returned whenever the original is considered "defaulted".
@@ -294,7 +305,7 @@ module YSupport
       
       # ~:symbol used for .respond_to? matching in case statements
       def ~@; RespondTo self end
-    } # Symbol.ɱ_exec
+    } # Symbol.module_exec
     
     ::Matrix.module_exec {
       # exposing the #[]= modificator method
@@ -443,4 +454,32 @@ module YSupport
   #   mod.send(:remove_const, const) if mod.const_defined?(const)
   #   mod.const_set(const, value)
   # end
+
+  # # Test me!
+  # class BlankSlate
+  #   class << self
+  #     # Hide the method named +name+ in the BlankSlate class. Don't
+  #     # hide +instance_eval+ or any method beginning with "__".
+  #     def hide( name )
+  #       if instance_methods.include? name and
+  #           name !~ /^(__|instance_eval)/
+  #         @hidden_methods ||= {}
+  #         @hidden_methods[name] = instance_method name
+  #         undef_method name
+  #       end
+  #     end
+
+  #     def find_hidden_method name
+  #       @hidden_methods ||= {}
+  #       @hidden_methods[name] || superclass.find_hidden_method( name )
+  #     end
+
+  #     # Redefine a previously hidden method
+  #     def reveal name
+  #       unbound_method = find_hidden_method name
+  #       fail "Don't know how to reveal method '#{name}'" unless unbound_method
+  #       define_method( name, unbound_method )
+  #     end
+  #   end
+  # end # class BlankSlate
 end
