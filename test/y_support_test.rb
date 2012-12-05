@@ -140,9 +140,9 @@ class YSupportTest < Test::Unit::TestCase
       assert_equal defaults, result
       assert_equal result.object_id, test.object_id
       test = { a: 11, b: 22 }
-      assert_equal( { a: 11, b: 22 }, test.dℲ!( defaults ) )
+      assert_equal( { a: 11, b: 22 }, test.default!( defaults ) )
       test = { a: 11, c: 22 }
-      assert_equal( { a: 11, b: nil, c: 22 }, test.dℲ!( defaults ) )
+      assert_equal( { a: 11, b: nil, c: 22 }, test.default!( defaults ) )
     end
     
     should "have #with_keys and #modify_keys" do
