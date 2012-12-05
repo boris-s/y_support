@@ -136,7 +136,7 @@ class YSupportTest < Test::Unit::TestCase
     should "have #dℲ! custom defaulter" do
       defaults = { a: 1, b: nil }
       test = {}
-      result = test.dℲ!( defaults )
+      result = test.default!( defaults )
       assert_equal defaults, result
       assert_equal result.object_id, test.object_id
       test = { a: 11, b: 22 }
@@ -179,7 +179,7 @@ class YSupportTest < Test::Unit::TestCase
     should "have #dot! meta patcher for dotted access to keys" do
       h = Hash.new.merge!(aaa: 1, taint: 2)
       assert_raise ArgumentError do h.dot! end
-      assert_nothing_raised do h.dot!( overwrite_mτs: true ) end
+      assert_nothing_raised do h.dot!( overwrite_methods: true ) end
       assert_equal( {aaa: 1}, {aaa: 1}.dot! )
     end
   end # context Hash

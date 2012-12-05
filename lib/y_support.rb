@@ -222,7 +222,7 @@ module YSupport
       # Like #do_with_values, but modifies the receiver.
       def with_values!
         each_with_object self do |hash_pair, ꜧ|
-          hash_kay, hash_val = hash_pair
+          hash_key, hash_val = hash_pair
           ꜧ[ hash_key ] = yield( hash_val )
         end
       end
