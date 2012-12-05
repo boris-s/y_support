@@ -249,20 +249,29 @@ module YSupport
         end
       end
       
-      # Makes ꜧ keyj accessible as mτj. If the hash keys collide with its
-      # methods, ArgumentError is raised, unless :overwrite_mτs option == true.
+      # Makes hash keys accessible as methods. If the hash keys collide with
+      # its methods, ArgumentError is raised, unless :overwrite_methods
+      # option == true.
+      # 
       def dot!( oo = {} )
-        keys.each { |key|
-          msg = "key #{key} of #dot!-ted ꜧ is not convertible to a ß"
-          raise ArgumentError, msg unless key.respond_to? :to_ß
-          unless oo[:overwrite_mτs]
-            if methods.include? key.to_ß
-              raise ArgumentError, "#dot!-ted ꜧ must not have key ɴs colliding w its mτs"
+        keys.each do |key|
+          msg = "key #{key} of #dot!-ted hash is not convertible to a symbol"
+          raise ArgumentError, msg unless key.respond_to? :to_sym
+          unless oo[:overwrite_methods]
+            if methods.include? key.to_sym
+              raise ArgumentError, "#dot!-ted hash must not have key names " +
+                "colliding with its methods"
             end
           end
-          dϝ_ⓒ_mτ key.to_ß do self[key] end
-          dϝ_ⓒ_mτ "#{key}=".to_ß do |value| self[key] = value end
-        }
+
+          define_singleton_method key.to_sym do
+            self[key]
+          end
+
+          define_singleton_method "#{key}=".to_sym do |value|
+            self[key] = value
+          end
+        end
         return self
       end
     end # Hash.module_exec
