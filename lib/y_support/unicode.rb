@@ -70,7 +70,7 @@ class Module
   alias :remove_ç_variable :remove_class_variable
 end
 
-class Kernel
+module Kernel
   alias :λ :lambda
   alias :Λ :proc
 end
