@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+#encoding: utf-8
+
 class Hash
   # Merges the synonymous hash keys into a single main key - useful for
   # argument passing and validation.  Returns nil if neither main key,
@@ -36,7 +37,7 @@ class Hash
       yield self[key] if block_given?
     return self[key] end
   alias :must_have :aE_has
-  alias :a℈_has :aE_has if USE_SCRUPLE
+  alias :a℈_has :aE_has if ::YSupport::USE_SCRUPLE
   alias :aE_∋ :aE_has
-  alias :a℈_∋ :aE_has if USE_SCRUPLE
+  alias :a℈_∋ :aE_has if ::YSupport::USE_SCRUPLE
 end

@@ -22,3 +22,7 @@ require 'active_support/core_ext/hash/except'
 require 'active_support/core_ext/hash/keys'
 require 'active_support/core_ext/hash/slice'
 require 'active_support/core_ext/hash/indifferent_access'
+
+module YSupport
+  USE_SCRUPLE = true
+end

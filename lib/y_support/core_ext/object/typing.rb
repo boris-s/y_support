@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 class Object
-  USE_SCRUPLE = true
-
   # Alias for ArgumentError
   AE = ArgumentError
   # Alias for ArgumentError
-  A℈ = ArgumentError if USE_SCRUPLE
+  A℈ = ArgumentError if ::YSupport::USE_SCRUPLE
 
   # Class compliance inquirer.
   def declares_module_compliance?( mod )
@@ -58,7 +56,7 @@ class Object
     end
     return self
   end
-  alias :a℈ :aE if USE_SCRUPLE
+  alias :a℈ :aE if ::YSupport::USE_SCRUPLE
   
   # Fails if the receiver fulfills the criterion supplied in a block.
   def aE_not( how_comply = "comply", what_is_receiver = "object", &b )
@@ -70,34 +68,34 @@ class Object
     end
     return self
   end
-  alias :a℈_not :aE_not if USE_SCRUPLE
+  alias :a℈_not :aE_not if ::YSupport::USE_SCRUPLE
   
   # Fails unless the receiver complies
   def aE_kind_of( ç, what_is_receiver = "object" )
     raise AE, "#{what_is_receiver} is not a kind of #{ç}" unless
       self.kind_of? ç
     return self end
-  alias :a℈_kind_of :aE_kind_of if USE_SCRUPLE
+  alias :a℈_kind_of :aE_kind_of if ::YSupport::USE_SCRUPLE
   alias :aE_is_a :aE_kind_of
-  alias :a℈_is_a :aE_kind_of if USE_SCRUPLE
+  alias :a℈_is_a :aE_kind_of if ::YSupport::USE_SCRUPLE
   
   # Fails unless the receiver complies
   def aE_module_compliance( ɱ, what_is_receiver = "object" )
     raise AE, "#{what_is_receiver} declares not compliance to :#{ɱ}" unless
       self.∈? ɱ
     return self end
-  alias :a℈_module_compliance :aE_module_compliance if USE_SCRUPLE
+  alias :a℈_module_compliance :aE_module_compliance if ::YSupport::USE_SCRUPLE
   alias :aE_ɱ_compliance :aE_module_compliance
-  alias :a℈_ɱ_compliance :aE_module_compliance if USE_SCRUPLE
+  alias :a℈_ɱ_compliance :aE_module_compliance if ::YSupport::USE_SCRUPLE
   alias :aE_∈ :aE_module_compliance
-  alias :a℈_∈ :aE_module_compliance if USE_SCRUPLE
+  alias :a℈_∈ :aE_module_compliance if ::YSupport::USE_SCRUPLE
   
   # Fails unless the receiver complies
   def aE_respond_to( mt_sym, what_is_receiver = "object" )
     raise AE, "#{what_is_receiver} responds not to \##{mt_sym}" unless
       self.respond_to? mt_sym.to_sym
     return self end
-  alias :a℈_respond_to :aE_respond_to if USE_SCRUPLE
+  alias :a℈_respond_to :aE_respond_to if ::YSupport::USE_SCRUPLE
   
   # Fails unless the receiver complies
   def aE_equal( other, what_is_receiver = "object",
@@ -105,7 +103,7 @@ class Object
     raise AE, "#{what_is_receiver} not == to #{what_is_other}" unless
       self == other
     return self end
-  alias :a℈_equal :aE_equal if USE_SCRUPLE
+  alias :a℈_equal :aE_equal if ::YSupport::USE_SCRUPLE
   
   # Fails unless the receiver complies
   def aE_not_equal( other, what_is_receiver = "object",
@@ -113,25 +111,25 @@ class Object
     raise AE, "#{what_is_receiver} must not == to #{what_is_other}" if
       self == other
     return self end
-  alias :a℈_not_equal :aE_not_equal if USE_SCRUPLE
+  alias :a℈_not_equal :aE_not_equal if ::YSupport::USE_SCRUPLE
   
   # Fails unless the receiver complies
   def aE_blank( what_is_receiver = "object" )
     raise AE, "#{what_is_receiver} must be \#blank?" unless self.blank?
     return self end
-  alias :a℈_blank :aE_blank if USE_SCRUPLE
+  alias :a℈_blank :aE_blank if ::YSupport::USE_SCRUPLE
   
   # Fails unless the receiver complies
   def aE_not_blank( what_is_receiver = "object" )
     raise AE, "#{what_is_receiver} must not be \#blank?" if self.blank?
     return self end
-  alias :a℈_not_blank :aE_not_blank if USE_SCRUPLE
+  alias :a℈_not_blank :aE_not_blank if ::YSupport::USE_SCRUPLE
   
   # Fails unless the receiver complies
   def aE_present( what_is_receiver = "object" )
     raise AE, "#{what_is_receiver} must be \#present?" unless self.present?
     return self end
-  alias :a℈_present :aE_present if USE_SCRUPLE
+  alias :a℈_present :aE_present if ::YSupport::USE_SCRUPLE
   
   # Fails unless the receiver has prescribed attribute reader
   def aE_has_attr_reader( y, what_is_receiver = "object" )
@@ -148,5 +146,5 @@ class Object
       instance_variable_set "@#{y}", m
     end
     return self end
-  alias :a℈_has_attr_reader :aE_has_attr_reader if USE_SCRUPLE
+  alias :a℈_has_attr_reader :aE_has_attr_reader if ::YSupport::USE_SCRUPLE
 end
