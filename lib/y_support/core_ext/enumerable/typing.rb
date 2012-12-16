@@ -1,47 +1,50 @@
 # -*- coding: utf-8 -*-
 class Module
-  # Fails unless all the collection member comply
-  def aE_all( what_is_receiver = "collection" )
-    raise AE, "#{what_is_receiver} must all comply" unless
+  # Fails with ArgumentError unless all the collection member comply
+  # with the supplied block (true/false output).
+  # 
+  def aE_all( what_is_receiver_txt = "collection" )
+    raise AE, "#{what_is_receiver_txt} must all comply" unless
       all? {|e| yield e }
-    return self end
-  alias :a℈_all :aE_all if USE_SCRUPLE
+    return self
+  end
+
+  # Fails with ArgumentError unless all collection members are #kind_of?
+  # 
+  def aE_all_kind_of( kind, what_is_receiver_txt = "collection" )
+    raise AE, "#{what_is_receiver txt} must all be #kind_of? " +
+      "#{mod}:#{mod.class}" if any? {|e| ! e.kind_of? kind }
+    return self
+  end
+  alias :aE_all_a :aE_all_kind_of
+
+  # Fails with ArgumentError unless all collection members declare class
+  # compliance with specified class/module.
+  # 
+  def aE_all_declare_kind_of( kind, what_is_receiver_txt = "collection" )
+    raise AE, "#{what_is_receiver_txt} must all module-comply to #{mod}" unless
+      all? {|e| e.declares_module_compliance? kind }
+    return self
+  end
+  alias :aE_all_declare_class :aE_all_declare_kind_of
+  alias :aE_all_declare_ç :aE_all_declare_kind_of
   
-  def aE_all_kind_of( mod, what_is_receiver = "collection" )
-    raise AE, "#{what_is_receiver} must all be #kind_of? #{mod}:#{mod.class}" if
-      not all? {|e| e.kind_of? mod }
-    return self end
-  alias :a℈_all_kind_of :aE_all_kind_of if USE_SCRUPLE
-  alias :a℈_all_a :a℈_all_kind_of
-  
-  def aE_all_module_comply( mod, what_is_receiver = "collection" )
-    raise AE, "#{what_is_receiver} must all module-comply to #{mod}" unless
-      all? {|e| e.declares_module_compliance? mod }
-    return self end
-  alias :a℈_all_module_comply :aE_all_module_comply if USE_SCRUPLE
-  alias :aE_all_ɱ_comply :aE_all_module_comply
-  alias :a℈_all_ɱ_comply :aE_all_module_comply if USE_SCRUPLE
-  alias :aE_all_∈ :aE_all_module_comply
-  alias :a℈_all_∈ :aE_all_module_comply if USE_SCRUPLE
-  alias :aE_all_E :aE_all_module_comply
-  alias :a℈_all_E :aE_all_module_comply if USE_SCRUPLE
-  
-  # Fails unless the collection members are #all_numeric?
-  def aE_all_numeric( what_is_receiver = "collection" )
-    raise AE, "#{what_is_receiver} must be all numeric" unless
+  # Fails unless the collection members all declare compliance with Numeric.
+  # 
+  def aE_all_numeric( what_is_receiver_txt = "collection" )
+    raise AE, "#{what_is_receiver_txt} must be all numeric" unless
       all? {|e| e.kind_of? Numeric }
-    return self end
-  alias :a℈_all_numeric :aE_all_numeric if USE_SCRUPLE
+    return self
+  end
   
-  # Fails unless the collection is a subset of the argument
-  def aE_subset_of( other, what_is_receiver = "collection",
-                    what_is_argument = "the other collection" )
-    unless all? {|e| other.include? e }
-      msg = "#{what_is_receiver} must be a subset of #{what_is_argument}"
-      raise AE, msg
-    end
-    return self end
-  alias :a℈_subset_of :aE_subset_of if USE_SCRUPLE
+  # Fails unless the collection is a subset of the argument.
+  # 
+  def aE_subset_of other_collection,
+                   what_is_receiver_txt = "collection",
+                   what_is_other_collection_txt = "the required collection"
+    raise AE, "#{what_is_receiver_txt} must be a subset of " +
+      "#{what_is_other_collection_txt}" unless all? {|e| other.include? e }
+    return self
+  end
   alias :aE_⊂ :aE_subset_of
-  alias :a℈_⊂ :aE_subset_of if USE_SCRUPLE
 end
