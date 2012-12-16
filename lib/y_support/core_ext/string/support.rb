@@ -1,5 +1,6 @@
-# -*- coding: utf-8 -*-
-class Hash
+#encoding: utf-8
+
+class String
   # Integer() style conversion, or false if conversion impossible.
   def can_be_integer?
     begin; int = Integer( self.stripn ); return int

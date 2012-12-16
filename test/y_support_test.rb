@@ -131,7 +131,7 @@ class YSupportTest < Test::Unit::TestCase
   end # context Array
 
   context "Hash" do
-    should "have #dℲ! custom defaulter" do
+    should "have #default! custom defaulter" do
       defaults = { a: 1, b: nil }
       test = {}
       result = test.default!( defaults )
