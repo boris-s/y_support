@@ -442,107 +442,107 @@ class ScruplesTest < Test::Unit::TestCase
       assert_nothing_raised do 3.aE_not &:even? end
       assert_raise AE do 2.aE_not &:even? end
       assert_raise AE do "".aE_not end
-      assert_raise A℈ do "".a℈_not end # noting #a℈_not alias
+      assert_raise AE do "".aE_not end # noting #aE_not alias
     end
     
-    should "have #a℈_kind_of, alias #a℈_is_a A℈ enforcers" do
-      assert_raise A℈ do :o.a℈_kind_of Numeric end
-      assert_nothing_raised do 0.a℈_kind_of Numeric end
-      assert_equal( "hello", "hello".a℈_kind_of( String ) )
-      assert_raise A℈ do :o.a℈_is_a Numeric end
-      assert_nothing_raised do 0.a℈_is_a Numeric end
-      assert_equal( "hello", "hello".a℈_is_a( String ) )
+    should "have #aE_kind_of, alias #aE_is_a AE enforcers" do
+      assert_raise AE do :o.aE_kind_of Numeric end
+      assert_nothing_raised do 0.aE_kind_of Numeric end
+      assert_equal( "hello", "hello".aE_kind_of( String ) )
+      assert_raise AE do :o.aE_is_a Numeric end
+      assert_nothing_raised do 0.aE_is_a Numeric end
+      assert_equal( "hello", "hello".aE_is_a( String ) )
     end
     
-    should "have #a℈_class_compliance, alias #a℈_∈ enforcer" do
+    should "have #aE_class_compliance, alias #aE_∈ enforcer" do
       Koko = Class.new; Pipi = Class.new
       koko = Koko.new; pipi = Pipi.new
       pipi.∈! koko.class.name.to_sym
-      assert_raise A℈ do koko.a℈_∈ pipi.class.name.to_sym end
-      assert_nothing_raised do koko.a℈_∈ koko.class.name.to_sym end
-      assert_nothing_raised do pipi.a℈_∈ pipi.class.name.to_sym end
-      assert_nothing_raised do pipi.a℈_∈ koko.class.name.to_sym end
-      assert_raise A℈ do koko.a℈_∈ Pipi end
-      assert_nothing_raised do pipi.a℈_∈ Pipi end
-      assert_nothing_raised do pipi.a℈_∈ Koko end
-      assert_equal koko, koko.a℈_∈( Koko )
+      assert_raise AE do koko.aE_∈ pipi.class.name.to_sym end
+      assert_nothing_raised do koko.aE_∈ koko.class.name.to_sym end
+      assert_nothing_raised do pipi.aE_∈ pipi.class.name.to_sym end
+      assert_nothing_raised do pipi.aE_∈ koko.class.name.to_sym end
+      assert_raise AE do koko.aE_∈ Pipi end
+      assert_nothing_raised do pipi.aE_∈ Pipi end
+      assert_nothing_raised do pipi.aE_∈ Koko end
+      assert_equal koko, koko.aE_∈( Koko )
       # passing mention of the alias
-      assert_equal koko, koko.a℈_ɱ_compliance( Koko )
+      assert_equal koko, koko.aE_ɱ_compliance( Koko )
     end
     
-    should "have #a℈_respond_to enforces" do
-      assert_raise A℈ do :o.a℈_respond_to :each end
-      assert_nothing_raised do {}.a℈_respond_to :each end
-      assert_equal( [:hello], [:hello].a℈_respond_to( :each ) )
+    should "have #aE_respond_to enforces" do
+      assert_raise AE do :o.aE_respond_to :each end
+      assert_nothing_raised do {}.aE_respond_to :each end
+      assert_equal( [:hello], [:hello].aE_respond_to( :each ) )
     end
     
-    should "have #a℈_equal, alias #a℈= enforcer" do
-      assert_raise A℈ do 0.a℈_equal 1 end
-      assert_nothing_raised do 1.a℈_equal 2.0/2.0 end
-      assert_equal( "hello", "hello".a℈_equal( " hello ".strip ) )
+    should "have #aE_equal, alias #aE= enforcer" do
+      assert_raise AE do 0.aE_equal 1 end
+      assert_nothing_raised do 1.aE_equal 2.0/2.0 end
+      assert_equal( "hello", "hello".aE_equal( " hello ".strip ) )
     end
     
-    should "have #a℈_not_equal enforcer" do
-      assert_raise A℈ do 1.a℈_not_equal 1.0 end
-      assert_nothing_raised do 7.a℈_not_equal 42 end
-      assert_equal( "hello", "hello".a℈_not_equal( "goodbye" ) )
+    should "have #aE_not_equal enforcer" do
+      assert_raise AE do 1.aE_not_equal 1.0 end
+      assert_nothing_raised do 7.aE_not_equal 42 end
+      assert_equal( "hello", "hello".aE_not_equal( "goodbye" ) )
     end
     
-    should "have #a℈_blank enforcer" do
-      assert_raise A℈ do "x".a℈_blank end
-      assert_nothing_raised do ["", []].each{|e| e.a℈_blank } end
-      assert_equal( {}, {}.a℈_blank )
+    should "have #aE_blank enforcer" do
+      assert_raise AE do "x".aE_blank end
+      assert_nothing_raised do ["", []].each{|e| e.aE_blank } end
+      assert_equal( {}, {}.aE_blank )
     end
     
-    should "have #a℈_not_blank enforcer" do
-      assert_raise A℈ do nil.a℈_not_blank end
-      assert_nothing_raised do 0.a℈_not_blank end
-      assert_equal( "hello", "hello".a℈_not_blank )
+    should "have #aE_not_blank enforcer" do
+      assert_raise AE do nil.aE_not_blank end
+      assert_nothing_raised do 0.aE_not_blank end
+      assert_equal( "hello", "hello".aE_not_blank )
     end
     
-    should "have #a℈_present enforcer" do
-      assert_raise A℈ do nil.a℈_present end
-      assert_nothing_raised do 0.a℈_present end
-      assert_equal( "hello", "hello".a℈_present )
+    should "have #aE_present enforcer" do
+      assert_raise AE do nil.aE_present end
+      assert_nothing_raised do 0.aE_present end
+      assert_equal( "hello", "hello".aE_present )
     end
     
-    should "have #a℈_has_attr_reader enforcer" do
-      assert_raise A℈ do
-        Object.new.a℈_has_attr_reader :nonexisting_attribute end
+    should "have #aE_has_attr_reader enforcer" do
+      assert_raise AE do
+        Object.new.aE_has_attr_reader :nonexisting_attribute end
       assert_nothing_raised do
         class XXX; attr_reader :someattr end
         x = XXX.new
-        x.a℈_has_attr_reader :someattr
+        x.aE_has_attr_reader :someattr
       end
       x = XXX.new
-      assert_equal( x, x.a℈_has_attr_reader(:someattr) )
+      assert_equal( x, x.aE_has_attr_reader(:someattr) )
     end
   end # context Object
   
   context "Enumerable" do
-    should "have #a℈_all enforcer" do
-      assert_raise A℈ do [1, 2, 7].a℈_all{|e| e < 5 } end
-      assert_nothing_raised do [1, 2, 4].a℈_all{|e| e < 5 } end
+    should "have #aE_all enforcer" do
+      assert_raise AE do [1, 2, 7].aE_all{|e| e < 5 } end
+      assert_nothing_raised do [1, 2, 4].aE_all{|e| e < 5 } end
     end
 
-    should "have #a℈_all_kind_of enforcer" do
-      assert_raise A℈ do [1.0, 2.0, :a].a℈_all_kind_of Numeric end
-      assert_nothing_raised do [1.0, 2.0, 3].a℈_all_kind_of Numeric end
+    should "have #aE_all_kind_of enforcer" do
+      assert_raise AE do [1.0, 2.0, :a].aE_all_kind_of Numeric end
+      assert_nothing_raised do [1.0, 2.0, 3].aE_all_kind_of Numeric end
     end
 
-    should "have #a℈_all_ɱ_comply enforcer" do
-      assert_raise A℈ do [1.0, 2.0, :a].a℈_all_ɱ_comply Numeric end
-      assert_nothing_raised do [1.0, 2.0, 3].a℈_all_ɱ_comply Numeric end
+    should "have #aE_all_declare_kind_of class compliance enforcer" do
+      assert_raise AE do [1.0, 2.0, :a].aE_all_declare_kind_of Numeric end
+      assert_nothing_raised do [1.0, 2.0, 3].aE_all_declare_class Numeric end
     end
 
-    should "have #a℈_all_numeric enforcer" do
-      assert_raise A℈ do [:a].a℈_all_numeric end
-      assert_nothing_raised do [1, 2.0].a℈_all_numeric end
+    should "have #aE_all_numeric enforcer" do
+      assert_raise AE do [:a].aE_all_numeric end
+      assert_nothing_raised do [1, 2.0].aE_all_numeric end
     end
     
-    should "have #a℈_subset_of enforcer" do
-      assert_raise A℈ do [6].a℈_subset_of [*0..5] end
-      assert_nothing_raised do [1,2].a℈_subset_of [*0..5] end
+    should "have #aE_subset_of enforcer" do
+      assert_raise AE do [6].aE_subset_of [*0..5] end
+      assert_nothing_raised do [1,2].aE_subset_of [*0..5] end
     end
   end # context Enumerable
 

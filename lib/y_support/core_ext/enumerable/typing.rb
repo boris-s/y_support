@@ -44,7 +44,8 @@ module Enumerable
                    what_is_receiver_txt = "collection",
                    what_is_other_collection_txt = "the required collection"
     raise AE, "#{what_is_receiver_txt} must be a subset of " +
-      "#{what_is_other_collection_txt}" unless all? {|e| other.include? e }
+      "#{what_is_other_collection_txt}" unless
+      all? {|e| other_collection.include? e }
     return self
   end
   alias :aE_⊂ :aE_subset_of
