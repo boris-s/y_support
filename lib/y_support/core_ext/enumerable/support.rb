@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+#encoding: utf-8
+
 module Enumerable
   # Checks whether #all? collection elements are #kind_of? module
   # supplied as an argument

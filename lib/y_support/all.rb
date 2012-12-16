@@ -4,9 +4,7 @@ require 'y_support/unicode'
 require 'y_support/respond_to'
 require 'y_support/null_object'
 require 'y_support/local_object'
-puts "before core ext"
 puts require 'y_support/core_ext'
-puts "after core ext"
 require 'y_support/stdlib_ext'
 
 # *** DEVELOPMENT REMARKS FOLLOW ***
