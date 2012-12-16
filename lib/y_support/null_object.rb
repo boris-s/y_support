@@ -51,19 +51,19 @@ class NullObject
 
   # Always an empty array.
   # 
-  def to_a; []; end
+  def to_a; [] end
 
   # Description string ('null something', or simply 'null').
   # 
-  def to_s; "null #{what}".strip; end
+  def to_s; "null #{null_object_type}".strip end
 
   # Always Float zero.
   # 
-  def to_f; 0.0; end
+  def to_f; 0.0 end
 
   # Always Integer zero.
   # 
-  def to_i; 0; end
+  def to_i; 0 end
 
   # Always false.
   # 
@@ -78,7 +78,7 @@ class NullObject
   def blank?; true end
 
   def inspect                        # :nodoc:
-    "NullObject #{what}".strip
+    "NullObject #{null_object_type}".strip
   end
 
   def method_missing ß, *aj, &b      # :nodoc:
