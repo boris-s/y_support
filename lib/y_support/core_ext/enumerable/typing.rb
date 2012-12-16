@@ -13,7 +13,7 @@ module Enumerable
   # Fails with ArgumentError unless all collection members are #kind_of?
   # 
   def aE_all_kind_of( kind, what_is_receiver_txt = "collection" )
-    raise AE, "#{what_is_receiver txt} must all be #kind_of? " +
+    raise AE, "#{what_is_receiver_txt} must all be #kind_of? " +
       "#{mod}:#{mod.class}" if any? {|e| ! e.kind_of? kind }
     return self
   end
