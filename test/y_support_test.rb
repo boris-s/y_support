@@ -5,9 +5,8 @@ require 'test/unit'
 require 'shoulda'
 require 'minitest/spec'
 require 'minitest/autorun'
-# require './../lib/y_support'
-require 'y_support'
-include YSupport
+require './../lib/y_support/all'
+# require 'y_support/all'
 
 class YSupportTest < Test::Unit::TestCase
   context "Object" do
@@ -289,14 +288,6 @@ class YSupportTest < Test::Unit::TestCase
       assert_equal 2, Matrix.zero(3, 2).number_of_columns
     end
   end # context Matrix
-  
-  context "Vector" do
-    require 'matrix'
-    should "have #zero class method returning a vector of zeros" do
-      assert_equal Vector[ 0, 0, 0 ], Vector.zero(3)
-      assert_equal Vector[], Vector.zero(0)
-    end
-  end # context Vector
   
   context "String" do
     should "have #can_be_integer? returning the integer or false if not convertible" do
