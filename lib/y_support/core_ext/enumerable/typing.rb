@@ -23,7 +23,7 @@ module Enumerable
   # compliance with specified class/module.
   # 
   def aE_all_declare_kind_of( kind, what_is_receiver_txt = "collection" )
-    raise AE, "#{what_is_receiver_txt} must all module-comply to #{mod}" unless
+    raise AE, "#{what_is_receiver_txt} must all module-comply to #{kind}" unless
       all? {|e| e.declares_module_compliance? kind }
     return self
   end
