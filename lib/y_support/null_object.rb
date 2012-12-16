@@ -49,6 +49,14 @@ class NullObject
     @recorded_messages = []
   end
 
+  # Inquirer whether the object is NullObject. If type is specified, the
+  # method will only return true for null objects of that type.
+  # 
+  def null_object? null_type = nil
+    null_object_type == null_type
+  end
+  alias null? null_object?
+
   # Always an empty array.
   # 
   def to_a; [] end

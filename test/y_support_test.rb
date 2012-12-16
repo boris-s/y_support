@@ -194,9 +194,9 @@ class YSupportTest < Test::Unit::TestCase
       assert_respond_to NullObject.new, :arbitrary_message
       n = NullObject.new :x
       n.arbitrary_message( :a, :b ) { "hello" }
-      assert_equal :x, n.what
-      assert_equal [ :arbitrary_message, [:a, :b] ], n.recorded_msgj[0][0..1]
-      assert_equal "hello", n.recorded_msgj[0][2].call
+      assert_equal :x, n.null_object_type
+      assert_equal [ :arbitrary_message, [:a, :b] ], n.recorded_messages[0][0..1]
+      assert_equal "hello", n.recorded_messages[0][2].call
       assert_equal "NullObject kokotina", NullObject.new( :kokotina ).inspect
     end
     
@@ -211,9 +211,9 @@ class YSupportTest < Test::Unit::TestCase
       assert_respond_to InertRecorder.new, :arbitrary_message
       n = InertRecorder.new :x, :y
       n.arbitrary_message( :a, :b ) { "hello" }
-      assert_equal [:x, :y], n.init_argj
-      assert_equal [ :arbitrary_message, [:a, :b] ], n.recorded_msgj[0][0..1]
-      assert_equal "hello", n.recorded_msgj[0][2].call
+      assert_equal [:x, :y], n.init_args
+      assert_equal [ :arbitrary_message, [:a, :b] ], n.recorded_messages[0][0..1]
+      assert_equal "hello", n.recorded_messages[0][2].call
     end
     
     should "LocalObject exist and comply" do

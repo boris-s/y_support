@@ -13,9 +13,10 @@ class Object
   end
   alias :const_redϝ_wo_warning :const_redef_without_warning
   
-  def null_object?( what = nil )
-    is_a?( NullObject ) and  what.nil? ? true : self.what == what
-  end
+  # The inquirer whether the object is NullObject. NullObject overrides
+  # this method to return true when necessary.
+  # 
+  def null_object?( null_type = nil ); false end
   alias :null? :null_object?
   
   # Converts #nil?-positive objects to NullObjects. If 2 arguments
