@@ -1,6 +1,6 @@
 #encoding: utf-8
 
-class Enumerable
+module Enumerable
   # Fails with ArgumentError unless all the collection member comply
   # with the supplied block (true/false output).
   # 
