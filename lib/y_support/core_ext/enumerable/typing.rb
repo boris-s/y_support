@@ -14,7 +14,7 @@ module Enumerable
   # 
   def aE_all_kind_of( kind, what_is_receiver_txt = "collection" )
     raise AE, "#{what_is_receiver_txt} must all be #kind_of? " +
-      "#{mod}:#{mod.class}" if any? {|e| ! e.kind_of? kind }
+      "#{kind}:#{kind.class}" if any? {|e| ! e.kind_of? kind }
     return self
   end
   alias :aE_all_a :aE_all_kind_of
