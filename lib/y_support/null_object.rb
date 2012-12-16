@@ -82,7 +82,7 @@ class NullObject
   end
 
   def method_missing ß, *aj, &b      # :nodoc:
-    @recorded_msgj << [ ß, aj, b ]; self
+    @recorded_messages << [ ß, aj, b ]; self
   end
 
   def respond_to? ß, *aj, &b         # :nodoc:
