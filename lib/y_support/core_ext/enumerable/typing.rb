@@ -1,5 +1,6 @@
-# -*- coding: utf-8 -*-
-class Module
+#encoding: utf-8
+
+class Enumerable
   # Fails with ArgumentError unless all the collection member comply
   # with the supplied block (true/false output).
   # 
