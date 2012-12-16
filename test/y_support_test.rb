@@ -7,6 +7,34 @@ require 'minitest/spec'
 require 'minitest/autorun'
 require 'y_support/all'
 
+describe ::NameMagic do
+  before do
+    @ç = Class.new do include NameMagic end
+    @reporter = Object.new
+    @reporter.singleton_class.class_exec { attr_reader :report }
+    @ç.name_magic_hook do |instance|
+      @reporter.define_singleton_method :report do
+        "New instance report: #{instance.name}"
+      end
+    end
+  end
+  
+  it "should work" do
+    @ç.must_respond_to :const_magic
+    @ç.instances.must_be_empty
+    @ç.nameless_instances.must_be_empty
+    @reporter.report.must_equal nil
+    @ç.new( name: "Boris" )
+    @reporter.report.must_equal "New instance report: Boris"
+    ufo = @ç.new
+    @ç.nameless_instances.must_equal [ufo]
+    UFO = @ç.new
+    @reporter.report.must_equal "New instance report: UFO"
+    Elaine = @ç.new
+    Elaine.name.must_equal "Elaine"
+  end
+end
+
 class YSupportTest < Test::Unit::TestCase
   context "Object" do
     should "Object have const_set_if_not_defined" do

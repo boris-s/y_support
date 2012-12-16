@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'y_support'
+require 'y_support/name_magic'
 require 'y_support/unicode'
 require 'y_support/respond_to'
 require 'y_support/null_object'
