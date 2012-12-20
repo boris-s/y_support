@@ -42,6 +42,9 @@ module NameMagic
     ɴ = self.class.send :validate_name, name
     # get previous name of this instance, if any
     old_ɴ = name()
+    # honor the hook
+    naming_hook = self.class.instance_variable_get :@naming_hook
+    ɴ = naming_hook.call( self, ɴ, old_ɴ ) if naming_hook
     # do nothing if previous name same as the new one
     return if old_ɴ == ɴ
     # otherwise, continue by being cautious about name collisions
@@ -52,9 +55,6 @@ module NameMagic
     self.class.__instances__[ self ] = ɴ.to_sym
     # forget the old name
     self.class.forget old_ɴ
-    # and honor the hook
-    naming_hook = self.class.instance_variable_get :@naming_hook
-    naming_hook.call( self, ɴ, old_ɴ ) if naming_hook
   end
 
   # Names an instance, aggresively (overwrites existing names).
@@ -63,6 +63,9 @@ module NameMagic
     ɴ = self.class.send :validate_name, name
     # get previous name of this instance, if any
     old_ɴ = self.class.__instances__[ self ]
+    # honor the hook
+    naming_hook = self.class.instance_variable_get :@naming_hook
+    ɴ = naming_hook.call( self, ɴ, old_ɴ ) if naming_hook
     # do noting if previous name same as the new one
     return false if old_ɴ == ɴ
     # otherwise, continue by forgetting the colliding name, if any
@@ -73,9 +76,6 @@ module NameMagic
     self.class.__instances__[ self ] = ɴ.to_sym
     # forget the old name
     self.class.forget old_ɴ
-    # honor the hook
-    naming_hook = self.class.instance_variable_get :@naming_hook
-    naming_hook.call( self, ɴ, old_ɴ ) if naming_hook
     return true
   end
 
@@ -211,7 +211,11 @@ module NameMagic
     def new_instance_hook &block; @new_instance_hook = block end
 
     # Registers a hook to execute whenever naming is performed on an instance.
-    # The block should take three arguments (instance, name, old_name).
+    # The block should take three arguments (instance, name, old_name). The
+    # output value of the block is the name to be actually used – the hook
+    # thus allows to define transformations on the name when naming. It is the
+    # responsibility of the block to output a suitable symbol (capitalized,
+    # usable as a constant name etc.)
     # 
     def naming_hook &block; @naming_hook = block end
 
@@ -229,17 +233,16 @@ module NameMagic
           # is it a wanted object?
           if incriminated_ids.include? ◉.object_id then
             if @name_avid_instances.include? ◉ then # name avidly
-              @name_avid_instances.delete ◉
-              ◉.name! const_ß
+              @name_avid_instances.delete ◉ # make not avid first
+              ◉.name! const_ß               # and then name it rudely
             else # name this anonymous instance cautiously
-              raise NameError, "Name '#{const_ß}' already exists in " +
-                "#{self.class} namespace!" if
-                  __instances__[ ◉ ] || const_get( const_ß )
-              # if everything's ok., add the instance to the namespace
-              __instances__[ ◉ ] = const_ß
-              const_set const_ß, ◉
               # honor naming_hook
-              @naming_hook.call( ◉, const_ß, nil ) if @naming_hook
+              ɴ = @naming_hook.call( ◉, const_ß, nil ) if @naming_hook
+              raise NameError, "Name '#{ɴ}' already exists in #{self.class} " +
+                "namespace!" if __instances__[ ◉ ] || const_get( ɴ )
+              # if everything's ok., add the instance to the namespace
+              __instances__[ ◉ ] = ɴ
+              const_set ɴ, ◉
             end
             # and stop working in case there are no more unnamed instances
             incriminated_ids.delete ◉.object_id

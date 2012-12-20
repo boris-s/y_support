@@ -19,7 +19,7 @@ describe ::NameMagic do
     end
     @ç.naming_hook do |instance, name, old_name|
       @reporter.define_singleton_method :naming do
-        "New instance was named: #{name}"
+        name # compulsory - this block can be used to transform name
       end
     end
   end
@@ -30,11 +30,13 @@ describe ::NameMagic do
     @ç.nameless_instances.must_be_empty
     @reporter.report.must_equal nil
     @ç.new( name: "Boris" )
-    @reporter.report.must_equal "New instance report: Boris"
+    @reporter.report.must_equal "New instance reported"
+    @reporter.naming.must_equal :Boris
     ufo = @ç.new
     @ç.nameless_instances.must_equal [ufo]
     UFO = @ç.new
-    @reporter.report.must_equal "New instance report: UFO"
+    @reporter.report.must_equal "New instance reported"
+    @reporter.naming.must_equal :UFO
     Elaine = @ç.new
     Elaine.name.must_equal "Elaine"
   end
