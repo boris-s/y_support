@@ -420,11 +420,11 @@ class ScruplesTest < Test::Unit::TestCase
   end
 
   context "general" do
-    should "have A℈ alias for ArgumentError" do
-      assert_equal ::ArgumentError, ::A℈
+    should "have AE alias for ArgumentError" do
+      assert_equal ::ArgumentError, ::AE
     end
     
-    should "have #aE (#a℈) raising ArgumentError if block falsey" do
+    should "have #aE raising ArgumentError if block falsey" do
       assert_raise AE do 0.aE "yada yada" do self == 1 end end
       assert_nothing_raised do 0.aE "yada yada" do self == 0 end end
       assert_equal( "hello", "hello".aE( "have 4 unique letters" ) do
@@ -432,10 +432,9 @@ class ScruplesTest < Test::Unit::TestCase
       assert_nothing_raised do 2.aE &:even? end
       assert_raise AE do 3.aE &:even? end
       assert_raise AE do nil.aE end
-      assert_raise A℈ do nil.a℈ end  # noting #a℈ alias
     end
     
-    should "have #aE_not (alias #a℈_not) raising ArgumentError if block truey" do
+    should "have #aE_not raising ArgumentError if block truey" do
       assert_raise AE do 0.aE_not { self < 1 } end
       assert_nothing_raised do 1.aE_not { self == 2 } end
       assert_equal( "hello", "hello".aE_not( "have x" ) { include? 'x' } )
@@ -547,19 +546,19 @@ class ScruplesTest < Test::Unit::TestCase
   end # context Enumerable
 
   context "Array" do
-    should "have #a℈_has, alias #a℈_include, #℈_∋ enforcer" do
-      assert_respond_to [1, 2, 4], :a℈_has
-      assert_raise A℈ do [1, 2, 4].a℈_has 3 end
-      assert_nothing_raised do [1, 2, 4].a℈_has 4 end
-      assert_equal [6, 7], [6, 7].a℈_has( 6 )
-      assert_respond_to [1, 2, 4], :a℈_include
-      assert_raise A℈ do [1, 2, 4].a℈_include 3 end
-      assert_nothing_raised do [1, 2, 4].a℈_include 4 end
-      assert_equal [6, 7], [6, 7].a℈_include( 6 )
-      assert_respond_to [1, 2, 4], :a℈_∋
-      assert_raise A℈ do [1, 2, 4].a℈_∋ 3 end
-      assert_nothing_raised do [1, 2, 4].a℈_∋ 4 end
-      assert_equal [6, 7], [6, 7].a℈_∋( 6 )
+    should "have #aE_has, alias #aE_include, #aE_∋ enforcer" do
+      assert_respond_to [1, 2, 4], :aE_has
+      assert_raise AE do [1, 2, 4].aE_has 3 end
+      assert_nothing_raised do [1, 2, 4].aE_has 4 end
+      assert_equal [6, 7], [6, 7].aE_has( 6 )
+      assert_respond_to [1, 2, 4], :aE_include
+      assert_raise AE do [1, 2, 4].aE_include 3 end
+      assert_nothing_raised do [1, 2, 4].aE_include 4 end
+      assert_equal [6, 7], [6, 7].aE_include( 6 )
+      assert_respond_to [1, 2, 4], :aE_∋
+      assert_raise AE do [1, 2, 4].aE_∋ 3 end
+      assert_nothing_raised do [1, 2, 4].aE_∋ 4 end
+      assert_equal [6, 7], [6, 7].aE_∋( 6 )
     end
   end # context Array
 
@@ -575,7 +574,7 @@ class ScruplesTest < Test::Unit::TestCase
       assert_equal true, a.merge_synonym_keys!( :k, :o, :t )
       assert_equal( { a: 'a', b: 'b', k: 'k' }, a )
       old = a.dup
-      assert_raise A℈ do a.merge_synonym_keys!( :a, :b ) end
+      assert_raise AE do a.merge_synonym_keys!( :a, :b ) end
       assert_equal old, a
       assert_equal true, a.merge_synonym_keys!( :c, :b )
       assert_equal( { a: 'a', c: 'b', k: 'k' }, a )
@@ -588,8 +587,8 @@ class ScruplesTest < Test::Unit::TestCase
       old = a.dup
       assert_nothing_raised do a.may_have :z end
       assert_nothing_raised do a.∋? :z end
-      assert_raises A℈ do a.may_have( :a, syn!: :b ) end
-      assert_raises A℈ do a.∋?( :a, syn!: :b ) end
+      assert_raises AE do a.may_have( :a, syn!: :b ) end
+      assert_raises AE do a.∋?( :a, syn!: :b ) end
       assert_equal false, a.has?( :z )
       assert_equal nil, a.may_have( :z )
       assert_equal false, a.∋?( :z )
@@ -604,26 +603,26 @@ class ScruplesTest < Test::Unit::TestCase
       assert_equal( { a: 'ano', c: 'bobo', k: 'kokot' }, a )
     end
     
-    should "have #a℈_has, alias #a℈_∋ synonymizing enforcer" do
+    should "have #aE_has, alias #aE_∋ synonymizing enforcer" do
       a = { infile: 'a', csv_out_file: 'b', k: 'k', o: 'k', t: 'k' }
-      assert_respond_to a, :a℈_has
+      assert_respond_to a, :aE_has
       old = a.dup
-      assert_raises A℈ do a.a℈_has :z end
-      assert_nothing_raised do a.a℈_has :infile end
-      assert_nothing_raised do a.a℈_has :csv_out_file end
+      assert_raises AE do a.aE_has :z end
+      assert_nothing_raised do a.aE_has :infile end
+      assert_nothing_raised do a.aE_has :csv_out_file end
       class TestClass; def initialize( args )
-                         args.a℈_has :infile
-                         args.a℈_has :csv_out_file
-                         args.a℈_has :k
+                         args.aE_has :infile
+                         args.aE_has :csv_out_file
+                         args.aE_has :k
                        end end
       assert_nothing_raised do TestClass.new a end
-      assert_raises A℈ do a.a℈_has( :a, syn!: :b ) end
-      assert_equal "a", a.a℈_has( :infile )
-      assert_equal "k", a.a℈_has( :k, syn!: [:o, :t] )
-      assert_equal "b", a.a℈_has( :c, syn!: :csv_out_file )
+      assert_raises AE do a.aE_has( :a, syn!: :b ) end
+      assert_equal "a", a.aE_has( :infile )
+      assert_equal "k", a.aE_has( :k, syn!: [:o, :t] )
+      assert_equal "b", a.aE_has( :c, syn!: :csv_out_file )
       assert_equal( { infile: 'a', c: 'b', k: 'k' }, a )
-      assert_raises A℈ do a.a℈_has(:c) {|val| val == 'c'} end
-      assert_nothing_raised do a.a℈_has(:c) {|val| val == 'b'} end
+      assert_raises AE do a.aE_has(:c) {|val| val == 'c'} end
+      assert_nothing_raised do a.aE_has(:c) {|val| val == 'b'} end
     end
   end # context Hash
 end # class ScruplesTest
