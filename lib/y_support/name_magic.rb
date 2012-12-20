@@ -96,9 +96,16 @@ module NameMagic
 
     def instance which
       const_magic
-      return which if ( @instances ||= {} ).keys.include? which
-      inst = @instances.rassoc( which.to_sym )
-      raise ArgumentError, "No instance #{which} in #{self}" if inst.nil?
+      # if 'which' is an actual instance, just return it
+      return which if __instances__.keys.include? which
+      # otherwise check the argument class
+      case which
+      when String, Symbol then
+        inst = @instances.rassoc( which.to_sym )
+        raise ArgumentError, "No instance #{which} in #{self}" if inst.nil?
+      else
+        raise ArgumentError, "No instance #{which} (#{which.class}) in #{self}"
+      end
       return inst[0]
     end
 
@@ -169,7 +176,7 @@ module NameMagic
       inst = begin
                instance( instance )
              rescue ArgumentError
-               return nil
+               return nil            # nothing to forget
              end
       ɴ = inst.nil? ? nil : inst.name
       send :remove_const, ɴ if ɴ # clear constant assignment
