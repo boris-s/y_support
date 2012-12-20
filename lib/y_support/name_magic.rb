@@ -1,7 +1,6 @@
 #encoding: utf-8
 require 'y_support'
 
-
 # A mixin imitating Ruby constant magic, plus automation of :name alias :ɴ
 # named argument. This allows to write:
 #

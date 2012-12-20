@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+#encoding: utf-8
+
 class Hash
   # reversed merge!: defaults.merge( self! )
   alias :default! :reverse_merge!
