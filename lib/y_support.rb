@@ -2,7 +2,7 @@
 require "y_support/version"
 
 # require 'mathn'
-# require 'set'
+require 'set'
 # require 'csv'
 
 # these may or may not disappear into their own sections:
