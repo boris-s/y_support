@@ -51,6 +51,7 @@ module NameMagic
     raise NameError, "Name '#{ɴ}' already exists in " +
       "#{self.class} namespace!" if self.class.__instances__.rassoc( ɴ )
     # if everything's ok., add self to the namespace
+    puts "ɴ is #{ɴ}, class #{ɴ.class}"
     self.class.const_set ɴ, self
     self.class.__instances__[ self ] = ɴ
     # forget the old name
