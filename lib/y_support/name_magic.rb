@@ -227,7 +227,7 @@ module NameMagic
             else # name this anonymous instance cautiously
               raise NameError, "Name '#{const_ß}' already exists in " +
                 "#{self.class} namespace!" if
-                  __instances__[ ◉ ] || const_get const_ß
+                  __instances__[ ◉ ] || const_get( const_ß )
               # if everything's ok., add the instance to the namespace
               __instances__[ ◉ ] = const_ß
               const_set const_ß, ◉

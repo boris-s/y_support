@@ -11,10 +11,15 @@ describe ::NameMagic do
   before do
     @ç = Class.new do include NameMagic end
     @reporter = Object.new
-    @reporter.singleton_class.class_exec { attr_reader :report }
-    @ç.name_magic_hook do |instance|
+    @reporter.singleton_class.class_exec { attr_reader :report, :naming }
+    @ç.new_instance_hook do |instance|
       @reporter.define_singleton_method :report do
-        "New instance report: #{instance.name}"
+        "New instance reported"
+      end
+    end
+    @ç.naming_hook do |instance, name, old_name|
+      @reporter.define_singleton_method :naming do
+        "New instance was named: #{name}"
       end
     end
   end
