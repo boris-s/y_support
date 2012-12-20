@@ -37,7 +37,5 @@ class Hash
       yield self[key] if block_given?
     return self[key] end
   alias :must_have :aE_has
-  alias :a℈_has :aE_has if ::YSupport::USE_SCRUPLE
   alias :aE_∋ :aE_has
-  alias :a℈_∋ :aE_has if ::YSupport::USE_SCRUPLE
 end
