@@ -45,6 +45,7 @@ module NameMagic
     # honor the hook
     naming_hook = self.class.instance_variable_get :@naming_hook
     ɴ = naming_hook.call( self, ɴ, old_ɴ ) if naming_hook
+    ɴ = self.class.send :validate_naming_hook_return_value, ɴ
     # do nothing if previous name same as the new one
     return if old_ɴ == ɴ
     # otherwise, continue by being cautious about name collisions
@@ -67,6 +68,7 @@ module NameMagic
     # honor the hook
     naming_hook = self.class.instance_variable_get :@naming_hook
     ɴ = naming_hook.call( self, ɴ, old_ɴ ) if naming_hook
+    ɴ = self.class.send :validate_naming_hook_return_value, ɴ
     # do noting if previous name same as the new one
     return false if old_ɴ == ɴ
     # otherwise, continue by forgetting the colliding name, if any
@@ -239,6 +241,7 @@ module NameMagic
             else # name this anonymous instance cautiously
               # honor naming_hook
               ɴ = @naming_hook.call( ◉, const_ß, nil ) if @naming_hook
+              ɴ = validate_naming_hook_return_value( ɴ )
               raise NameError, "Name '#{ɴ}' already exists in #{self.class} " +
                 "namespace!" if __instances__[ ◉ ] || const_get( ɴ )
               # if everything's ok., add the instance to the namespace
@@ -265,6 +268,18 @@ module NameMagic
       raise NameError, "#{self.class} name must start with a capital letter " +
         "'A'..'Z'! (Name '#{ɴ}' was supplied)" unless ( ?A..?Z ) === ɴ.to_s[0]
       return ɴ
+    end
+
+    def validate_naming_hook_return_value( ɴ )
+      begin
+        return ɴ.to_sym
+      rescue
+        raise "Bad naming_hook block - it returns a #{ɴ.class} instead of a " +
+          "name. The block should take 3 arguments (instance, name, old name) " +
+          "and it is expected to return the transformed name. The main " +
+          "purpose of this hook is to enable name transformations. If no " +
+          "transformation is desired, the block may return the name unchanged."
+      end
     end
   end # module NameMagicClassMethods
 end # module NameMagic
