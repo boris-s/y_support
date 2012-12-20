@@ -125,7 +125,7 @@ module NameMagic
       avid = oo[:name_avid] ? oo.delete( :name_avid ) : false
       # Avoid name collisions unless avid
       raise NameError, "#{self} instance #{ɴς} already exists!" if
-        ( @instances ||= {} ).keys.include? ɴς unless avid
+        ( @instances ||= {} ).keys.include? ɴß unless avid
       # instantiate
       new_inst = if oo.empty? then super *args, &block
                  else super *args, oo, &block end
@@ -135,8 +135,8 @@ module NameMagic
       @new_instance_hook.call( new_inst ) if @new_instance_hook
       # and then either name it, if name was supplied, or make it avid
       # (avid instances will replace a competitor, if any, in the name table)
-      if ɴς then
-        if avid then new_inst.name! ɴς else new_inst.name = ɴς end
+      if ɴß then
+        if avid then new_inst.name! ɴß else new_inst.name = ɴß end
       else
         ( @name_avid_instances ||= [] ) << new_inst
       end
