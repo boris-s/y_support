@@ -118,7 +118,7 @@ module NameMagic
       # extract options:
       if args[-1].is_a? Hash then oo = args.pop else oo = {} end
       # consume :name named argument if it was supplied
-      ɴς = if oo[:name] then validate_name( oo.delete :name )
+      ɴß = if oo[:name] then validate_name( oo.delete :name )
            elsif oo[:ɴ] then validate_name( oo.delete :ɴ )
            else nil end
       # Expecting true/false, if :name_avid option is given
@@ -254,10 +254,15 @@ module NameMagic
 
     # Checks whether a name is valid
     def validate_name( name )
-      ɴ = name.to_s
+      begin
+        ɴ = name.to_sym
+      rescue NoMethodError
+        raise ArgumentError,
+              "Argument (class #{name.class}) cannot be validated as name"
+      end
       # check whether the name starts with 'A'..'Z'
       raise NameError, "#{self.class} name must start with a capital letter " +
-        "'A'..'Z'! (Name '#{ɴ}' was supplied)" unless ( ?A..?Z ) === ɴ[0]
+        "'A'..'Z'! (Name '#{ɴ}' was supplied)" unless ( ?A..?Z ) === ɴ.to_s[0]
       return ɴ
     end
   end # module NameMagicClassMethods
