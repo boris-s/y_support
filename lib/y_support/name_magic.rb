@@ -54,7 +54,7 @@ module NameMagic
     self.class.forget old_ɴ
     # and honor the hook
     naming_hook = self.class.instance_variable_get :@naming_hook
-    naming_hook.call( self, const_ß, old_ɴ ) if naming_hook
+    naming_hook.call( self, ɴ, old_ɴ ) if naming_hook
   end
 
   # Names an instance, aggresively (overwrites existing names).
@@ -75,7 +75,7 @@ module NameMagic
     self.class.forget old_ɴ
     # honor the hook
     naming_hook = self.class.instance_variable_get :@naming_hook
-    naming_hook.call( self, const_ß, old_ɴ ) if naming_hook
+    naming_hook.call( self, ɴ, old_ɴ ) if naming_hook
     return true
   end
 
