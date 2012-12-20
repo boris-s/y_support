@@ -52,7 +52,7 @@ module NameMagic
       "#{self.class} namespace!" if self.class.__instances__.rassoc( ɴ )
     # if everything's ok., add self to the namespace
     self.class.const_set ɴ, self
-    self.class.__instances__[ self ] = ɴ.to_sym
+    self.class.__instances__[ self ] = ɴ
     # forget the old name
     self.class.forget old_ɴ
   end
@@ -73,7 +73,7 @@ module NameMagic
     self.class.forget same_ɴ_inst if same_ɴ_inst
     # add self to the namespace
     self.class.const_set ɴ, self
-    self.class.__instances__[ self ] = ɴ.to_sym
+    self.class.__instances__[ self ] = ɴ
     # forget the old name
     self.class.forget old_ɴ
     return true
@@ -124,13 +124,13 @@ module NameMagic
       # Expecting true/false, if :name_avid option is given
       avid = oo[:name_avid] ? oo.delete( :name_avid ) : false
       # Avoid name collisions unless avid
-      raise NameError, "#{self} instance #{ɴς} already exists!" if
-        ( @instances ||= {} ).keys.include? ɴß unless avid
+      raise NameError, "#{self} instance #{ɴß} already exists!" if
+        __instances__.keys.include? ɴß unless avid
       # instantiate
       new_inst = if oo.empty? then super *args, &block
                  else super *args, oo, &block end
       # treat is as unnamed at first
-      ( @instances ||= {} ).merge! new_inst => nil
+      __instances__.merge! new_inst => nil
       # honor the hook
       @new_instance_hook.call( new_inst ) if @new_instance_hook
       # and then either name it, if name was supplied, or make it avid
