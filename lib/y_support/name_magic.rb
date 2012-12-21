@@ -1,4 +1,5 @@
-#encoding: utf-8
+# -*- coding: utf-8 -*-
+n#encoding: utf-8
 require 'y_support'
 
 # A mixin imitating Ruby constant magic, plus automation of :name alias :ɴ
@@ -44,7 +45,10 @@ module NameMagic
     old_ɴ = name()
     # honor the hook
     naming_hook = self.class.instance_variable_get :@naming_hook
-    ɴ = naming_hook.call( ɴ, self, old_ɴ ) if naming_hook
+    if naming_hook then
+      ɴ = self.class.send :validate_naming_hook_return_value,
+                          naming_hook.call( ɴ, self, old_ɴ )
+    end
     ɴ = self.class.send :validate_naming_hook_return_value, ɴ
     # do nothing if previous name same as the new one
     return if old_ɴ == ɴ
@@ -66,8 +70,10 @@ module NameMagic
     old_ɴ = self.class.__instances__[ self ]
     # honor the hook
     naming_hook = self.class.instance_variable_get :@naming_hook
-    ɴ = naming_hook.call( ɴ, self, old_ɴ ) if naming_hook
-    ɴ = self.class.send :validate_naming_hook_return_value, ɴ
+    if naming_hook then
+      ɴ = self.class.send :validate_naming_hook_return_value,
+                          naming_hook.call( ɴ, self, old_ɴ )
+    end
     # do noting if previous name same as the new one
     return false if old_ɴ == ɴ
     # otherwise, continue by forgetting the colliding name, if any
@@ -82,8 +88,7 @@ module NameMagic
   end
 
   module NameMagicClassMethods
-    # Presents class-owned @instances hash of { instance => name_string }
-    # pairs.
+    # Presents class-owned @instances hash of { instance => name } pairs.
     # 
     def instances
       const_magic
@@ -240,8 +245,10 @@ module NameMagic
               ◉.name! const_ß               # and then name it rudely
             else # name this anonymous instance cautiously
               # honor naming_hook
-              ɴ = @naming_hook.call( const_ß, ◉, nil ) if @naming_hook
-              ɴ = validate_naming_hook_return_value( ɴ )
+              ɴ = if @naming_hook then
+                    validate_naming_hook_return_value @naming_hook
+                      .call( const_ß, ◉, nil )
+                  else const_ß end
               raise NameError, "Name '#{ɴ}' already exists in #{self.class} " +
                 "namespace!" if __instances__[ ◉ ] || const_get( ɴ )
               # if everything's ok., add the instance to the namespace
