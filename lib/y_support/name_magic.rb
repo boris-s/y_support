@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-n#encoding: utf-8
+#encoding: utf-8
 require 'y_support'
 
 # A mixin imitating Ruby constant magic, plus automation of :name alias :ɴ
