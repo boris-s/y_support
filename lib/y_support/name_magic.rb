@@ -101,6 +101,12 @@ module NameMagic
       return @instances ||= {}
     end
 
+    # Presents class-owned @avid_instances (no const_magic).
+    # 
+    def __avid_instances__
+      return @avid_instances ||= []
+    end
+
     def instance which
       const_magic
       # if 'which' is an actual instance, just return it
@@ -146,13 +152,13 @@ module NameMagic
       if ɴß then
         if avid then new_inst.name! ɴß else new_inst.name = ɴß end
       else
-        ( @name_avid_instances ||= [] ) << new_inst
+        __avid_instances__ << new_inst
       end
       # return the new instance
       return new_inst
     end
 
-    # Compared to #new method, #new! uses name_avid mode: without
+    # Compared to #new method, #new! uses avid mode: without
     # concerns about overwriting existing named instances.
     # 
     def new! *args, &block
@@ -167,6 +173,7 @@ module NameMagic
     # accordingly. Number of the remaining nameless instances is returned.
     # 
     def const_magic
+      puts "#{self} is performing const_magic"
       return 0 if nameless_instances.size == 0
       serve_all_modules
       return nameless_instances.size
@@ -175,7 +182,7 @@ module NameMagic
     # Returns those instances, which are nameless (@instances hash value is nil).
     # 
     def nameless_instances
-      ( @instances ||= {} ).select { |key, val| val.nil? }.keys
+      __instances__.select { |key, val| val.nil? }.keys
     end
 
     # Clears class-owned references to a specified instance.
@@ -189,7 +196,7 @@ module NameMagic
       ɴ = inst.nil? ? nil : inst.name
       send :remove_const, ɴ if ɴ # clear constant assignment
       __instances__.delete( inst )   # remove @instances entry
-      ( @name_avid_instances ||= [] ).delete( inst ) # remove if any
+      __avid_instances__.delete( inst ) # remove if any
       return inst                            # return forgotten instance
     end
 
@@ -198,7 +205,7 @@ module NameMagic
     # 
     def __forget__( instance )
       name = __instances__.delete instance # remove @instances entry
-      ( @name_avid_instances ||= [] ).delete( instance ) # remove if any
+      __avid_instances__.delete( instance ) # remove if any
       send :remove_const, name if name
       return instance
     end
@@ -208,7 +215,7 @@ module NameMagic
     def forget_anonymous_instances
       nameless_instances.each { |inst, ɴ|
         @instances.delete inst
-        @name_avid_instances.delete inst
+        __avid_instances__.delete inst
       }
     end
     alias :forget_nameless_instances :forget_anonymous_instances
@@ -242,8 +249,8 @@ module NameMagic
     # Checks all the constants in some module's namespace, recursively.
     # 
     def serve_all_modules
-      incriminated_ids = 
-        ( nameless_instances + ( @name_avid_instances ||= [] ) )
+      puts "Hello from #serve_all_modules"
+      incriminated_ids = ( nameless_instances + __avid_instances__ )
         .map( &:object_id ).uniq
       ObjectSpace.each_object Module do |ɱ|
         # check all the module constants:
@@ -251,9 +258,9 @@ module NameMagic
           ◉ = ɱ.const_get( const_ß ) rescue nil
           # is it a wanted object?
           if incriminated_ids.include? ◉.object_id then
-            if @name_avid_instances.include? ◉ then # name avidly
-              @name_avid_instances.delete ◉ # make not avid first
-              ◉.name! const_ß               # and then name it rudely
+            if __avid_instances__.include? ◉ then # name avidly
+              __avid_instances__.delete ◉         # make not avid first
+              ◉.name! const_ß                     # and then name it rudely
             else # name this anonymous instance cautiously
               # honor naming_hook
               ɴ = if @naming_hook then
