@@ -59,7 +59,7 @@ module NameMagic
     self.class.const_set ɴ, self
     self.class.__instances__[ self ] = ɴ
     # forget the old name
-    self.class.forget old_ɴ
+    self.class.__forget__ old_ɴ
   end
 
   # Names an instance, aggresively (overwrites existing names).
@@ -78,12 +78,12 @@ module NameMagic
     return false if old_ɴ == ɴ
     # otherwise, continue by forgetting the colliding name, if any
     same_ɴ_inst = self.class.instance( ɴ ) rescue nil
-    self.class.forget same_ɴ_inst if same_ɴ_inst
+    self.class.__forget__ same_ɴ_inst if same_ɴ_inst
     # add self to the namespace
     self.class.const_set ɴ, self
     self.class.__instances__[ self ] = ɴ
     # forget the old name
-    self.class.forget old_ɴ
+    self.class.__forget__ old_ɴ
     return true
   end
 
@@ -179,17 +179,27 @@ module NameMagic
 
     # Clears class-owned references to a specified instance.
     # 
-    def forget( instance )
+    def forget( which_instance )
       inst = begin
-               instance( instance )
+               instance( which_instance )
              rescue ArgumentError
                return nil            # nothing to forget
              end
       ɴ = inst.nil? ? nil : inst.name
       send :remove_const, ɴ if ɴ # clear constant assignment
-      ( @instances ||= {} ).delete( inst )   # remove @instances entry
+      __instances__.delete( inst )   # remove @instances entry
       ( @name_avid_instances ||= [] ).delete( inst ) # remove if any
       return inst                            # return forgotten instance
+    end
+
+    # Clears class-owned references to a specified instance without performing
+    # #const_magic first. The argument must be an instance of the target class.
+    # 
+    def __forget__( instance )
+      name = __instances__.delete instance # remove @instances entry
+      ( @name_avid_instances ||= [] ).delete( instance ) # remove if any
+      send :remove_const, name if name
+      return instance
     end
 
     # Clears class-owned references anonymous instances.
