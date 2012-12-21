@@ -249,7 +249,7 @@ module NameMagic
                     validate_naming_hook_return_value @naming_hook
                       .call( const_ß, ◉, nil )
                   else const_ß end
-              raise NameError, "Name '#{ɴ}' already exists in #{self.class} " +
+              raise NameError, "Name '#{ɴ}' already exists in #{self} " +
                 "namespace!" if __instances__[ ◉ ] || const_get( ɴ )
               # if everything's ok., add the instance to the namespace
               __instances__[ ◉ ] = ɴ
