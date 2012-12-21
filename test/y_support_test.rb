@@ -17,7 +17,7 @@ describe ::NameMagic do
         "New instance reported"
       end
     end
-    @ç.naming_hook do |instance, name, old_name|
+    @ç.naming_hook do |name, instance, old_name|
       @reporter.define_singleton_method :naming do
         "Name of the new instance was #{name}"
       end
