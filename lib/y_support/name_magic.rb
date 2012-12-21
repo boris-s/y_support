@@ -49,7 +49,7 @@ module NameMagic
       ɴ = self.class.send :validate_naming_hook_return_value,
                           naming_hook.call( ɴ, self, old_ɴ )
     end
-    ɴ = self.class.send :validate_naming_hook_return_value, ɴ
+    ɴ = self.class.send :validate_name_starts_with_capital_letter, ɴ
     # do nothing if previous name same as the new one
     return if old_ɴ == ɴ
     # otherwise, continue by being cautious about name collisions
@@ -74,6 +74,7 @@ module NameMagic
       ɴ = self.class.send :validate_naming_hook_return_value,
                           naming_hook.call( ɴ, self, old_ɴ )
     end
+    ɴ = self.class.send :validate_name_starts_with_capital_letter, ɴ
     # do noting if previous name same as the new one
     return false if old_ɴ == ɴ
     # otherwise, continue by forgetting the colliding name, if any
@@ -260,14 +261,17 @@ module NameMagic
           if incriminated_ids.include? ◉.object_id then
             puts "caught #{const_ß}"
             if __avid_instances__.include? ◉ then # name avidly
+              puts "it is avid"
               __avid_instances__.delete ◉         # make not avid first
               ◉.name! const_ß                     # and then name it rudely
             else # name this anonymous instance cautiously
+              puts "it is not avid"
               # honor naming_hook
               ɴ = if @naming_hook then
                     validate_naming_hook_return_value @naming_hook
                       .call( const_ß, ◉, nil )
                   else const_ß end
+              ɴ = validate_name_starts_with_capital_letter( ɴ )
               raise NameError, "Name '#{ɴ}' already exists in #{self} " +
                 "namespace!" if __instances__[ ◉ ] || const_get( ɴ )
               # if everything's ok., add the instance to the namespace
@@ -292,10 +296,6 @@ module NameMagic
         raise ArgumentError, "Argument (class #{tentative_name.class}) " +
           "cannot be validated as name!"
       end
-      # check whether the name starts with 'A'..'Z'
-      raise NameError, "#{self.class} name must start with a capital letter " +
-        "'A'..'Z'! (Name '#{ɴ}' was supplied)" unless ( ?A..?Z ) === ɴ.to_s[0]
-      return ɴ
     end
 
     # Checks whether the return value of naming_hook is o.k. Takes one
@@ -313,6 +313,14 @@ module NameMagic
           "transformation is desired, the block – if used – must return the " +
           "name unchanged."
       end
+    end
+
+    # Checks whether a name starts with a capital letter.
+    def validate_name_starts_with_capital_letter( ɴ )
+      # check whether the name starts with 'A'..'Z'
+      raise NameError, "#{self.class} name must start with a capital letter " +
+        "'A'..'Z'! (Name '#{ɴ}' was supplied)" unless ( ?A..?Z ) === ɴ.to_s[0]
+      return ɴ.to_sym
     end
   end # module NameMagicClassMethods
 end # module NameMagic
