@@ -21,7 +21,7 @@ require 'y_support'
 # SomeName.new arg1, arg2, ..., name: "SomeName", named_arg1: val1, ...
 #
 # Hook is provided for when the name magic is performed.
-
+# 
 module NameMagic
   def self.included receiver         # :nodoc:
     receiver.extend NameMagicClassMethods
@@ -44,7 +44,7 @@ module NameMagic
     old_ɴ = name()
     # honor the hook
     naming_hook = self.class.instance_variable_get :@naming_hook
-    ɴ = naming_hook.call( self, ɴ, old_ɴ ) if naming_hook
+    ɴ = naming_hook.call( ɴ, self, old_ɴ ) if naming_hook
     ɴ = self.class.send :validate_naming_hook_return_value, ɴ
     # do nothing if previous name same as the new one
     return if old_ɴ == ɴ
@@ -66,7 +66,7 @@ module NameMagic
     old_ɴ = self.class.__instances__[ self ]
     # honor the hook
     naming_hook = self.class.instance_variable_get :@naming_hook
-    ɴ = naming_hook.call( self, ɴ, old_ɴ ) if naming_hook
+    ɴ = naming_hook.call( ɴ, self, old_ɴ ) if naming_hook
     ɴ = self.class.send :validate_naming_hook_return_value, ɴ
     # do noting if previous name same as the new one
     return false if old_ɴ == ɴ
@@ -223,7 +223,8 @@ module NameMagic
 
     private
     
-    # Checks all the constants in some module's namespace, recursively
+    # Checks all the constants in some module's namespace, recursively.
+    # 
     def serve_all_modules
       incriminated_ids = 
         ( nameless_instances + ( @name_avid_instances ||= [] ) )
@@ -239,7 +240,7 @@ module NameMagic
               ◉.name! const_ß               # and then name it rudely
             else # name this anonymous instance cautiously
               # honor naming_hook
-              ɴ = @naming_hook.call( ◉, const_ß, nil ) if @naming_hook
+              ɴ = @naming_hook.call( const_ß, ◉, nil ) if @naming_hook
               ɴ = validate_naming_hook_return_value( ɴ )
               raise NameError, "Name '#{ɴ}' already exists in #{self.class} " +
                 "namespace!" if __instances__[ ◉ ] || const_get( ɴ )
@@ -255,13 +256,15 @@ module NameMagic
       end # each_object Module
     end # def serve_all_modules
 
-    # Checks whether a name is valid
-    def validate_name( name )
+    # Checks whether a name is valid. Takes in the tentative name, and returns
+    # its validated version (a symbol).
+    # 
+    def validate_name( tentative_name )
       begin
-        ɴ = name.to_sym
+        ɴ = tentative_name.to_sym
       rescue NoMethodError
-        raise ArgumentError,
-              "Argument (class #{name.class}) cannot be validated as name"
+        raise ArgumentError, "Argument (class #{tentative_name.class}) " +
+          "cannot be validated as name!"
       end
       # check whether the name starts with 'A'..'Z'
       raise NameError, "#{self.class} name must start with a capital letter " +
@@ -269,15 +272,20 @@ module NameMagic
       return ɴ
     end
 
-    def validate_naming_hook_return_value( ɴ )
+    # Checks whether the return value of naming_hook is o.k. Takes one
+    # argument – the return value – and returns the validated return value.
+    # 
+    def validate_naming_hook_return_value( raw_return_value )
       begin
-        return ɴ.to_sym
+        return raw_return_value.to_sym
       rescue
-        raise "Bad naming_hook block - it returns a #{ɴ.class} instead of a " +
-          "name. The block should take 3 arguments (instance, name, old name) " +
-          "and it is expected to return the transformed name. The main " +
-          "purpose of this hook is to enable name transformations. If no " +
-          "transformation is desired, the block may return the name unchanged."
+        raise "Bad naming_hook block - it returns a " +
+          "#{raw_return_value.class} instead of a name. The block should " +
+          "take up to 3 arguments (name, instance, old_name) and is " +
+          "expected to return the transformed name. The main purpose " +
+          "of this hook is to enable name transformations. If no " +
+          "transformation is desired, the block – if used – must return the " +
+          "name unchanged."
       end
     end
   end # module NameMagicClassMethods
