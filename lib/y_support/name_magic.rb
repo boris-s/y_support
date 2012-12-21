@@ -134,6 +134,7 @@ module NameMagic
       raise NameError, "#{self} instance #{ɴß} already exists!" if
         __instances__.keys.include? ɴß unless avid
       # instantiate
+      args = if oo.empty? then args else args + [ oo ] end
       new_inst = if oo.empty? then super *args, &block
                  else super *args, oo, &block end
       # treat is as unnamed at first
