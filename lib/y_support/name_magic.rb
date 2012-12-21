@@ -258,6 +258,7 @@ module NameMagic
           ◉ = ɱ.const_get( const_ß ) rescue nil
           # is it a wanted object?
           if incriminated_ids.include? ◉.object_id then
+            puts "caught #{const_ß}"
             if __avid_instances__.include? ◉ then # name avidly
               __avid_instances__.delete ◉         # make not avid first
               ◉.name! const_ß                     # and then name it rudely
