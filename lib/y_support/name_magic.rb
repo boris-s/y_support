@@ -271,9 +271,6 @@ module NameMagic
       puts "we have #{incriminated_ids.size} incriminated ids of class #{self}"
       ObjectSpace.each_object Module do |ɱ|
         # check all the module constants:
-        puts "working in module #{ɱ}"
-        # workaround for buggy tests would be:
-        # next if ɱ.name.start_with "I18n"
         ɱ.constants( false ).each do |const_ß|
           begin # insurance against buggy dynamic loading of constants
             ◉ = ɱ.const_get( const_ß )
