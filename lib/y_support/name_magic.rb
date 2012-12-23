@@ -100,7 +100,10 @@ module NameMagic
     # 
     def instances
       const_magic
-      __instances__
+      ii = __instances__
+      fuckers = ii.select { |instance, name| instance.class != self }
+      raise "{fuckers.size} fucker(s) have appeared. \n#{fuckers}" unless
+        fuckers.emtpy?
     end
 
     # Presents class-owned @instances without const_magic.
