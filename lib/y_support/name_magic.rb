@@ -100,11 +100,15 @@ module NameMagic
     # 
     def instances
       const_magic
-      ii = __instances__
-      fuckers = ii.select { |instance, name| instance.class != self }
-      raise "{fuckers.size} fucker(s) have appeared. \n#{fuckers}" unless
-        fuckers.empty?
-      return ii
+      __instances__.keys
+    end
+
+    # Presents an array of all the instance names (disregarding anonymous
+    # instances).
+    # 
+    def instance_names
+      const_magic
+      __instances__.values.compact
     end
 
     # Presents class-owned @instances without const_magic.
