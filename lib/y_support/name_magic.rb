@@ -266,7 +266,7 @@ module NameMagic
         puts "working in module #{ɱ}"
         ɱ.constants( false ).each do |const_ß|
           puts "about to const_get: #{const_ß}"
-          ◉ = ɱ.const_get( const_ß ) rescue nil
+          ◉ = ɱ.const_get( const_ß )
           puts "const_get done, about to check the object's id"
           ◉id = ◉.object_id
           puts "about so see it it's incriminated"
