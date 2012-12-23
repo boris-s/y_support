@@ -253,14 +253,14 @@ module NameMagic
       puts "Hello from #serve_all_modules"
       incriminated_ids = ( nameless_instances + __avid_instances__ )
         .map( &:object_id ).uniq
-      puts "we have #{incriminated_ids.size} incriminated ids of class #{ç}"
+      puts "we have #{incriminated_ids.size} incriminated ids of class #{self}"
       ObjectSpace.each_object Module do |ɱ|
         # check all the module constants:
         ɱ.constants( false ).each do |const_ß|
           ◉ = ɱ.const_get( const_ß ) rescue nil
           # is it a wanted object?
           if incriminated_ids.include? ◉.object_id then
-            puts "incriminated object id found in module #{ɱ}"
+            puts "incriminated object id found in module #{ɱ} assigned to constant #{const_ß}"
             if __avid_instances__.map( &:object_id ).include? ◉.object_id then
               # name avidly
               __avid_instances__.delete_if { |instance| # make not avid first
