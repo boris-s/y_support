@@ -65,33 +65,27 @@ module NameMagic
   # Names an instance, aggresively (overwrites existing names).
   # 
   def name!( name )
-    puts "Hello from rude naming."
     ɴ = self.class.send :validate_name, name
     # get previous name of this instance, if any
     old_ɴ = self.class.__instances__[ self ]
     # honor the hook
-    puts "about to honor naming hook with #{ɴ}"
     naming_hook = self.class.instance_variable_get :@naming_hook
     if naming_hook then
       ɴ = self.class.send :validate_naming_hook_return_value,
                           naming_hook.call( ɴ, self, old_ɴ )
     end
-    puts "naming hook honored, returned #{ɴ}" 
     ɴ = self.class.send :validate_name_starts_with_capital_letter, ɴ
     # do nothing if the previous name same as the new one
     return false if old_ɴ == ɴ
     # otherwise, continue by forgetting the colliding name, if any
-    puts "about to get the collider by __instance__( #{ɴ} )"
     if pair = self.class.__instances__.rassoc( ɴ ) then
       self.class.__forget__( pair[0] )
-      puts "collider forgotten"
     end
     # add self to the namespace
     self.class.const_set ɴ, self
     self.class.__instances__[ self ] = ɴ
     # forget the old name
     self.class.__forget__ old_ɴ
-    puts "about to return from name!"
     return true
   end
 
