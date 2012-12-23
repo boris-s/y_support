@@ -265,8 +265,9 @@ module NameMagic
         # check all the module constants:
         puts "working in module #{ɱ}"
         ɱ.constants( false ).each do |const_ß|
-          puts "const: #{const_ß}"
+          puts "about to const_get: #{const_ß}"
           ◉ = ɱ.const_get( const_ß ) rescue nil
+          puts "const_get done, about to check the object's id"
           # is it a wanted object?
           if incriminated_ids.include? ◉.object_id then
             puts "incriminated object id found in module #{ɱ} assigned to constant #{const_ß}"
