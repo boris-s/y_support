@@ -261,7 +261,7 @@ module NameMagic
           if incriminated_ids.include? ◉.object_id then
             if __avid_instances__.map( &:object_id ).include? ◉.object_id then
               # name avidly
-              __avid_instances__.delete { |instance| # make not avid first
+              __avid_instances__.delete_if { |instance| # make not avid first
                 instance.object_id == ◉.object_id
               }
               ◉.name! const_ß      # and then name it rudely
