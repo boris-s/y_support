@@ -70,11 +70,13 @@ module NameMagic
     # get previous name of this instance, if any
     old_ɴ = self.class.__instances__[ self ]
     # honor the hook
+    puts "about to honor naming hook with #{ɴ}"
     naming_hook = self.class.instance_variable_get :@naming_hook
     if naming_hook then
       ɴ = self.class.send :validate_naming_hook_return_value,
                           naming_hook.call( ɴ, self, old_ɴ )
     end
+    puts "naming hook honored, returned #{ɴ}" 
     ɴ = self.class.send :validate_name_starts_with_capital_letter, ɴ
     # do noting if previous name same as the new one
     return false if old_ɴ == ɴ
