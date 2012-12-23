@@ -131,9 +131,9 @@ module NameMagic
       case which
       when String, Symbol then
         inst = @instances.rassoc( which.to_sym )
-        raise ArgumentError, "No instance #{which} in #{self}" if inst.nil?
+        raise NameError, "No instance #{which} in #{self}." if inst.nil?
       else
-        raise ArgumentError, "No instance #{which} (#{which.class}) in #{self}"
+        raise TypeError, "No instance #{which.class}:#{which} in #{self}."
       end
       return inst[0]
     end
