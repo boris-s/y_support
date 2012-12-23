@@ -91,6 +91,7 @@ module NameMagic
     self.class.__instances__[ self ] = ɴ
     # forget the old name
     self.class.__forget__ old_ɴ
+    puts "about to return from name!"
     return true
   end
 
@@ -275,6 +276,7 @@ module NameMagic
               }
               puts "its id has been deleted from __avid_instances__"
               ◉.name! const_ß      # and then name it rudely
+              puts "rude naming finished with name #{const_ß}"
             else # name this anonymous instance cautiously
               puts "it is not avid"
               # honor naming_hook
@@ -288,8 +290,9 @@ module NameMagic
               # if everything's ok., add the instance to the namespace
               __instances__[ ◉ ] = ɴ
               const_set ɴ, ◉
+              puts "cautious naming finished"
+              puts "the object's name was set to #{ɴ}, and it was made a constant in #{self}"
             end
-            puts "the object's name was set to #{ɴ}, and it was made a constant in #{self}"
             # and stop working in case there are no more unnamed instances
             incriminated_ids.delete ◉.object_id
             puts "the object's id was deleted from the incriminated ids"
