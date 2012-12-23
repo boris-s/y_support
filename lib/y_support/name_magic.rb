@@ -78,11 +78,14 @@ module NameMagic
     end
     puts "naming hook honored, returned #{ɴ}" 
     ɴ = self.class.send :validate_name_starts_with_capital_letter, ɴ
-    # do noting if previous name same as the new one
+    # do nothing if the previous name same as the new one
     return false if old_ɴ == ɴ
     # otherwise, continue by forgetting the colliding name, if any
-    same_ɴ_inst = self.class.instance( ɴ ) rescue nil
-    self.class.__forget__ same_ɴ_inst if same_ɴ_inst
+    puts "about to get the collider by __instance__( #{ɴ} )"
+    if pair = self.class.__instances__.rassoc( ɴ ) then
+      self.class.__forget__( pair[0] )
+      puts "collider forgotten"
+    end
     # add self to the namespace
     self.class.const_set ɴ, self
     self.class.__instances__[ self ] = ɴ
