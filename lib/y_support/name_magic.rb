@@ -268,8 +268,10 @@ module NameMagic
           puts "about to const_get: #{const_ß}"
           ◉ = ɱ.const_get( const_ß ) rescue nil
           puts "const_get done, about to check the object's id"
+          ◉id = ◉.id
+          puts "about so see it it's incriminated"
           # is it a wanted object?
-          if incriminated_ids.include? ◉.object_id then
+          if incriminated_ids.include? ◉id then
             puts "incriminated object id found in module #{ɱ} assigned to constant #{const_ß}"
             if __avid_instances__.map( &:object_id ).include? ◉.object_id then
               puts "it is avid"
@@ -302,6 +304,7 @@ module NameMagic
             break if incriminated_ids.empty?
             puts "incriminated ids still not empty, so continuing searching the module space"
           end
+          puts "the object id not among the incriminated ids"
         end # each
       end # each_object Module
     end # def serve_all_modules
