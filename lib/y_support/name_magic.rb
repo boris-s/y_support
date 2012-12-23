@@ -189,7 +189,6 @@ module NameMagic
     # accordingly. Number of the remaining nameless instances is returned.
     # 
     def const_magic
-      puts "#{self} is performing const_magic"
       return 0 if nameless_instances.size == 0
       serve_all_modules
       return nameless_instances.size
@@ -265,10 +264,8 @@ module NameMagic
     # Checks all the constants in some module's namespace, recursively.
     # 
     def serve_all_modules
-      puts "Hello from #serve_all_modules"
       incriminated_ids = ( nameless_instances + __avid_instances__ )
         .map( &:object_id ).uniq
-      puts "we have #{incriminated_ids.size} incriminated ids of class #{self}"
       ObjectSpace.each_object Module do |ɱ|
         # check all the module constants:
         ɱ.constants( false ).each do |const_ß|
