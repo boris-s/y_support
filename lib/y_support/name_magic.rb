@@ -268,7 +268,7 @@ module NameMagic
           puts "about to const_get: #{const_ß}"
           ◉ = ɱ.const_get( const_ß ) rescue nil
           puts "const_get done, about to check the object's id"
-          ◉id = ◉.id
+          ◉id = ◉.object_id
           puts "about so see it it's incriminated"
           # is it a wanted object?
           if incriminated_ids.include? ◉id then
