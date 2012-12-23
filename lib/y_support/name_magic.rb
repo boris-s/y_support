@@ -262,12 +262,14 @@ module NameMagic
           if incriminated_ids.include? ◉.object_id then
             puts "incriminated object id found in module #{ɱ} assigned to constant #{const_ß}"
             if __avid_instances__.map( &:object_id ).include? ◉.object_id then
+              puts "it is avid"
               # name avidly
               __avid_instances__.delete_if { |instance| # make not avid first
                 instance.object_id == ◉.object_id
               }
               ◉.name! const_ß      # and then name it rudely
             else # name this anonymous instance cautiously
+              puts "it is not avid"
               # honor naming_hook
               ɴ = if @naming_hook then
                     validate_naming_hook_return_value @naming_hook
@@ -280,9 +282,12 @@ module NameMagic
               __instances__[ ◉ ] = ɴ
               const_set ɴ, ◉
             end
+            puts "the object's name was set to #{ɴ}, and it was made a constant in #{self}"
             # and stop working in case there are no more unnamed instances
             incriminated_ids.delete ◉.object_id
+            puts "the object's id was deleted from the incriminated ids"
             break if incriminated_ids.empty?
+            puts "incriminated ids still not empty, so continuing searching the module space"
           end
         end # each
       end # each_object Module
