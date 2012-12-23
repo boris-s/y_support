@@ -65,6 +65,7 @@ module NameMagic
   # Names an instance, aggresively (overwrites existing names).
   # 
   def name!( name )
+    puts "Hello from rude naming."
     ɴ = self.class.send :validate_name, name
     # get previous name of this instance, if any
     old_ɴ = self.class.__instances__[ self ]
@@ -267,6 +268,7 @@ module NameMagic
               __avid_instances__.delete_if { |instance| # make not avid first
                 instance.object_id == ◉.object_id
               }
+              puts "its id has been deleted from __avid_instances__"
               ◉.name! const_ß      # and then name it rudely
             else # name this anonymous instance cautiously
               puts "it is not avid"
