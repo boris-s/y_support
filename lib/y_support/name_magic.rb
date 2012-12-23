@@ -259,15 +259,13 @@ module NameMagic
           ◉ = ɱ.const_get( const_ß ) rescue nil
           # is it a wanted object?
           if incriminated_ids.include? ◉.object_id then
-            puts "caught #{const_ß}"
-            a = __avid_instances__
-            puts "got avid instances"
-            if a.include? ◉ then # name avidly
-              puts "it is avid"
-              __avid_instances__.delete ◉         # make not avid first
-              ◉.name! const_ß                     # and then name it rudely
+            if __avid_instances__.map( &:object_id ).include? ◉.object_id then
+              # name avidly
+              __avid_instances__.delete { |instance| # make not avid first
+                instance.object_id == ◉.object_id
+              }
+              ◉.name! const_ß      # and then name it rudely
             else # name this anonymous instance cautiously
-              puts "it is not avid"
               # honor naming_hook
               ɴ = if @naming_hook then
                     validate_naming_hook_return_value @naming_hook
