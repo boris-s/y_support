@@ -264,9 +264,15 @@ module NameMagic
       ObjectSpace.each_object Module do |ɱ|
         # check all the module constants:
         puts "working in module #{ɱ}"
+        # workaround for buggy tests would be:
+        # next if ɱ.name.start_with "I18n"
         ɱ.constants( false ).each do |const_ß|
           puts "about to const_get: #{const_ß}"
-          ◉ = ɱ.const_get( const_ß )
+          begin # insurance against buggy dynamic loading of constants
+            ◉ = ɱ.const_get( const_ß )
+          rescue
+            next
+          end
           puts "const_get done, about to check the object's id"
           ◉id = ◉.object_id
           puts "about so see it it's incriminated"
