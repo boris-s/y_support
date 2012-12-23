@@ -263,7 +263,9 @@ module NameMagic
       puts "we have #{incriminated_ids.size} incriminated ids of class #{self}"
       ObjectSpace.each_object Module do |ɱ|
         # check all the module constants:
+        puts "working in module #{ɱ}"
         ɱ.constants( false ).each do |const_ß|
+          puts "const: #{const_ß}"
           ◉ = ɱ.const_get( const_ß ) rescue nil
           # is it a wanted object?
           if incriminated_ids.include? ◉.object_id then
