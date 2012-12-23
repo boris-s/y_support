@@ -275,17 +275,13 @@ module NameMagic
         # workaround for buggy tests would be:
         # next if ɱ.name.start_with "I18n"
         ɱ.constants( false ).each do |const_ß|
-          puts "about to const_get: #{const_ß}"
           begin # insurance against buggy dynamic loading of constants
             ◉ = ɱ.const_get( const_ß )
           rescue
             next
           end
-          puts "const_get done, about to check the object's id"
-          ◉id = ◉.object_id
-          puts "about so see it it's incriminated"
           # is it a wanted object?
-          if incriminated_ids.include? ◉id then
+          if incriminated_ids.include? ◉.object_id then
             puts "incriminated object id found in module #{ɱ} assigned to constant #{const_ß}"
             if __avid_instances__.map( &:object_id ).include? ◉.object_id then
               puts "it is avid"
@@ -304,13 +300,16 @@ module NameMagic
                       .call( const_ß, ◉, nil )
                   else const_ß end
               ɴ = validate_name_starts_with_capital_letter( ɴ )
-              raise NameError, "Name '#{ɴ}' already exists in #{self} " +
-                "namespace!" if __instances__[ ◉ ] || const_get( ɴ )
-              # if everything's ok., add the instance to the namespace
-              __instances__[ ◉ ] = ɴ
-              const_set ɴ, ◉
-              puts "cautious naming finished"
-              puts "the object's name was set to #{ɴ}, and it was made a constant in #{self}"
+              if const_get( ɴ ) then
+                raise NameError, "Another #{self} named '#{ɴ}' already " +
+                  "exists!" unless const_get( ɴ ) == ◉ 
+                puts "cautious naming: freewheel"
+              else
+                # add the instance to the namespace
+                __instances__[ ◉ ] = ɴ
+                const_set ɴ, ◉
+              end
+              puts "cautious naming action: named #{ɴ} in #{self}"
             end
             # and stop working in case there are no more unnamed instances
             incriminated_ids.delete ◉.object_id
@@ -318,7 +317,6 @@ module NameMagic
             break if incriminated_ids.empty?
             puts "incriminated ids still not empty, so continuing searching the module space"
           end
-          puts "the object id not among the incriminated ids"
         end # each
       end # each_object Module
     end # def serve_all_modules
