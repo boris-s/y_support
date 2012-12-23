@@ -32,7 +32,7 @@ module NameMagic
   # 
   def name
     self.class.const_magic
-    return nil unless ɴ = self.class.instances[ self ]
+    return nil unless ɴ = self.class.__instances__[ self ]
     return ɴ
   end
   alias ɴ name
