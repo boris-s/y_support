@@ -25,9 +25,9 @@ require 'y_support'
 # 
 module NameMagic
   def self.included receiver         # :nodoc:
-    receiver.module_exec {
-      alias original_method_new new
-    }
+    class << receiver
+      alias :original_method_new :new
+    end
     receiver.extend NameMagicClassMethods
   end
 
