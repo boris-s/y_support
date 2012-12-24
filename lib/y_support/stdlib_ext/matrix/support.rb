@@ -106,11 +106,66 @@ class Matrix
       return new_matrix( rows, arg.column_size )
     else
       compat_1, compat_2 = arg.coerce self
-      raise TypeError unless coercion.is_a?(Array) && coercion.length == 2
       return compat_1 * compat_2
     end
   end
   
+  # Matrix addition.
+  #   Matrix.scalar(2,5) + Matrix[[1,0], [-4,7]]
+  #     =>  6  0
+  #        -4 12
+  #
+  def + arg
+    case arg
+    when Numeric
+      Matrix.Raise ErrOperationNotDefined, "+", self.class, arg.class
+    when Vector
+      arg = Matrix.column_vector( arg )
+    when Matrix
+    else
+      compat_1, compat_2 = arg.coerce self
+      return compat_1 + compat_2
+    end
+
+    Matrix.Raise ErrDimensionMismatch unless
+      row_size == arg.row_size and column_size == arg.column_size
+
+    rows = Array.new( row_size ) { |i|
+      Array.new( column_size ) { |j|
+        self[i, j] + arg[ i, j ]
+      }
+    }
+    new_matrix rows, column_size
+  end
+
+  # Matrix subtraction.
+  #   Matrix[[1,5], [4,2]] - Matrix[[9,3], [-4,1]]
+  #     => -8  2
+  #         8  1
+  #
+  def - arg
+    case arg
+    when Numeric
+      Matrix.Raise ErrOperationNotDefined, "-", self.class, arg.class
+    when Vector
+      arg = Matrix.column_vector( arg )
+    when Matrix
+    else
+      compat_1, compat_2 = arg.coerce self
+      return compat_1 - compat_2
+    end
+
+    Matrix.Raise ErrDimensionMismatch unless
+      row_size == arg.row_size and column_size == arg.column_size
+
+    rows = Array.new( row_size ) { |i|
+      Array.new( column_size ) { |j|
+        self[i, j] - arg[ i, j ]
+      }
+    }
+    new_matrix rows, column_size
+  end
+
   # aliasing #row_size, #column_size
   alias :number_of_rows :row_size
   alias :number_of_columns :column_size
