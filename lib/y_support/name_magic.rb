@@ -25,6 +25,9 @@ require 'y_support'
 # 
 module NameMagic
   def self.included receiver         # :nodoc:
+    receiver.module_exec {
+      alias original_method_new new
+    }
     receiver.extend NameMagicClassMethods
   end
 
@@ -151,8 +154,8 @@ module NameMagic
         __instances__.keys.include? ɴß unless avid
       # instantiate
       args = if oo.empty? then args else args + [ oo ] end
-      new_inst = if oo.empty? then super *args, &block
-                 else super *args, oo, &block end
+      new_inst = if oo.empty? then original_method_new *args, &block
+                 else original_method_new *args, oo, &block end
       # treat is as unnamed at first
       __instances__.merge! new_inst => nil
       # honor the hook

@@ -454,13 +454,13 @@ class ScruplesTest < Test::Unit::TestCase
       assert_raise AE do "".aE_not end # noting #aE_not alias
     end
     
-    should "have #aE_kind_of, alias #aE_is_a AE enforcers" do
-      assert_raise AE do :o.aE_kind_of Numeric end
-      assert_nothing_raised do 0.aE_kind_of Numeric end
-      assert_equal( "hello", "hello".aE_kind_of( String ) )
-      assert_raise AE do :o.aE_is_a Numeric end
-      assert_nothing_raised do 0.aE_is_a Numeric end
-      assert_equal( "hello", "hello".aE_is_a( String ) )
+    should "have #tE_kind_of, alias #tE_is_a TE enforcers" do
+      assert_raise TE do :o.tE_kind_of Numeric end
+      assert_nothing_raised do 0.tE_kind_of Numeric end
+      assert_equal( "hello", "hello".tE_kind_of( String ) )
+      assert_raise TE do :o.tE_is_a Numeric end
+      assert_nothing_raised do 0.tE_is_a Numeric end
+      assert_equal( "hello", "hello".tE_is_a( String ) )
     end
     
     should "have #aE_class_compliance, alias #aE_∈ enforcer" do
