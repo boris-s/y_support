@@ -38,7 +38,7 @@ class Matrix
   def self.correspondence_matrix( array1, array2 )
     return Matrix.empty 0, array1.size if array2.empty?
     return Matrix.empty array2.size, 0 if array1.empty?
-    self[ *array2.map { |e2| array1.map { |e1| e1 == e2 ? 1 : 0 } } ]
+    self[ *array2.map { |e2| array1.map { |e1| e1 == e2 ? 1 : TOTAL_ZERO.new } } ]
   end
   
   # Converts a column into array. If argument is given, it chooses
