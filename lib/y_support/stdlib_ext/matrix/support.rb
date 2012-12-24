@@ -75,6 +75,61 @@ class Matrix
     ( t.join_bottom( other.t ) ).t
   end
 
+  TOTAL_ZERO = Class.new do
+    def zero?
+      true
+    end
+
+    def + other
+      other
+    end
+
+    def - other
+      -other
+    end
+
+    def * other
+      self
+    end
+
+    def ** other
+      self
+    end
+
+    def / other
+      raise "division by zero" if other.zero?
+      self
+    end
+
+    def to_f
+      0.0
+    end
+
+    def to_i
+      0
+    end
+
+    def coerce( other )
+      begin
+        return other, other.class.zero
+      rescue
+        return other, other * 0
+      end
+    end
+  end
+
+  #
+  # Creates a zero matrix.
+  #   Matrix.zero(2)
+  #     => 0 0
+  #        0 0
+  #
+  def Matrix.zero(row_size, column_size = row_size)
+    rows = Array.new( row_size ) { Array.new( column_size, TOTAL_ZERO.new ) }
+    new rows, column_size
+  end
+  
+  
   #
   # Matrix multiplication.
   #   Matrix[[2,4], [6,8]] * Matrix.identity(2)
