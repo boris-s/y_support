@@ -74,6 +74,42 @@ class Matrix
       row_size == other.row_size
     ( t.join_bottom( other.t ) ).t
   end
+
+  #
+  # Matrix multiplication.
+  #   Matrix[[2,4], [6,8]] * Matrix.identity(2)
+  #     => 2 4
+  #        6 8
+  #
+  def * arg # arg is matrix or vector or number
+    case arg
+    when Numeric
+      rows = @rows.map { |row|
+        row.map { |e| e * arg }
+      }
+      return new_matrix rows, column_size
+    when Vector
+      arg = Matrix.column_vector arg
+      result = self * arg
+      return result.column 0
+    when Matrix
+      Matrix.Raise ErrDimensionMismatch if column_size != arg.row_size
+
+      rows = Array.new( row_size ) { |i|
+        Array.new( arg.column_size ) { |j|
+          ( 0 ... column_size ).reduce nil do |accumulator, col|
+            accumulator.nil? ? self[ i, col ] * arg[ col, j ] :
+              accumulator + self[ i, col ] * arg[ col, j ]
+          end
+        }
+      }
+      return new_matrix( rows, arg.column_size )
+    else
+      compat_1, compat_2 = arg.coerce self
+      raise TypeError unless coercion.is_a?(Array) && coercion.length == 2
+      return compat_1 * compat_2
+    end
+  end
   
   # aliasing #row_size, #column_size
   alias :number_of_rows :row_size
