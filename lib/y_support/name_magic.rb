@@ -258,7 +258,6 @@ module NameMagic
     # Checks all the constants in some module's namespace, recursively.
     # 
     def serve_all_modules
-      puts __callee__
       incriminated_ids = ( nameless_instances + __avid_instances__ )
         .map( &:object_id ).uniq
       ObjectSpace.each_object Module do |ɱ|
