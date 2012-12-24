@@ -163,7 +163,7 @@ class Matrix
       rows = Array.new( row_size ) { |i|
         Array.new( arg.column_size ) { |j|
           ( 0 ... column_size ).reduce( TOTAL_ZERO.new ) { |accumulator, col|
-            accumulator + self[ i, col ] * arg[ col, j ]
+            accumulator + arg[ col, j ] + self[ i, col ]
           }
         }
       }
