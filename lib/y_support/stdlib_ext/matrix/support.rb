@@ -146,6 +146,7 @@ class Matrix
   #        6 8
   #
   def * arg # arg is matrix or vector or number
+    puts "here we have matrix multiplication, self:\n#{self}\nother:\n#{arg}"
     case arg
     when Numeric
       rows = @rows.map { |row|
