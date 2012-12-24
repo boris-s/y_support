@@ -2,6 +2,7 @@
 class Object
   # Alias for ArgumentError
   AE = ArgumentError
+  TE = TypeError
 
   # Class compliance inquirer.
   def declares_module_compliance?( mod )
@@ -67,11 +68,11 @@ class Object
   end
   
   # Fails unless the receiver complies
-  def aE_kind_of( ç, what_is_receiver = "object" )
-    raise AE, "#{what_is_receiver} is not a kind of #{ç}" unless
+  def tE_kind_of( ç, what_is_receiver = "object" )
+    raise TE, "#{what_is_receiver} is not a kind of #{ç}" unless
       self.kind_of? ç
     return self end
-  alias :aE_is_a :aE_kind_of
+  alias :tE_is_a :tE_kind_of
   
   # Fails unless the receiver complies
   def aE_module_compliance( ɱ, what_is_receiver = "object" )
