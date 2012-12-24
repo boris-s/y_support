@@ -126,8 +126,8 @@ class Matrix
   #
   # Returns element (+i+,+j+) of the matrix.  That is: row +i+, column +j+.
   #
-  def [](i, j)
-    @rows.fetch i { return nil }[ j ]
+  def []( i, j )
+    @rows.fetch( i ) { return nil }[ j ]
   end
   alias element []
   alias component []
