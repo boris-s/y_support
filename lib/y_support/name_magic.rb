@@ -31,7 +31,7 @@ module NameMagic
     receiver.extend NameMagicClassMethods
   end
 
-  # Retrievs an instance name (demodulized).
+  # Retrieves an instance name (demodulized).
   # 
   def name
     self.class.const_magic
@@ -130,7 +130,7 @@ module NameMagic
         inst = @instances.rassoc( which.to_sym )
         raise NameError, "No instance #{which} in #{self}." if inst.nil?
       else
-        raise TypeError, "No instance #{which.class}:#{which} in #{self}."
+        raise TypeError, "No instance #{which.class}:'#{which}' in #{self}."
       end
       return inst[0]
     end
