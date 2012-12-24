@@ -2,12 +2,6 @@
 require 'matrix'
 
 class Matrix
-  # exposing the #[]= element modifier method
-  alias :private_element_assignment :[]=
-    def []=( a, b, newval )
-      private_element_assignment a, b, newval
-    end
-  
   # Pretty inspect
   def pretty_inspect
     return inspect if row_size == 0 or column_size == 0
@@ -128,8 +122,23 @@ class Matrix
     rows = Array.new( row_size ) { Array.new( column_size, TOTAL_ZERO.new ) }
     new rows, column_size
   end
-  
-  
+
+  #
+  # Returns element (+i+,+j+) of the matrix.  That is: row +i+, column +j+.
+  #
+  def [](i, j)
+    @rows.fetch i { return nil }[ j ]
+  end
+  alias element []
+  alias component []
+
+  def []=(i, j, v)
+    @rows[i][j] = v
+  end
+  alias set_element []=
+  alias set_component []=
+  private :[]=, :set_element, :set_component
+
   #
   # Matrix multiplication.
   #   Matrix[[2,4], [6,8]] * Matrix.identity(2)
@@ -152,9 +161,8 @@ class Matrix
 
       rows = Array.new( row_size ) { |i|
         Array.new( arg.column_size ) { |j|
-          ( 0 ... column_size ).reduce nil do |accumulator, col|
-            accumulator.nil? ? self[ i, col ] * arg[ col, j ] :
-              accumulator + self[ i, col ] * arg[ col, j ]
+          ( 0 ... column_size ).reduce TOTAL_ZERO.new do |accumulator, col|
+            accumulator + self[ i, col ] * arg[ col, j ]
           end
         }
       }
@@ -232,6 +240,6 @@ class Vector
   # .zero class method returns a vector filled with zeros
   # 
   def zero( vector_size )
-    self[*([0] * vector_size)]
+    self[*([TOTAL_ZERO.new] * vector_size)]
   end
 end
