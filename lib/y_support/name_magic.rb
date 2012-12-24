@@ -104,8 +104,7 @@ module NameMagic
     # instances).
     # 
     def instance_names
-      const_magic
-      __instances__.map( &:name ).compact
+      instances.map( &:name ).compact
     end
 
     # Presents class-owned @instances without const_magic.
