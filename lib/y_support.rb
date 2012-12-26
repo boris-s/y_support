@@ -10,7 +10,7 @@ require "y_support/version"
 require 'active_support/core_ext/module/delegation'
 require 'active_support/core_ext/object/blank'
 # require 'active_support/core_ext/object/duplicable'
-# require 'active_support/core_ext/string/starts_ends_with'
+require 'active_support/core_ext/string/starts_ends_with'
 require 'active_support/core_ext/string/strip'
 # require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/integer/multiple'
