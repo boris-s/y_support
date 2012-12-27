@@ -126,7 +126,7 @@ module NameMagic
       # otherwise check the argument class
       case which
       when String, Symbol then
-        inst = @instances.rassoc( which.to_sym )
+        inst = __instances__.rassoc( which.to_sym )
         raise NameError, "No instance #{which} in #{self}." if inst.nil?
       else
         raise TypeError, "No instance #{which.class}:'#{which}' in #{self}."
@@ -225,7 +225,7 @@ module NameMagic
     # 
     def forget_anonymous_instances
       nameless_instances.each { |inst, ɴ|
-        @instances.delete inst
+        __instances__.delete inst
         __avid_instances__.delete inst
       }
     end
@@ -234,8 +234,8 @@ module NameMagic
     # Clears class-owned references to all the instances.
     # 
     def forget_all_instances
-      @instances = {}                # clear @instances
-      constants( false )             # clear constant assignments in the class
+      __instances__.clear          # clears @instances
+      constants( false )           # clear constant assignments in the class
         .each { |ß| send :remove_const, ß if const_get( ß ).is_a? self }
     end
     

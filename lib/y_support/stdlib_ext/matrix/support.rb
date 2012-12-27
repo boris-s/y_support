@@ -38,7 +38,7 @@ class Matrix
   def self.correspondence_matrix( array1, array2 )
     return Matrix.empty 0, array1.size if array2.empty?
     return Matrix.empty array2.size, 0 if array1.empty?
-    self[ *array2.map { |e2| array1.map { |e1| e1 == e2 ? 1 : TOTAL_ZERO.new } } ]
+    self[ *array2.map { |e2| array1.map { |e1| e1 == e2 ? 1 : 0 } } ] # FIXME: Ordinary zero
   end
   
   # Converts a column into array. If argument is given, it chooses
@@ -119,7 +119,7 @@ class Matrix
   #        0 0
   #
   def Matrix.zero(row_size, column_size = row_size)
-    rows = Array.new( row_size ) { Array.new( column_size, TOTAL_ZERO.new ) }
+    rows = Array.new( row_size ) { Array.new( column_size, 0 ) } # FIXME: Ordinary zero
     new rows, column_size
   end
 
@@ -161,7 +161,7 @@ class Matrix
 
       rows = Array.new( row_size ) { |i|
         Array.new( arg.column_size ) { |j|
-          ( 0 ... column_size ).reduce( TOTAL_ZERO.new ) { |accumulator, col|
+          ( 0 ... column_size ).reduce( 0 ) { |accumulator, col| # FIXME: Ordinary zero
             accumulator + arg[ col, j ] * self[ i, col ]
           }
         }
@@ -240,6 +240,6 @@ class Vector
   # .zero class method returns a vector filled with zeros
   # 
   def zero( vector_size )
-    self[*([TOTAL_ZERO.new] * vector_size)]
+    self[*([0] * vector_size)] # FIXME: Ordinary zero
   end
 end
