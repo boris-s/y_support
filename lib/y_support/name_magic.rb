@@ -54,10 +54,7 @@ module NameMagic
     old_ɴ = name()
     # honor the hook
     name_set_closure = self.class.instance_variable_get :@name_set_closure
-    if name_set_closure then
-      ɴ = self.class.send :validate_name_set_closure_return_value,
-                          name_set_closure.call( ɴ, self, old_ɴ )
-    end
+    ɴ = name_set_closure.call( ɴ, self, old_ɴ ) if name_set_closure
     ɴ = self.class.send :validate_name_starts_with_capital_letter, ɴ
     # do nothing if previous name same as the new one
     return if old_ɴ == ɴ
