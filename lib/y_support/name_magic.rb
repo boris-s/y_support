@@ -24,7 +24,7 @@ require 'y_support'
 # Hook is provided for when the name magic is performed.
 # 
 module NameMagic
-  DEBUG = true
+  DEBUG = false
   PROBLEM_MODULES = [ 'Gem', 'Rack', 'ActiveSupport' ]
 
   def self.included receiver         # :nodoc:
