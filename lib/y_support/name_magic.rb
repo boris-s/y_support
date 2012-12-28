@@ -35,8 +35,8 @@ module NameMagic
   # 
   def name
     self.class.const_magic
-    return nil unless ɴ = self.class.__instances__[ self ]
-    return ɴ
+    ɴ = self.class.__instances__[ self ]
+    return ɴ ? @name_get_closure.( ɴ ) : nil
   end
   alias ɴ name
 
@@ -47,10 +47,10 @@ module NameMagic
     # get previous name of this instance, if any
     old_ɴ = name()
     # honor the hook
-    naming_hook = self.class.instance_variable_get :@naming_hook
-    if naming_hook then
-      ɴ = self.class.send :validate_naming_hook_return_value,
-                          naming_hook.call( ɴ, self, old_ɴ )
+    name_set_closure = self.class.instance_variable_get :@name_set_closure
+    if name_set_closure then
+      ɴ = self.class.send :validate_name_set_closure_return_value,
+                          name_set_closure.call( ɴ, self, old_ɴ )
     end
     ɴ = self.class.send :validate_name_starts_with_capital_letter, ɴ
     # do nothing if previous name same as the new one
@@ -72,10 +72,10 @@ module NameMagic
     # get previous name of this instance, if any
     old_ɴ = self.class.__instances__[ self ]
     # honor the hook
-    naming_hook = self.class.instance_variable_get :@naming_hook
-    if naming_hook then
-      ɴ = self.class.send :validate_naming_hook_return_value,
-                          naming_hook.call( ɴ, self, old_ɴ )
+    name_set_closure = self.class.instance_variable_get :@name_set_closure
+    if name_set_closure then
+      ɴ = self.class.send :validate_name_set_closure_return_value,
+                          name_set_closure.call( ɴ, self, old_ɴ )
     end
     ɴ = self.class.send :validate_name_starts_with_capital_letter, ɴ
     # do nothing if the previous name same as the new one
@@ -162,7 +162,7 @@ module NameMagic
       # treat is as unnamed at first
       __instances__.merge! new_inst => nil
       # honor the hook
-      @new_instance_hook.call( new_inst ) if @new_instance_hook
+      @new_instance_closure.call( new_inst ) if @new_instance_closure
       # and then either name it, if name was supplied, or make it avid
       # (avid instances will replace a competitor, if any, in the name table)
       if ɴß then
@@ -249,16 +249,22 @@ module NameMagic
     # (the new instance that was created) and is called in #new method right
     # after instantiation, but before naming.
     # 
-    def new_instance_hook &block; @new_instance_hook = block end
+    def new_instance_closure &block; @new_instance_closure = block end
 
-    # Registers a hook to execute whenever naming is performed on an instance.
-    # The block should take three arguments (instance, name, old_name). The
-    # output value of the block is the name to be actually used – the hook
+    # Registers a hook to execute whenever name setting is performed on an
+    # instance. The block should take three arguments (instance, name, old_name).
+    # The output value of the block is the name to be actually used – the hook
     # thus allows to define transformations on the name when naming. It is the
     # responsibility of the block to output a suitable symbol (capitalized,
     # usable as a constant name etc.)
     # 
-    def naming_hook &block; @naming_hook = block end
+    def name_set_closure &block; @name_set_closure = block end
+
+    # Registers a hook to execute whenever the instance is asked about its
+    # name. The name object contained in __instances__[self] is subjected
+    # to the name_get_closure before being returned as instance name.
+    # 
+    def name_get_closure &block; @name_get_closure = block end
 
     private
     
@@ -284,9 +290,9 @@ module NameMagic
               }
               ◉.name! const_ß      # and then name it rudely
             else # name this anonymous instance cautiously
-              # honor naming_hook
-              ɴ = if @naming_hook then
-                    validate_naming_hook_return_value @naming_hook
+              # honor name_set_closure
+              ɴ = if @name_set_closure then
+                    validate_name_set_closure_return_value @name_set_closure
                       .call( const_ß, ◉, nil )
                   else const_ß end
               ɴ = validate_name_starts_with_capital_letter( ɴ )
@@ -319,14 +325,14 @@ module NameMagic
       end
     end
 
-    # Checks whether the return value of naming_hook is o.k. Takes one
+    # Checks whether the return value of name_set_closure is o.k. Takes one
     # argument – the return value – and returns the validated return value.
     # 
-    def validate_naming_hook_return_value( raw_return_value )
+    def validate_name_set_closure_return_value( raw_return_value )
       begin
         return raw_return_value.to_sym
       rescue
-        raise "Bad naming_hook block - it returns a " +
+        raise "Bad name_set_closure block - it returns a " +
           "#{raw_return_value.class} instead of a name. The block should " +
           "take up to 3 arguments (name, instance, old_name) and is " +
           "expected to return the transformed name. The main purpose " +
