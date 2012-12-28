@@ -55,43 +55,34 @@ module NameMagic
     # honor the hook
     name_set_closure = self.class.instance_variable_get :@name_set_closure
     ɴ = name_set_closure.call( ɴ, self, old_ɴ ) if name_set_closure
-    ɴ = validate_capitalization( ɴ )
-    # do nothing if previous name same as the new one
-    return if old_ɴ == ɴ
-    # otherwise, continue by being cautious about name collisions
+    ɴ = self.class.send :validate_capitalization, ɴ
+    return if old_ɴ == ɴ # already named as required; nothing to do
+    # otherwise, be cautious about name collision
     raise NameError, "Name '#{ɴ}' already exists in " +
       "#{self.class} namespace!" if self.class.__instances__.rassoc( ɴ )
-    # if everything's ok., add self to the namespace
-    self.class.const_set ɴ, self
-    self.class.__instances__[ self ] = ɴ
-    # forget the old name
-    self.class.__forget__ old_ɴ
+    # since everything's ok...
+    self.class.const_set ɴ, self         # write a constant
+    self.class.__instances__[ self ] = ɴ # write __instances__
+    self.class.__forget__ old_ɴ          # forget the old name of self
   end
 
   # Names an instance, aggresively (overwrites existing names).
   # 
-  def name!( name )
-    ɴ = self.class.send :validate_name, name
+  def name!( ɴ )
     # get previous name of this instance, if any
     old_ɴ = self.class.__instances__[ self ]
     # honor the hook
     name_set_closure = self.class.instance_variable_get :@name_set_closure
-    if name_set_closure then
-      ɴ = self.class.send :validate_name_set_closure_return_value,
-                          name_set_closure.call( ɴ, self, old_ɴ )
-    end
-    ɴ = self.class.send :validate_name_starts_with_capital_letter, ɴ
-    # do nothing if the previous name same as the new one
-    return false if old_ɴ == ɴ
-    # otherwise, continue by forgetting the colliding name, if any
-    if pair = self.class.__instances__.rassoc( ɴ ) then
-      self.class.__forget__( pair[0] )
-    end
-    # add self to the namespace
-    self.class.const_set ɴ, self
-    self.class.__instances__[ self ] = ɴ
-    # forget the old name
-    self.class.__forget__ old_ɴ
+    ɴ = name_set_closure.( ɴ, self, old_ɴ ) if name_set_closure
+    ɴ = self.class.send :validate_capitalization, ɴ
+    return false if old_ɴ == ɴ # already named as required; nothing to do
+    # otherwise, rudely remove the collider, if any
+    pair = self.class.__instances__.rassoc( ɴ )
+    self.class.__forget__( pair[0] ) if pair
+    # and add add self to the namespace
+    self.class.const_set ɴ, self         # write a constant
+    self.class.__instances__[ self ] = ɴ # write to __instances__
+    self.class.__forget__ old_ɴ          # forget the old name of self
     return true
   end
 
