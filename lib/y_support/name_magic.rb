@@ -49,8 +49,7 @@ module NameMagic
 
   # Names an instance, cautiously (ie. no overwriting of existing names).
   # 
-  def name=( name )
-    ɴ = self.class.send :validate_name, name
+  def name=( ɴ )
     # get previous name of this instance, if any
     old_ɴ = name()
     # honor the hook
