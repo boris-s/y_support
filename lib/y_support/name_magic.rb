@@ -277,6 +277,7 @@ module NameMagic
       ObjectSpace.each_object Module do |ɱ|
         # hack against bugs when getting constants from URI
         next if ɱ.name.include? "URI"
+        next if ɱ.name.include? "18"
         # check all the module constants:
         ɱ.constants( false ).each do |const_ß|
           begin # insurance against buggy dynamic loading of constants
