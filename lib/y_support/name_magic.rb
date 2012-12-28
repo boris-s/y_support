@@ -279,7 +279,6 @@ module NameMagic
       ObjectSpace.each_object Module do |ɱ|
         # hack against bugs when getting constants from URI
         next if ::NameMagic::PROBLEM_MODULES.any? { |e| ɱ.name.start_with? ɴ }
-        # puts ɱ
         # check all the module constants:
         ɱ.constants( false ).each do |const_ß|
           begin # insurance against buggy dynamic loading of constants
@@ -298,13 +297,16 @@ module NameMagic
             else # name this anonymous instance cautiously
               # honor name_set_closure
               ɴ = if @name_set_closure then
-                    validate_name_set_closure_return_value @name_set_closure
-                      .call( const_ß, ◉, nil )
+                    @name_set_closure.( const_ß, ◉, nil )
                   else const_ß end
-              ɴ = validate_name_starts_with_capital_letter( ɴ )
-              if const_get( ɴ ) then
+              ɴ = validate_capitalization( ɴ )
+              conflicter = begin # be cautious
+                             const_get( ɴ )
+                           rescue NameError
+                           end
+              if conflicter then
                 raise NameError, "Another #{self} named '#{ɴ}' already " +
-                  "exists!" unless const_get( ɴ ) == ◉ 
+                  "exists!" unless conflicter == ◉
               else
                 # add the instance to the namespace
                 __instances__[ ◉ ] = ɴ
@@ -319,41 +321,14 @@ module NameMagic
       end # each_object Module
     end # def serve_all_modules
 
-    # Checks whether a name is valid. Takes in the tentative name, and returns
-    # its validated version (a symbol).
-    # 
-    def validate_name( tentative_name )
-      begin
-        ɴ = tentative_name.to_sym
-      rescue NoMethodError
-        raise ArgumentError, "Argument (class #{tentative_name.class}) " +
-          "cannot be validated as name!"
-      end
-    end
-
-    # Checks whether the return value of name_set_closure is o.k. Takes one
-    # argument – the return value – and returns the validated return value.
-    # 
-    def validate_name_set_closure_return_value( raw_return_value )
-      begin
-        return raw_return_value.to_sym
-      rescue
-        raise "Bad name_set_closure block - it returns a " +
-          "#{raw_return_value.class} instead of a name. The block should " +
-          "take up to 3 arguments (name, instance, old_name) and is " +
-          "expected to return the transformed name. The main purpose " +
-          "of this hook is to enable name transformations. If no " +
-          "transformation is desired, the block – if used – must return the " +
-          "name unchanged."
-      end
-    end
-
     # Checks whether a name starts with a capital letter.
-    def validate_name_starts_with_capital_letter( ɴ )
+    # 
+    def validate_capitalization( name )
+      ɴ = name.to_s
       # check whether the name starts with 'A'..'Z'
-      raise NameError, "#{self.class} name must start with a capital letter " +
-        "'A'..'Z'! (Name '#{ɴ}' was supplied)" unless ( ?A..?Z ) === ɴ.to_s[0]
-      return ɴ.to_sym
+      raise NameError, "#{self.class} name must start with a capital " +
+        " letter 'A'..'Z' ('#{ɴ}' was given)!" unless ( ?A..?Z ) === ɴ[0]
+      return ɴ
     end
   end # module NameMagicClassMethods
 end # module NameMagic
