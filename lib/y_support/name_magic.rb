@@ -278,7 +278,7 @@ module NameMagic
         .map( &:object_id ).uniq
       ObjectSpace.each_object Module do |ɱ|
         # hack against bugs when getting constants from URI
-        ::NameMagic::PROBLEM_MODULES.each { |ɴ| next if ɱ.name.start_with? ɴ }
+        next if ::NameMagic::PROBLEM_MODULES.any? { |e| ɱ.name.start_with? ɴ }
         # puts ɱ
         # check all the module constants:
         ɱ.constants( false ).each do |const_ß|
