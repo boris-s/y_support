@@ -46,9 +46,10 @@ describe ::NameMagic do
     @ç.nameless_instances.must_equal [ufo]
     UFO = @ç.new
     @reporter.report.must_equal "New instance reported"
-    @reporter.naming.must_equal "Name of the new instance was Boris"
+    @reporter.name_set.must_equal "Name of the new instance was Boris"
     UFO.name
-    @reporter.naming.must_equal "Name of the new instance was UFO"
+    @reporter.name_set.must_equal "Name of the new instance was UFO"
+    @reporter.name_get.must_equal "Name get closure called on UFO"
     Elaine = @ç.new
     Elaine.name.must_equal :Elaine
   end
