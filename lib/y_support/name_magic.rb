@@ -24,6 +24,8 @@ require 'y_support'
 # Hook is provided for when the name magic is performed.
 # 
 module NameMagic
+  PROBLEM_MODULES = [ 'Gem' ]
+
   def self.included receiver         # :nodoc:
     class << receiver
       alias :original_method_new :new
@@ -276,7 +278,7 @@ module NameMagic
         .map( &:object_id ).uniq
       ObjectSpace.each_object Module do |ɱ|
         # hack against bugs when getting constants from URI
-        next if ɱ.name.start_with? "Gem"
+        ::NameMagic::PROBLEM_MODULES.each { |ɴ| next if ɱ.name.start_with? ɴ }
         # puts ɱ
         # check all the module constants:
         ɱ.constants( false ).each do |const_ß|
