@@ -36,7 +36,12 @@ module NameMagic
   def name
     self.class.const_magic
     ɴ = self.class.__instances__[ self ]
-    return ɴ ? @name_get_closure.( ɴ ) : nil
+    if ɴ then
+      name_get_closure = self.class.instance_variable_get :@name_get_closure
+      return name_get_closure ? name_get_closure.( ɴ ) : ɴ
+    else
+      return nil
+    end
   end
   alias ɴ name
 
