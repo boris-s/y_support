@@ -24,6 +24,7 @@ require 'y_support'
 # Hook is provided for when the name magic is performed.
 # 
 module NameMagic
+  DEBUG = true
   PROBLEM_MODULES = [ 'Gem', 'Rack' ]
 
   def self.included receiver         # :nodoc:
@@ -277,7 +278,7 @@ module NameMagic
         next if ::NameMagic::PROBLEM_MODULES.any? { |problem_ς|
           ɱ.name.to_s.start_with? problem_ς
         }
-        # puts ɱ
+        puts ɱ if ::NameMagic::DEBUG
         # check all the module constants:
         ɱ.constants( false ).each do |const_ß|
           begin # insurance against buggy dynamic loading of constants
