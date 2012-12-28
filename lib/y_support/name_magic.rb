@@ -25,7 +25,7 @@ require 'y_support'
 # 
 module NameMagic
   DEBUG = true
-  PROBLEM_MODULES = [ 'Gem', 'Rack' ]
+  PROBLEM_MODULES = [ 'Gem', 'Rack', 'ActiveSupport' ]
 
   def self.included receiver         # :nodoc:
     class << receiver
