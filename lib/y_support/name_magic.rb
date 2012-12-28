@@ -151,8 +151,8 @@ module NameMagic
       # extract options:
       if args[-1].is_a? Hash then oo = args.pop else oo = {} end
       # consume :name named argument if it was supplied
-      ɴß = if oo[:name] then validate_name( oo.delete :name )
-           elsif oo[:ɴ] then validate_name( oo.delete :ɴ )
+      ɴß = if oo[:name] then oo.delete :name
+           elsif oo[:ɴ] then oo.delete :ɴ
            else nil end
       # Expecting true/false, if :name_avid option is given
       avid = oo[:name_avid] ? oo.delete( :name_avid ) : false
