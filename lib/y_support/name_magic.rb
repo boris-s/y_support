@@ -55,7 +55,7 @@ module NameMagic
     # honor the hook
     name_set_closure = self.class.instance_variable_get :@name_set_closure
     ɴ = name_set_closure.call( ɴ, self, old_ɴ ) if name_set_closure
-    ɴ = self.class.send :validate_capitalization, ɴ
+    ɴ = self.class.send( :validate_capitalization, ɴ ).to_sym
     return if old_ɴ == ɴ # already named as required; nothing to do
     # otherwise, be cautious about name collision
     raise NameError, "Name '#{ɴ}' already exists in " +
@@ -74,7 +74,7 @@ module NameMagic
     # honor the hook
     name_set_closure = self.class.instance_variable_get :@name_set_closure
     ɴ = name_set_closure.( ɴ, self, old_ɴ ) if name_set_closure
-    ɴ = self.class.send :validate_capitalization, ɴ
+    ɴ = self.class.send( :validate_capitalization, ɴ ).to_sym
     return false if old_ɴ == ɴ # already named as required; nothing to do
     # otherwise, rudely remove the collider, if any
     pair = self.class.__instances__.rassoc( ɴ )
@@ -288,7 +288,7 @@ module NameMagic
               ɴ = if @name_set_closure then
                     @name_set_closure.( const_ß, ◉, nil )
                   else const_ß end
-              ɴ = validate_capitalization( ɴ )
+              ɴ = validate_capitalization( ɴ ).to_sym
               conflicter = begin # be cautious
                              const_get( ɴ )
                            rescue NameError
