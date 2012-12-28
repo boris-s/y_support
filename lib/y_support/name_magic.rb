@@ -96,6 +96,7 @@ module NameMagic
     # Presents class-owned @instances hash of { instance => name } pairs.
     # 
     def instances
+      puts "Hello from original #instances"
       const_magic
       __instances__.keys
     end
@@ -110,16 +111,19 @@ module NameMagic
     # Presents class-owned @instances without const_magic.
     # 
     def __instances__
+      puts "Hello from original #__instances__"
       return @instances ||= {}
     end
 
     # Presents class-owned @avid_instances (no const_magic).
     # 
     def __avid_instances__
+      puts "Hello from original #__avid_instances__"
       return @avid_instances ||= []
     end
 
     def instance which
+      puts "Hello from #instance method"
       const_magic
       # if 'which' is an actual instance, just return it
       return which if __instances__.keys.include? which
@@ -185,6 +189,7 @@ module NameMagic
     # accordingly. Number of the remaining nameless instances is returned.
     # 
     def const_magic
+      puts "Hello from #const_magic"
       return 0 if nameless_instances.size == 0
       serve_all_modules
       return nameless_instances.size
