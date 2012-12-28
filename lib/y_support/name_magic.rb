@@ -51,7 +51,7 @@ module NameMagic
   # 
   def name=( ɴ )
     # get previous name of this instance, if any
-    old_ɴ = name()
+    old_ɴ = self.class.__instances__[ self ]
     # honor the hook
     name_set_closure = self.class.instance_variable_get :@name_set_closure
     ɴ = name_set_closure.call( ɴ, self, old_ɴ ) if name_set_closure
