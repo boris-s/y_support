@@ -61,9 +61,9 @@ module NameMagic
     raise NameError, "Name '#{ɴ}' already exists in " +
       "#{self.class} namespace!" if self.class.__instances__.rassoc( ɴ )
     # since everything's ok...
-    self.class.const_set ɴ, self         # write a constant
-    self.class.__instances__[ self ] = ɴ # write __instances__
-    self.class.__forget__ old_ɴ          # forget the old name of self
+    self.class.namespace.const_set ɴ, self # write a constant
+    self.class.__instances__[ self ] = ɴ   # write __instances__
+    self.class.__forget__ old_ɴ            # forget the old name of self
   end
 
   # Names an instance, aggresively (overwrites existing names).
@@ -80,9 +80,9 @@ module NameMagic
     pair = self.class.__instances__.rassoc( ɴ )
     self.class.__forget__( pair[0] ) if pair
     # and add add self to the namespace
-    self.class.const_set ɴ, self         # write a constant
-    self.class.__instances__[ self ] = ɴ # write to __instances__
-    self.class.__forget__ old_ɴ          # forget the old name of self
+    self.class.namespace.const_set ɴ, self # write a constant
+    self.class.__instances__[ self ] = ɴ   # write to __instances__
+    self.class.__forget__ old_ɴ            # forget the old name of self
     return true
   end
 
@@ -111,6 +111,14 @@ module NameMagic
     # 
     def __avid_instances__
       return @avid_instances ||= []
+    end
+
+    # Presents class-owned namespace. Normally, this is the class itself,
+    # but can be overriden so as to define constants holding the instances
+    # in some other module.
+    # 
+    def namespace
+      self
     end
 
     def instance which
@@ -200,7 +208,7 @@ module NameMagic
                return nil            # nothing to forget
              end
       ɴ = inst.nil? ? nil : inst.name
-      send :remove_const, ɴ if ɴ # clear constant assignment
+      namespace.send :remove_const, ɴ if ɴ # clear constant assignment
       __instances__.delete( inst )   # remove @instances entry
       __avid_instances__.delete( inst ) # remove if any
       return inst                            # return forgotten instance
@@ -212,7 +220,7 @@ module NameMagic
     def __forget__( instance )
       name = __instances__.delete instance # remove @instances entry
       __avid_instances__.delete( instance ) # remove if any
-      send :remove_const, name if name
+      namespace.send :remove_const, name if name
       return instance
     end
 
@@ -229,9 +237,10 @@ module NameMagic
     # Clears class-owned references to all the instances.
     # 
     def forget_all_instances
-      __instances__.clear          # clears @instances
-      constants( false )           # clear constant assignments in the class
-        .each { |ß| send :remove_const, ß if const_get( ß ).is_a? self }
+      __instances__.clear           # clears @instances
+      constants( false ).each { |ß| # clear constants in the namespace
+        namespace.send :remove_const, ß if const_get( ß ).is_a? self
+      }
     end
     
     # Registers a hook to execute whenever name magic creates a new instance
@@ -291,7 +300,7 @@ module NameMagic
                   else const_ß end
               ɴ = validate_capitalization( ɴ ).to_sym
               conflicter = begin # be cautious
-                             const_get( ɴ )
+                             namespace.const_get( ɴ )
                            rescue NameError
                            end
               if conflicter then
@@ -300,7 +309,7 @@ module NameMagic
               else
                 # add the instance to the namespace
                 __instances__[ ◉ ] = ɴ
-                const_set ɴ, ◉
+                namespace.const_set ɴ, ◉
               end
             end
             # and stop working in case there are no more unnamed instances
