@@ -6,14 +6,14 @@ class Object
   # Class compliance inquirer.
   # 
   def declares_compliance?( mod )
-    if mod.is_a? Module then mod = mod.name else mod = mod.to_s end
-    if self.class.name == mod then return true # native type
+    mod = mod.is_a?( Module ) ? mod.name.to_sym : mod.to_sym
+    if self.class.name.to_sym == mod then return true # native type
     elsif declared_compliance.include?( mod ) then return true
     elsif begin
             self.singleton_class
           rescue TypeError
             self.class
-          end.ancestors.any? {|ancest| ancest.name == mod } then
+          end.ancestors.any? { |ancest| ancest.name.to_sym == mod } then
       return true # implicit compliance through ancestry
     else return false end # none applies
   end
