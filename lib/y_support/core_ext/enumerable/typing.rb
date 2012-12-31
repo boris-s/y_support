@@ -54,7 +54,7 @@ module Enumerable
   def tE_all_numeric what_is_collection_element=nil
     e = what_is_collection_element || "collection element"
     m = "Each #{e} must declare compliance with Numeric!"
-    raise TErr, m unless all? { |e| e.declares_compliance? Numeric }
+    raise TErr, m unless all? { |e| e.class_complies? Numeric }
     return self
   end
   

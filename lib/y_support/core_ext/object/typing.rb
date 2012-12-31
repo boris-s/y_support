@@ -99,7 +99,7 @@ class Object
   def tE_class_complies klass, what_is_receiver=nil
     r = what_is_receiver ? what_is_receiver.to_s.capitalize :
       "#{self.class} instance #{object_id}"
-    m = "#{r} does not declare compliance to #{klass}!"
+    m = "#{r} does not comply or declare compliance with #{klass}!"
     raise TErr, m unless class_complies? klass
     return self
   end

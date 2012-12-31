@@ -41,13 +41,15 @@ class TypingTest < Test::Unit::TestCase
     end
     
     should "have #aE raising ArgumentError if block falsey" do
-      assert_raise AErr do 0.aE "yada yada" do self == 1 end end
-      assert_nothing_raised do 0.aE "yada yada" do self == 0 end end
-      assert_equal( "hello", "hello".aE( "have 4 unique letters" ) do
-                      each_char.map{|e| e }.uniq.join.size == 4 end )
-      assert_nothing_raised do 2.aE &:even? end
-      assert_raise AErr do 3.aE &:even? end
-      assert_raise AErr do nil.aE end
+      assert_raise TErr do 0.tE "yada yada" do self == 1 end end
+      assert_nothing_raised do 0.tE "yada yada" do self == 0 end end
+      assert_equal( "hello",
+                    "hello".tE( "have 4 unique letters" ) {
+                      each_char.map { |e| e }.uniq.join.size == 4
+                    } )
+      assert_nothing_raised do 2.tE &:even? end
+      assert_raise TErr do 3.tE &:even? end
+      assert_raise TErr do nil.tE end
     end
     
     should "have #tE_not raising TypeError if block truey" do
@@ -71,15 +73,15 @@ class TypingTest < Test::Unit::TestCase
     should "have #tE_complies" do
       Koko = Class.new; Pipi = Class.new
       koko = Koko.new; pipi = Pipi.new
-      pipi.tE_class_complies koko.class
+      pipi.declare_class_compliance! koko.class
       assert_raise TErr do koko.tE_class_complies pipi.class end
       assert_nothing_raised do koko.tE_class_complies koko.class end
       assert_nothing_raised do pipi.tE_class_complies pipi.class end
       assert_nothing_raised do pipi.tE_class_complies koko.class end
       assert_raise TErr do koko.tE_class_complies Pipi end
-      assert_nothing_raised do pipi.aE_class_complies Pipi end
-      assert_nothing_raised do pipi.aE_class_complies Koko end
-      assert_equal koko, koko.aE_class_complies( Koko )
+      assert_nothing_raised do pipi.tE_class_complies Pipi end
+      assert_nothing_raised do pipi.tE_class_complies Koko end
+      assert_equal koko, koko.tE_class_complies( Koko )
     end
     
     should "have #tE_respond_to enforcer" do
@@ -193,7 +195,7 @@ class TypingTest < Test::Unit::TestCase
       a = { infile: 'a', csv_out_file: 'b', k: 'k', o: 'k', t: 'k' }
       assert_respond_to a, :tE_has
       old = a.dup
-      assert_raises AErr do a.tE_has :z end
+      assert_raises TErr do a.tE_has :z end
       assert_nothing_raised do a.tE_has :infile end
       assert_nothing_raised do a.tE_has :csv_out_file end
       class TestClass; def initialize( args )
@@ -202,12 +204,12 @@ class TypingTest < Test::Unit::TestCase
                          args.tE_has :k
                        end end
       assert_nothing_raised do TestClass.new a end
-      assert_raises AErr do a.tE_has( :a, syn!: :b ) end
+      assert_raises TErr do a.tE_has( :a, syn!: :b ) end
       assert_equal "a", a.tE_has( :infile )
       assert_equal "k", a.tE_has( :k, syn!: [:o, :t] )
       assert_equal "b", a.tE_has( :c, syn!: :csv_out_file )
       assert_equal( { infile: 'a', c: 'b', k: 'k' }, a )
-      assert_raises AErr do a.tE_has(:c) {|val| val == 'c'} end
+      assert_raises TErr do a.tE_has(:c) {|val| val == 'c'} end
       assert_nothing_raised do a.tE_has(:c) {|val| val == 'b'} end
     end
   end # context Hash
