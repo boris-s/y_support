@@ -50,14 +50,13 @@ class TypingTest < Test::Unit::TestCase
       assert_raise AErr do nil.aE end
     end
     
-    should "have #aE_not raising ArgumentError if block truey" do
-      assert_raise AErr do 0.aE_not { self < 1 } end
-      assert_nothing_raised do 1.aE_not { self == 2 } end
-      assert_equal( "hello", "hello".aE_not( "have x" ) { include? 'x' } )
-      assert_nothing_raised do 3.aE_not &:even? end
-      assert_raise AErr do 2.aE_not &:even? end
-      assert_raise AErr do "".aE_not end
-      assert_raise AErr do "".aE_not end # noting #aE_not alias
+    should "have #tE_not raising TypeError if block truey" do
+      assert_raise TErr do 0.tE_not { self < 1 } end
+      assert_nothing_raised do 1.tE_not { self == 2 } end
+      assert_equal( "hello", "hello".tE_not( "have x" ) { include? 'x' } )
+      assert_nothing_raised do 3.tE_not &:even? end
+      assert_raise TErr do 2.tE_not &:even? end
+      assert_raise TErr do "".tE_not end
     end
     
     should "have #tE_kind_of, alias #tE_is_a TErr enforcers" do
@@ -69,95 +68,75 @@ class TypingTest < Test::Unit::TestCase
       assert_equal( "hello", "hello".tE_is_a( String ) )
     end
     
-    should "have #aE_class_compliance, alias #aE_∈ enforcer" do
+    should "have #tE_complies" do
       Koko = Class.new; Pipi = Class.new
       koko = Koko.new; pipi = Pipi.new
-      pipi.∈! koko.class.name.to_sym
-      assert_raise AErr do koko.aE_∈ pipi.class.name.to_sym end
-      assert_nothing_raised do koko.aE_∈ koko.class.name.to_sym end
-      assert_nothing_raised do pipi.aE_∈ pipi.class.name.to_sym end
-      assert_nothing_raised do pipi.aE_∈ koko.class.name.to_sym end
-      assert_raise AErr do koko.aE_∈ Pipi end
-      assert_nothing_raised do pipi.aE_∈ Pipi end
-      assert_nothing_raised do pipi.aE_∈ Koko end
-      assert_equal koko, koko.aE_∈( Koko )
-      # passing mention of the alias
-      assert_equal koko, koko.aE_ɱ_compliance( Koko )
+      pipi.tE_complies koko.class
+      assert_raise TErr do koko.tE_complies pipi.class end
+      assert_nothing_raised do koko.tE_complies koko.class end
+      assert_nothing_raised do pipi.tE_complies pipi.class end
+      assert_nothing_raised do pipi.tE_complies koko.class end
+      assert_raise TErr do koko.tE_complies Pipi end
+      assert_nothing_raised do pipi.aE_complies Pipi end
+      assert_nothing_raised do pipi.aE_complies Koko end
+      assert_equal koko, koko.aE_complies( Koko )
     end
     
-    should "have #aE_respond_to enforces" do
-      assert_raise AErr do :o.aE_respond_to :each end
-      assert_nothing_raised do {}.aE_respond_to :each end
-      assert_equal( [:hello], [:hello].aE_respond_to( :each ) )
+    should "have #tE_respond_to enforcer" do
+      assert_raise TErr do :o.tE_respond_to :each end
+      assert_nothing_raised do {}.tE_respond_to :each end
+      assert_equal( [:hello], [:hello].tE_respond_to( :each ) )
     end
     
-    should "have #aE_equal, alias #aE= enforcer" do
-      assert_raise AErr do 0.aE_equal 1 end
-      assert_nothing_raised do 1.aE_equal 2.0/2.0 end
-      assert_equal( "hello", "hello".aE_equal( " hello ".strip ) )
+    should "have #tE_equal enforcer" do
+      assert_raise TErr do 0.tE_equal 1 end
+      assert_nothing_raised do 1.tE_equal 2.0/2.0 end
+      assert_equal( "hello", "hello".tE_equal( " hello ".strip ) )
     end
     
-    should "have #aE_not_equal enforcer" do
-      assert_raise AErr do 1.aE_not_equal 1.0 end
-      assert_nothing_raised do 7.aE_not_equal 42 end
-      assert_equal( "hello", "hello".aE_not_equal( "goodbye" ) )
+    should "have #tE_not_equal enforcer" do
+      assert_raise TErr do 1.tE_not_equal 1.0 end
+      assert_nothing_raised do 7.tE_not_equal 42 end
+      assert_equal( "hello", "hello".tE_not_equal( "goodbye" ) )
     end
     
-    should "have #aE_blank enforcer" do
-      assert_raise AErr do "x".aE_blank end
-      assert_nothing_raised do ["", []].each{|e| e.aE_blank } end
-      assert_equal( {}, {}.aE_blank )
+    should "have #tE_blank enforcer" do
+      assert_raise TErr do "x".tE_blank end
+      assert_nothing_raised do ["", []].each{|e| e.tE_blank } end
+      assert_equal( {}, {}.tE_blank )
     end
     
-    should "have #aE_not_blank enforcer" do
-      assert_raise AErr do nil.aE_not_blank end
-      assert_nothing_raised do 0.aE_not_blank end
-      assert_equal( "hello", "hello".aE_not_blank )
+    should "have #tE_present enforcer" do
+      assert_raise TErr do nil.tE_present end
+      assert_nothing_raised do 0.tE_present end
+      assert_equal( "hello", "hello".tE_present )
     end
+  end
     
-    should "have #aE_present enforcer" do
-      assert_raise AErr do nil.aE_present end
-      assert_nothing_raised do 0.aE_present end
-      assert_equal( "hello", "hello".aE_present )
-    end
-    
-    should "have #aE_has_attr_reader enforcer" do
-      assert_raise AErr do
-        Object.new.aE_has_attr_reader :nonexisting_attribute end
-      assert_nothing_raised do
-        class XXX; attr_reader :someattr end
-        x = XXX.new
-        x.aE_has_attr_reader :someattr
-      end
-      x = XXX.new
-      assert_equal( x, x.aE_has_attr_reader(:someattr) )
-    end
-  end # context Object
-  
   context "Enumerable" do
-    should "have #aE_all enforcer" do
-      assert_raise AErr do [1, 2, 7].aE_all{|e| e < 5 } end
-      assert_nothing_raised do [1, 2, 4].aE_all{|e| e < 5 } end
+    should "have #tE_all enforcer" do
+      assert_raise TErr do [1, 2, 7].tE_all { |e| e < 5 } end
+      assert_nothing_raised do [1, 2, 4].tE_all { |e| e < 5 } end
     end
 
-    should "have #aE_all_kind_of enforcer" do
-      assert_raise AErr do [1.0, 2.0, :a].aE_all_kind_of Numeric end
-      assert_nothing_raised do [1.0, 2.0, 3].aE_all_kind_of Numeric end
+    should "have #tE_all_kind_of enforcer" do
+      assert_raise TErr do [1.0, 2.0, :a].tE_all_kind_of Numeric end
+      assert_nothing_raised do [1.0, 2.0, 3].tE_all_kind_of Numeric end
     end
 
-    should "have #aE_all_declare_kind_of class compliance enforcer" do
-      assert_raise AErr do [1.0, 2.0, :a].aE_all_declare_kind_of Numeric end
-      assert_nothing_raised do [1.0, 2.0, 3].aE_all_declare_class Numeric end
+    should "have #tE_all_declare_kind_of class compliance enforcer" do
+      assert_raise TErr do [1.0, 2.0, :a].tE_all_declare_kind_of Numeric end
+      assert_nothing_raised do [1.0, 2.0, 3].tE_all_declare_class Numeric end
     end
 
-    should "have #aE_all_numeric enforcer" do
-      assert_raise AErr do [:a].aE_all_numeric end
-      assert_nothing_raised do [1, 2.0].aE_all_numeric end
+    should "have #tE_all_numeric enforcer" do
+      assert_raise TErr do [:a].tE_all_numeric end
+      assert_nothing_raised do [1, 2.0].tE_all_numeric end
     end
     
-    should "have #aE_subset_of enforcer" do
-      assert_raise AErr do [6].aE_subset_of [*0..5] end
-      assert_nothing_raised do [1,2].aE_subset_of [*0..5] end
+    should "have #tE_subset_of enforcer" do
+      assert_raise TErr do [6].tE_subset_of [*0..5] end
+      assert_nothing_raised do [1,2].tE_subset_of [*0..5] end
     end
   end # context Enumerable
 
@@ -182,55 +161,54 @@ class TypingTest < Test::Unit::TestCase
       assert_equal true, a.merge_synonym_keys!( :k, :o, :t )
       assert_equal( { a: 'a', b: 'b', k: 'k' }, a )
       old = a.dup
-      assert_raise AErr do a.merge_synonym_keys!( :a, :b ) end
+      assert_raise TErr do a.merge_synonym_keys!( :a, :b ) end
       assert_equal old, a
       assert_equal true, a.merge_synonym_keys!( :c, :b )
       assert_equal( { a: 'a', c: 'b', k: 'k' }, a )
     end
     
-    should "have #may_have, alias #∋? synonym key merger" do
-      a = { a: 'ano', b: 'bobo', k: 'kokot', o: 'kokot', t: 'kokot' }
+    should "have #may_have synonym key merger" do
+      a = { a: 'a', b: 'b', k: 'k', o: 'k', t: 'k' }
       assert_respond_to a, :may_have
-      assert_respond_to a, :∋?
       old = a.dup
       assert_nothing_raised do a.may_have :z end
-      assert_nothing_raised do a.∋? :z end
-      assert_raises AErr do a.may_have( :a, syn!: :b ) end
-      assert_raises AErr do a.∋?( :a, syn!: :b ) end
+      assert_nothing_raised do a.has? :z end
+      assert_raises TErr do a.may_have( :a, syn!: :b ) end
+      assert_raises TErr do a.has?( :a, syn!: :b ) end
       assert_equal false, a.has?( :z )
       assert_equal nil, a.may_have( :z )
-      assert_equal false, a.∋?( :z )
+      assert_equal false, a.has?( :z )
       assert_equal true, a.has?( :a )
       assert_equal a[:a], a.may_have( :a )
-      assert_equal true, a.∋?( :a )
+      assert_equal true, a.has?( :a )
       assert_equal old, a
-      assert_equal 'kokot', a.may_have( :k, syn!: [:o, :t] )
-      assert_equal true, a.∋?( :k, syn!: [:o, :t] )
-      assert_equal 'bobo', a.may_have( :c, syn!: :b )
-      assert_equal true, a.∋?( :c, syn!: :b )
-      assert_equal( { a: 'ano', c: 'bobo', k: 'kokot' }, a )
+      assert_equal 'k', a.may_have( :k, syn!: [:o, :t] )
+      assert_equal true, a.has?( :k, syn!: [:o, :t] )
+      assert_equal 'b', a.may_have( :c, syn!: :b )
+      assert_equal true, a.has?( :c, syn!: :b )
+      assert_equal( { a: 'a', c: 'b', k: 'k' }, a )
     end
     
-    should "have #aE_has, alias #aE_∋ synonymizing enforcer" do
+    should "have #tE_has synonymizing enforcer" do
       a = { infile: 'a', csv_out_file: 'b', k: 'k', o: 'k', t: 'k' }
-      assert_respond_to a, :aE_has
+      assert_respond_to a, :tE_has
       old = a.dup
-      assert_raises AErr do a.aE_has :z end
-      assert_nothing_raised do a.aE_has :infile end
-      assert_nothing_raised do a.aE_has :csv_out_file end
+      assert_raises AErr do a.tE_has :z end
+      assert_nothing_raised do a.tE_has :infile end
+      assert_nothing_raised do a.tE_has :csv_out_file end
       class TestClass; def initialize( args )
-                         args.aE_has :infile
-                         args.aE_has :csv_out_file
-                         args.aE_has :k
+                         args.tE_has :infile
+                         args.tE_has :csv_out_file
+                         args.tE_has :k
                        end end
       assert_nothing_raised do TestClass.new a end
-      assert_raises AErr do a.aE_has( :a, syn!: :b ) end
-      assert_equal "a", a.aE_has( :infile )
-      assert_equal "k", a.aE_has( :k, syn!: [:o, :t] )
-      assert_equal "b", a.aE_has( :c, syn!: :csv_out_file )
+      assert_raises AErr do a.tE_has( :a, syn!: :b ) end
+      assert_equal "a", a.tE_has( :infile )
+      assert_equal "k", a.tE_has( :k, syn!: [:o, :t] )
+      assert_equal "b", a.tE_has( :c, syn!: :csv_out_file )
       assert_equal( { infile: 'a', c: 'b', k: 'k' }, a )
-      assert_raises AErr do a.aE_has(:c) {|val| val == 'c'} end
-      assert_nothing_raised do a.aE_has(:c) {|val| val == 'b'} end
+      assert_raises AErr do a.tE_has(:c) {|val| val == 'c'} end
+      assert_nothing_raised do a.tE_has(:c) {|val| val == 'b'} end
     end
   end # context Hash
 end # class ScruplesTest
