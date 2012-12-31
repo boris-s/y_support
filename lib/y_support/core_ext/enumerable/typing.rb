@@ -32,7 +32,7 @@ module Enumerable
   def tE_all_kind_of klass, what_is_collection_element=nil
     e = what_is_collection_element || "collection element"
     m = "Each #{e} must be kind of #{klass}!"
-    raise TErr, m unless all? { |e| e.kind_of? kind }
+    raise TErr, m unless all? { |e| e.kind_of? klass }
     return self
   end
 
