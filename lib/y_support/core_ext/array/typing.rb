@@ -10,7 +10,7 @@ class Array
     e = what_is_element ? what_is_element.to_s.capitalize :
       "Element (#{element.class} instance)"
     m = "#{e} is absent from the array."
-    raise AErr, m unless include? e
+    raise TErr, m unless include? e
     return self
   end
   alias :tE_include :tE_includes

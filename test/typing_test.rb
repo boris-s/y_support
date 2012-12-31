@@ -162,19 +162,11 @@ class TypingTest < Test::Unit::TestCase
   end # context Enumerable
 
   context "Array" do
-    should "have #aE_has, alias #aE_include, #aE_∋ enforcer" do
-      assert_respond_to [1, 2, 4], :aE_has
-      assert_raise AErr do [1, 2, 4].aE_has 3 end
-      assert_nothing_raised do [1, 2, 4].aE_has 4 end
-      assert_equal [6, 7], [6, 7].aE_has( 6 )
-      assert_respond_to [1, 2, 4], :aE_include
-      assert_raise AErr do [1, 2, 4].aE_include 3 end
-      assert_nothing_raised do [1, 2, 4].aE_include 4 end
-      assert_equal [6, 7], [6, 7].aE_include( 6 )
-      assert_respond_to [1, 2, 4], :aE_∋
-      assert_raise AErr do [1, 2, 4].aE_∋ 3 end
-      assert_nothing_raised do [1, 2, 4].aE_∋ 4 end
-      assert_equal [6, 7], [6, 7].aE_∋( 6 )
+    should "have #tE_includes (alias #tE_include) enforcer" do
+      assert_raise TErr do [1, 2, 4].tE_includes 3 end
+      assert_nothing_raised do [1, 2, 4].tE_includes( 4 ).tE_include( 4 ) end
+      assert_equal [6, 7], [6, 7].tE_includes( 6 )
+      assert_equal [6, 7], [6, 7].tE_include( 6 )
     end
   end # context Array
 
