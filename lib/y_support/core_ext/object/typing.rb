@@ -8,7 +8,7 @@ class Object
   def declares_compliance?( mod )
     if mod.is_a? Module then mod = mod.name else mod = mod.to_s end
     if self.class.name == mod then return true # native type
-    elsif module_compliance.include?( mod ) then return true # expl. declared compliance
+    elsif declared_compliance.include?( mod ) then return true
     elsif begin
             self.singleton_class
           rescue TypeError

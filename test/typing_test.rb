@@ -21,19 +21,19 @@ class TypingTest < Test::Unit::TestCase
     end
 
     should "have working class compliance methods" do
-      assert @p.declares_ɱ_compliance?( @p.class )
-      assert @p.declares_ɱ_compliance?( @p.class.name )
-      assert !@p.declares_ɱ_compliance?( @k.class )
-      assert !@p.declares_ɱ_compliance?( @k.class.name )
-      @p.declare_ɱ_compliance! @k.class.name.to_sym
-      assert @p.declares_ɱ_compliance?( @k.class.name.to_sym )
-      assert_equal [ @p.class.name, @k.class.name ], @p.ɱ_compliance
-      assert_equal [ @k.class.name ], @k.ɱ_compliance
-      assert @p.declares_ɱ_compliance? Object
+      assert @p.declares_compliance?( @p.class )
+      assert @p.declares_compliance?( @p.class.name )
+      assert !@p.declares_compliance?( @k.class )
+      assert !@p.declares_compliance?( @k.class.name )
+      @p.declare_compliance! @k.class.name.to_sym
+      assert @p.declares_compliance?( @k.class.name.to_sym )
+      assert_equal [ @p.class.name, @k.class.name ], @p.declared_compliance
+      assert_equal [ @k.class.name ], @k.declared_compliance
+      assert @p.declares_compliance? Object
       o = Object.new
-      assert_equal false, o.E?( @l )
+      assert_equal false, o.declares_compliance?( @l )
       o.extend @l
-      assert_equal true, o.E?( @l )
+      assert_equal true, o.declares_compliance?( @l )
     end
   end
 
