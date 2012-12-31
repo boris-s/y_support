@@ -21,7 +21,7 @@ class TypingTest < Test::Unit::TestCase
     end
 
     should "have working class compliance methods" do
-      assert @p.declares_compliance?( @p.class )
+      assert @p.class_complies?( @p.class )
       assert @p.declares_compliance?( @p.class.name )
       assert ! @p.declares_compliance?( @k.class )
       assert ! @p.declares_compliance?( @k.class.name )
