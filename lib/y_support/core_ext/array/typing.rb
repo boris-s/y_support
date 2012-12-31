@@ -1,9 +1,16 @@
 #encoding: utf-8
 class Array
-  # Fails unless the array #include? the argument
-  def aE_has( e, msg = "Element #{e} absent from the array" )
-    raise AE, msg unless self.include? e
+  # === Duck typing support (aka. runtime assertions)
+
+  # This method takes a block and fails with TypeError, if the receiver array
+  # fails to include the specified element. An optional argument customizes the
+  # error message (element description).
+  # 
+  def tE_includes element, what_is_element=nil
+    e = what_is_element ? what_is_element.to_s.capitalize :
+      "Element (#{element.class} instance)"
+    m = "#{e} is absent from the array."
+    raise AErr, m unless include? e
     return self end
-  alias :aE_include :aE_has
-  alias :aE_∋ :aE_has
+  alias :tE_include :aE_includes
 end
