@@ -96,11 +96,11 @@ class Object
   # given class, or is a descendant of that class. Second optional argument
   # customizes the error message (receiver description).
   # 
-  def tE_complies klass, what_is_receiver=nil
+  def tE_class_complies klass, what_is_receiver=nil
     r = what_is_receiver ? what_is_receiver.to_s.capitalize :
       "#{self.class} instance #{object_id}"
     m = "#{r} does not declare compliance to #{klass}!"
-    raise TErr, m unless complies? klass
+    raise TErr, m unless class_complies? klass
     return self
   end
   

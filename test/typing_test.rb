@@ -71,15 +71,15 @@ class TypingTest < Test::Unit::TestCase
     should "have #tE_complies" do
       Koko = Class.new; Pipi = Class.new
       koko = Koko.new; pipi = Pipi.new
-      pipi.tE_complies koko.class
-      assert_raise TErr do koko.tE_complies pipi.class end
-      assert_nothing_raised do koko.tE_complies koko.class end
-      assert_nothing_raised do pipi.tE_complies pipi.class end
-      assert_nothing_raised do pipi.tE_complies koko.class end
-      assert_raise TErr do koko.tE_complies Pipi end
-      assert_nothing_raised do pipi.aE_complies Pipi end
-      assert_nothing_raised do pipi.aE_complies Koko end
-      assert_equal koko, koko.aE_complies( Koko )
+      pipi.tE_class_complies koko.class
+      assert_raise TErr do koko.tE_class_complies pipi.class end
+      assert_nothing_raised do koko.tE_class_complies koko.class end
+      assert_nothing_raised do pipi.tE_class_complies pipi.class end
+      assert_nothing_raised do pipi.tE_class_complies koko.class end
+      assert_raise TErr do koko.tE_class_complies Pipi end
+      assert_nothing_raised do pipi.aE_class_complies Pipi end
+      assert_nothing_raised do pipi.aE_class_complies Koko end
+      assert_equal koko, koko.aE_class_complies( Koko )
     end
     
     should "have #tE_respond_to enforcer" do
