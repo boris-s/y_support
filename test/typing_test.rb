@@ -22,18 +22,16 @@ class TypingTest < Test::Unit::TestCase
 
     should "have working class compliance methods" do
       assert @p.class_complies?( @p.class )
-      assert @p.declares_compliance?( @p.class.name )
-      assert ! @p.declares_compliance?( @k.class )
-      assert ! @p.declares_compliance?( @k.class.name )
-      @p.declare_compliance! @k.class.name.to_sym
-      assert @p.declares_compliance?( @k.class.name.to_sym )
-      assert_equal [ @p.class.name, @k.class.name ], @p.declared_compliance
-      assert_equal [ @k.class.name ], @k.declared_compliance
-      assert @p.declares_compliance? Object
+      assert ! @p.class_complies?( @k.class )
+      @p.declare_class_compliance! @k.class
+      assert @p.class_declares_compliance?( @k.class )
+      assert_equal [ @k.class ], @p.declared_class_compliance
+      assert_equal [], @k.declared_class_compliance
+      assert @p.class_complies? Object
       o = Object.new
-      assert_equal false, o.declares_compliance?( @l )
+      assert_equal false, o.class_complies?( @l )
       o.extend @l
-      assert_equal true, o.declares_compliance?( @l )
+      assert_equal true, o.class_complies?( @l )
     end
   end
 
