@@ -55,7 +55,7 @@ class Hash
     raise TErr, "Key '#{key}' absent!" unless has? key, options
     # Now validate self[key] using the supplied block
     if block_given?
-      m = how_comply ? "Value for #{key} fails its duck type!"
+      m = "Value for #{key} fails its duck type!"
       raise TErr, m unless ( b.arity == 0 ? self[key].instance_exec( &b ) :
                                b.( self[key] ) )
     end
