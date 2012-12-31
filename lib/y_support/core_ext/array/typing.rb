@@ -11,6 +11,7 @@ class Array
       "Element (#{element.class} instance)"
     m = "#{e} is absent from the array."
     raise AErr, m unless include? e
-    return self end
-  alias :tE_include :aE_includes
+    return self
+  end
+  alias :tE_include :tE_includes
 end
