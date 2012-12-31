@@ -3,42 +3,34 @@
 class Object
   # === Support for typing by declaration
 
-  # Class compliance inquirer.
+  # Class compliance inquirer (declared compliance + class ancestors).
   # 
-  def declares_compliance?( mod )
-    mod = mod.is_a?( Module ) ? mod.name.to_sym : mod.to_sym
-    if self.class.name.to_sym == mod then return true # native type
-    elsif declared_compliance.include?( mod ) then return true
-    elsif begin
-            self.singleton_class
-          rescue TypeError
-            self.class
-          end.ancestors.any? { |ancest| ancest.name.to_sym == mod } then
-      return true # implicit compliance through ancestry
-    else return false end # none applies
+  def class_complies?( klass )
+    singleton_class_or_class.complies? klass
   end
-  
-  # Class compliance pseudo-getter.
+
+  # Declared class compliance.
   # 
-  def declared_compliance
-    mods = instance_variable_get :@declared_compliance
-    return [ self.class.name ] if mods.nil?
-    raise "Unexpected @declared_compliance instance variable!" unless
-      mods.include?( self.class.name.to_sym )
-    return mods
+  def class_declares_compliance?( klass )
+    singleton_class_or_class.declares_compliance? klass
   end
-  
-  # Declaration of module / class compliance.
+
+  # Class compliance (declared class compliance + ancestors).
   # 
-  def declare_compliance!( *modules )
-    modules.each do |symbol_or_module|
-      names = case symbol_or_module
-              when Module then
-                symbol_or_module.ancestors.map( &:name ).map( &:to_sym )
-              else [ symbol_or_module.to_sym ] end
-      instance_variable_set :@declared_compliance,
-                            ( declared_compliance() + names ).uniq
-    end
+  def class_compliance
+    singleton_class_or_class.compliance
+  end
+
+  # Declared class compliance.
+  # 
+  def declared_class_compliance
+    singleton_class_or_class.declared_compliance
+  end
+
+  # Declaration of class compliance.
+  # 
+  def declare_class_compliance!( klass )
+    singleton_class_or_class.declare_compliance! klass
   end
 
   # === Duck typing support (aka. runtime assertions)
@@ -170,5 +162,15 @@ class Object
     m = "#{r} fails to be #present?!"
     raise TErr, m unless present?
     return self
+  end
+
+  private
+
+  def singleton_class_or_class
+    begin
+      self.singleton_class
+    rescue TypeError
+      self.class
+    end
   end
 end
