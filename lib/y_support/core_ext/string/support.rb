@@ -2,44 +2,76 @@
 
 class String
   # Integer() style conversion, or false if conversion impossible.
-  def can_be_integer?
-    begin; int = Integer( self.stripn ); return int
-    rescue AE; return false end
+  # 
+  def to_Integer
+    begin
+      int = Integer stripn
+      return int
+    rescue ArgumentError
+      return false
+    end
   end
   
   # Float() style conversion, or false if conversion impossible.
-  def can_be_float?
-    begin; fl = Float( self.stripn ); return fl
-    rescue AE; return false end
+  # 
+  def to_Float
+    begin
+      fl = Float stripn
+      return fl
+    rescue ArgumentError
+      return false
+    end
   end
   
-  # #stripn is like #strip, but also strips newlines
-  def stripn; encode(universal_newline: true).gsub("\n", "").strip end
+  # Like #strip, but also strips newlines.
+  # 
+  def stripn
+    encode( universal_newline: true )
+      .gsub("\n", "")
+      .strip
+  end
   
   # Joins a paragraph of possibly indented, newline separated lines into a
   # single contiguous string.
-  def compact
-    encode(universal_newline: true).split("\n"). # split into lines
-      map( &:strip ).delete_if( &:blank? ).join " " # strip and join lines
+  # 
+  def wring_heredoc
+    encode(universal_newline: true)
+      .split("\n")                   # split into lines
+      .map( &:strip )                # strip them
+      .delete_if( &:blank? )         # delete blank lines
+      .join " "                      # and join with whitspace
   end
   
-  # #default replaces an empty string (#empty?) with provided default
-  # string.
+  # If the string is empty, it gets replace with the string given as argument.
+  # 
   def default! default_string
     strip.empty? ? clear << default_string.to_s : self
   end
   
-  # underscores spaces
-  def underscore_spaces; gsub( ' ', '_' ) end
-  
-  # Strips a ς (#stripn), removes criminal chars & underscores spaces
-  def symbolize
-    x = self; ",.?!;".each_char{|c| x.gsub!(c, " ")}
-    return x.stripn.squeeze(" ").underscore_spaces
+  # As it says – replaces spaces with underscores.
+  # 
+  def underscore_spaces
+    gsub ' ', '_'
   end
-  alias :ßize :symbolize
+  
+  # Converts a string into a standard symbol. While Symbol class objects can
+  # be created from any string, it is good practice to keep symbols free of
+  # whitespaces and weird characters, so that the are typed easily, usable as
+  # variable names etc. This method thus removes punctuation, removes
+  # superfluous spaces, and underscores the remaining ones, before returning
+  # the string.
+  # 
+  def standardize
+    ς = self.dup
+    ",.;".each_char { |c| ς.gsub! c, " " }
+    ς.stripn
+      .squeeze(" ")
+      .underscore_spaces
+  end
   
   # chains #symbolize and #to_sym
-  def to_normalized_sym; symbolize.to_sym end
-  alias :ßß :to_normalized_sym
+  def to_standardized_sym
+    standardize
+      .to_sym
+  end
 end

@@ -127,8 +127,8 @@ class TypingTest < Test::Unit::TestCase
     end
 
     should "have #tE_all_comply class compliance enforcer" do
-      assert_raise TErr do [1.0, 2.0, :a].tE_all_declare_kind_of Numeric end
-      assert_nothing_raised do [1.0, 2.0, 3].tE_all_declare_class Numeric end
+      assert_raise TErr do [1.0, 2.0, :a].tE_all_comply Numeric end
+      assert_nothing_raised do [1.0, 2.0, 3].tE_all_comply Numeric end
     end
 
     should "have #tE_all_numeric enforcer" do
