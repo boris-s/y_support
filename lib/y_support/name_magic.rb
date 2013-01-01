@@ -122,7 +122,6 @@ module NameMagic
     end
 
     def instance which
-      puts "Hello from #instance method"
       const_magic
       # if 'which' is an actual instance, just return it
       return which if __instances__.keys.include? which
