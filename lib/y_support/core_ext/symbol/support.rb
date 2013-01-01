@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
 class Symbol
-  # Symbol's method #default! just applies String's #dℲ! to a Symbol. Of
-  # course, a symbol cannot change, so despite the exclamation mark, new
-  # symbol is returned whenever the original is considered "defaulted".
-  # Ordinary #default does not work with symbols, as symbols are never
-  # considered blank.
+  # This method applies String#default! method to the receiver converted to
+  # a string. Of course, symbols are immutable, so in spite of the exclamation
+  # mark in the method name, a new symbol (supplied as argument) is returned,
+  # if the original one is considered "defaulted" (otherwise, original symbol
+  # is returned unchanged).
   # 
-  def default!( default_value )
-    to_s.default!( default_value ).to_sym
+  def default! default_symbol
+    to_s.default!( default_symbol ).to_sym
   end
   
-  # Chains #symbolize and #to_sym.
+  # Applies String#to_standardized_sym method to the recevier converted to a
+  # string.
   # 
-  def to_normalized_sym; to_s.to_normalized_sym end
-  alias :ßß :to_normalized_sym
+  def to_standardized_sym
+    to_s.to_standardized_sym
+  end
   
-  # Creates a RespondTo object from self. (Usef for ~:symbol style matching
-  # in case statements).
+  # Creates a RespondTo object from self. Intended use of RespondTo is in case
+  # statements (RespondTo has customized #=== method testing #respond_to?).
+  # So in a case statement, <tt>when ~:each</tt> activates when the tested
+  # object responds to #each method.
   # 
   def ~@; RespondTo self end
 end

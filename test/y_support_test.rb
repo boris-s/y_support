@@ -343,9 +343,8 @@ class YSupportTest < Test::Unit::TestCase
       assert_equal :kokot, :kokot.default!("default")
     end
     
-    should "have #to_normalized_sym alias #ßß" do
-      assert_equal :Yes_prisoner, (:" \nYes, prisoner!?.; \n \n").ßß
-      assert_equal :Yes, (:" \nYes, \n").to_normalized_sym
+    should "have #to_standardized_sym" do
+      assert_equal :Yes, (:" \nYes, \n").to_standardized_sym
     end
     
     should "have ~@ method for ~:symbol style .respond_to?" \
