@@ -69,7 +69,8 @@ class String
       .underscore_spaces
   end
   
-  # chains #symbolize and #to_sym
+  # Applies #standardize to the receiver and converts the result to a symbol.
+  # 
   def to_standardized_sym
     standardize
       .to_sym
