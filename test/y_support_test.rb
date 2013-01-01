@@ -286,15 +286,15 @@ class YSupportTest < Test::Unit::TestCase
   
   context "String" do
     should "have #can_be_integer? returning the integer or false if not convertible" do
-      assert_equal 33, "  33".can_be_integer?
-      assert_equal 8, " 010 ".can_be_integer?
-      assert_equal false, "garbage".can_be_integer?
+      assert_equal 33, "  33".to_Integer
+      assert_equal 8, " 010 ".to_Integer
+      assert_equal false, "garbage".to_Integer
     end
     
     should "have #can_be_float? returning the float or false if not convertible" do
-      assert_equal 22.2, ' 2.22e1'.can_be_float?
-      assert_equal 10, " 010 ".can_be_float?
-      assert_equal false, "garbage".can_be_float?
+      assert_equal 22.2, ' 2.22e1'.to_Float
+      assert_equal 10, " 010 ".to_Float
+      assert_equal false, "garbage".to_Float
     end
     
     should "have #default! defaulter" do
@@ -311,8 +311,9 @@ class YSupportTest < Test::Unit::TestCase
     end
     
     should "have #compact for joining indented lines (esp. heredocs)" do
-      assert_equal "test test test", "test\n test\n\n   \n   test\n  ".compact
-      funny_string = <<-FUNNY_STRING.compact
+      assert_equal "test test test",
+                   "test\n test\n\n   \n   test\n  ".wring_heredoc
+      funny_string = <<-FUNNY_STRING.wring_heredoc
                         This
                           is
                             a funny string.
@@ -326,11 +327,11 @@ class YSupportTest < Test::Unit::TestCase
     
     should "have #symbolize stripping, removing capitalization and diacritics " \
     'as if to make a suitable symbol material' do
-      assert_equal "Yes_prisoner", " \nYes, prisoner!?.; \n \n".symbolize
+      assert_equal "Yes_sir!", " \nYes, sir!.; \n \n".standardize
     end
     
-    should "have #to_normalized_sym chaining #symbolize and #to_sym" do
-      assert_equal :Yes_prisoner,  " \nYes, prisoner!?.; \n \n".to_normalized_sym
+    should "have #to_standardized_sym chaining #standardize and #to_sym" do
+      assert_equal :Yes,  " \nYes,.; \n \n".to_standardized_sym
     end
   end # context String
 
