@@ -129,7 +129,8 @@ module NameMagic
     def instance instance_identifier
       const_magic
       # if the argument is an actual instance, just return it
-      return which if __instances__.keys.include? which
+      return instance_identifier if
+        __instances__.keys.include? instance_identifier
       # otherwise, treat it as name
       begin
         __instances__.rassoc( instance_identifier ) ||
