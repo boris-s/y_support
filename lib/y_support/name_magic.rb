@@ -121,19 +121,21 @@ module NameMagic
       self
     end
 
-    def instance which
+    # Returns the instance of the class using NameMagic, specified by the
+    # argument. NameError is raised, if the argument does not represent a valid
+    # instance name, or if the argument itself is not a valid instance (in
+    # which case it is returned unchanged).
+    # 
+    def instance instance_identifier
       const_magic
-      # if 'which' is an actual instance, just return it
+      # if the argument is an actual instance, just return it
       return which if __instances__.keys.include? which
-      # otherwise check the argument class
-      case which
-      when String, Symbol then
-        inst = __instances__.rassoc( which.to_sym )
-        raise NameError, "No instance #{which} in #{self}." if inst.nil?
-      else
-        raise TypeError, "No instance #{which.class}:'#{which}' in #{self}."
-      end
-      return inst[0]
+      # otherwise, treat it as name
+      begin
+        __instances__.rassoc( instance_identifier ) ||
+          __instances__.rassoc( instance_identifier.to_sym )
+      rescue NoMethodError
+      end or raise NameError, "No instance #{instance_identifier} in #{self}."
     end
 
     # In addition to its ability to assign name to the target instance when
