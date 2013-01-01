@@ -40,10 +40,10 @@ module Enumerable
   # compliance with the class supplied as argument. Second optional argument
   # (collection element description) customizes the error message.
   # 
-  def tE_all_declare_compliance klass, what_is_collection_element=nil
+  def tE_all_comply klass, what_is_collection_element=nil
     e = what_is_collection_element || "collection element"
     m = "Each #{e} must declare compliance to #{klass}!"
-    raise TErr, m unless all? { |e| e.declares_compliance? klass }
+    raise TErr, m unless all? { |e| e.class_complies? klass }
     return self
   end
   
