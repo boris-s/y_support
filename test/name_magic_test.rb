@@ -5,8 +5,7 @@ require 'test/unit'
 require 'shoulda'
 require 'minitest/spec'
 require 'minitest/autorun'
-# require './../lib/y_support/all'
-require './../lib/y_support/name_magic'
+require 'y_support/name_magic'
 
 describe NameMagic do
   before do
