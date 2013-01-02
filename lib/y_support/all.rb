@@ -1,46 +1,13 @@
 # -*- coding: utf-8 -*-
 require 'y_support'
 require 'y_support/name_magic'
+require 'y_support/typing'
 require 'y_support/unicode'
 require 'y_support/respond_to'
 require 'y_support/null_object'
 require 'y_support/local_object'
-puts require 'y_support/core_ext'
+require 'y_support/core_ext'
 require 'y_support/stdlib_ext'
-
-# *** DEVELOPMENT REMARKS FOLLOW ***
-
-# Typing library.
-#
-# 1. Standard way of object typing is TYPING BY CLASS AND CLASS ANCESTRY.
-# 2. More powerful TYPING BY DECLARATION is supported by method
-# <b>declare_module_compliance</b>, by which it is declared that one module
-# provides the same interface as another module. Inquirer methods are
-# <b>module_compliance</b> (returns a list of modules with which the receive
-# complies) and <b>declares_module_compliance?</b>, which anwers whether the
-# receiver complies with a particular module. An object always implicitly
-# complies with its class and class ancestry.
-# 3. DUCK TYPING. Duck type enforcement for method parameters is supported
-# by a collection of enforcer methods. These methods look very much like
-# assertions, but they start with <b>aE_...</b>, meaning "enforce by raising
-# argument error".
-#
-# The library name comes from the scruple character <b>℈</b>, which can be
-# used instead of capital <b>E</>, meaning error. The scruple character ℈
-# (U+2108) originally meant a pharmaceutical unit, but here it is used more
-# in its sense of "moral reservation" - towards the input arguments.
-#
-# All Scruples methods raise ArgumentError (aliased as AE/A℈) if the
-# receiver fails the expectations. Those using Kragen's .XCompose file
-# (https://github.com/kragen/xcompose) can type ℈ as compose, s, c, r, dot.
-
-
-
-
-
-
-
-
 
 # # Redefining constants without warnings, useful for mocking.
 # def const_set_if_not_dϝ(const, value)

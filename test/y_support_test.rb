@@ -5,8 +5,7 @@ require 'test/unit'
 require 'shoulda'
 require 'minitest/spec'
 require 'minitest/autorun'
-# require 'y_support/all'
-require './../lib/y_support/all'
+require 'y_support/all'
 
 class YSupportTest < Test::Unit::TestCase
   context "Object" do

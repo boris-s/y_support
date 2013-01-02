@@ -19,7 +19,7 @@ require 'y_support'
 # enforcer methods (aka. run-time assertions). These methods look very much like
 # assertions, but they start with <b>tE_...</b>, meaning "enforce by raising
 # TypeError".
-# 
+
 class Object
   # Alias for ArgumentError
   # 
@@ -30,9 +30,9 @@ class Object
   TErr = TypeError
 end
 
-[:typing].each do |part|
-  Dir["#{File.dirname( __FILE__ )}/#{part}/*/typing.rb"].sort.each { |path|
-    dir = File.dirname( path ).match( "y_support/#{part}" ).post_match
-    require "y_support/#{part}#{dir}/typing"
+[ :core_ext, :stdlib_ext ].each do |ext|
+  Dir["#{File.dirname( __FILE__ )}/#{ext}/*/typing.rb"].sort.each { |path|
+    dir = File.dirname( path ).match( "y_support/#{ext}" ).post_match
+    require "y_support/#{ext}#{dir}/typing"
   }
 end
