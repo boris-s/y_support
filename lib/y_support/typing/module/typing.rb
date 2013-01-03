@@ -6,14 +6,14 @@ class Module
   # Compliance inquirer (declared compliance + ancestors).
   # 
   def complies?( other_module )
-    other_module.tE_kind_of Module, "other module"
+    other_module.aT_kind_of Module, "other module"
     compliance.include? other_module
   end
 
   # Declared complience inquirer.
   # 
   def declares_compliance?( other_module )
-    other_module.tE_kind_of Module, "other module"
+    other_module.aT_kind_of Module, "other module"
     declared_compliance.include? other_module
   end
 
@@ -34,7 +34,7 @@ class Module
   # Declaration of module / class compliance.
   # 
   def declare_compliance! other_module
-    other_module.tE_kind_of Module, "other module"
+    other_module.aT_kind_of Module, "other module"
     return false if declared_compliance.include? other_module
     ( @declared_compliance ||= [] ) << other_module
     return true
