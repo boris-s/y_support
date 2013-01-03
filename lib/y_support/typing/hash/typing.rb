@@ -51,7 +51,7 @@ class Hash
   # arguments (arity 0), it is executed inside the singleton class of the
   # receiver (using #instance_exec method).
   # 
-  def tE_has key, options={}, &b
+  def aT_has key, options={}, &b
     raise TErr, "Key '#{key}' absent!" unless has? key, options
     # Now validate self[key] using the supplied block
     if block_given?
@@ -61,14 +61,14 @@ class Hash
     end
     return self[key]
   end
-  alias :must_have :tE_has
+  alias :must_have :aT_has
 
-  # This method behaves exactly like #tE_has, but with the difference, that
+  # This method behaves exactly like #aT_has, but with the difference, that
   # it raises ArgumentError instead of TypeError
   # 
   def aE_has key, options={}, &b
     begin
-      options.empty? ? tE_has( key, &b ) : tE_has( key, options, &b )
+      options.empty? ? aT_has( key, &b ) : aT_has( key, options, &b )
     rescue TypeError => e
       raise AErr, e.message
     end

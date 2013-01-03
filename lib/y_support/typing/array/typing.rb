@@ -6,7 +6,7 @@ class Array
   # fails to include the specified element. An optional argument customizes the
   # error message (element description).
   # 
-  def tE_includes element, what_is_element=nil
+  def aT_includes element, what_is_element=nil
     e = what_is_element ? what_is_element.to_s.capitalize :
       "Element (#{element.class} instance)"
     m = "#{e} is absent from the array."
