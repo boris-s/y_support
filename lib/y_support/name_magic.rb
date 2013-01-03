@@ -128,19 +128,17 @@ module NameMagic
     # instance name, or if the argument itself is not a valid instance (in
     # which case it is returned unchanged).
     # 
-    def instance instance_identifier
+    def instance arg
       const_magic
       # if the argument is an actual instance, just return it
-      return instance_identifier if
-        __instances__.keys.include? instance_identifier
+      return arg if __instances__.keys.include? arg
       # otherwise, treat it as name
-      rassoc = begin
-                 __instances__.rassoc( instance_identifier ) ||
-                   __instances__.rassoc( instance_identifier.to_sym )
-               rescue NoMethodError
-               end or
-        raise NameError, "No instance #{instance_identifier} in #{self}."
-      return rassoc[0]
+      r = begin
+            __instances__.rassoc( arg ) || __instances__.rassoc( arg.to_sym )
+          rescue NoMethodError
+          end or
+        raise NameError, "No instance #{arg} in #{namespace}."
+      return r[0]
     end
 
     # In addition to its ability to assign name to the target instance when
