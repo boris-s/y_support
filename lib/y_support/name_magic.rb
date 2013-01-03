@@ -192,6 +192,7 @@ module NameMagic
     # accordingly. Number of the remaining nameless instances is returned.
     # 
     def const_magic
+      puts "performing const_magic"
       return 0 if nameless_instances.size == 0
       serve_all_modules
       return nameless_instances.size

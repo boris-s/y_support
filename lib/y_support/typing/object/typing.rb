@@ -44,7 +44,7 @@ class Object
   # the receiver (using #instance_exec method). If no block is given, it is
   # checked, whether the object is truey.
   # 
-  def tE what_is_receiver=nil, how_comply=nil, &b
+  def aT what_is_receiver=nil, how_comply=nil, &b
     r = what_is_receiver ? what_is_receiver.to_s.capitalize :
       "#{self.class} instance #{object_id}"
     if block_given?
