@@ -133,8 +133,8 @@ module NameMagic
         __instances__.keys.include? instance_identifier
       # otherwise, treat it as name
       begin
-        __instances__.rassoc( instance_identifier ) ||
-          __instances__.rassoc( instance_identifier.to_sym )
+        __instances__.rassoc( instance_identifier )[0] ||
+          __instances__.rassoc( instance_identifier.to_sym )[0]
       rescue NoMethodError
       end or raise NameError, "No instance #{instance_identifier} in #{self}."
     end
