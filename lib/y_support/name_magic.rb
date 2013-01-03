@@ -104,13 +104,15 @@ module NameMagic
     # Presents class-owned @instances without const_magic.
     # 
     def __instances__
-      return @instances ||= {}
+      namespace.instance_variable_get( :@instances ) or
+        namespace.instance_variable_set( :@instances, {} )
     end
 
     # Presents class-owned @avid_instances (no const_magic).
     # 
     def __avid_instances__
-      return @avid_instances ||= []
+      namespace.instance_variable_get( :@avid_instances ) or
+        namespace.instance_variable_set( :@avid_instances, [] )
     end
 
     # Presents class-owned namespace. Normally, this is the class itself,
