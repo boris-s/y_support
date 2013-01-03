@@ -13,5 +13,5 @@ class Array
     raise TErr, m unless include? element
     return self
   end
-  alias :tE_include :tE_includes
+  alias :aT_include :aT_includes
 end
