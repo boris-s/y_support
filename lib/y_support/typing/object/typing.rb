@@ -115,6 +115,7 @@ class Object
     raise TErr, m unless respond_to? method_name
     return self
   end
+  alias :aT_responds_to :aT_respond_to
   
   # Fails with TypeError unless the receiver, according to #== method, is
   # equal to the argument. Two more optional arguments customize the error
