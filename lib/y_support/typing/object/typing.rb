@@ -45,17 +45,12 @@ class Object
   # checked, whether the object is truey.
   # 
   def aT what_is_receiver=nil, how_comply=nil, &b
-    puts "hello from aT method, about to figure receriver message"
     r = what_is_receiver ? what_is_receiver.to_s.capitalize :
       "#{self.class} instance #{object_id}"
-    puts "receiver message figured"
     if block_given?
-      puts "block given, going to call it"
-      m = "#{r} fails #{ how_comply ? 'to %s' % how_comply : 'its duck type' }!"
+      m = "#{r} fails #{how_comply ? 'to %s' % how_comply : 'its duck type'}!"
       raise TErr, m unless ( b.arity == 0 ) ? instance_exec( &b ) : b.( self )
-      puts "called, complies"
     else
-      m = "#{r} is nil of false!"
       raise TErr, m unless self
     end
     return self
