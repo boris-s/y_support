@@ -40,15 +40,15 @@ class TypingTest < Test::Unit::TestCase
     end
     
     should "have #aE raising ArgumentError if block falsey" do
-      assert_raise TErr do 0.tE "yada yada" do self == 1 end end
-      assert_nothing_raised do 0.tE "yada yada" do self == 0 end end
+      assert_raise TErr do 0.aT "yada yada" do self == 1 end end
+      assert_nothing_raised do 0.aT "yada yada" do self == 0 end end
       assert_equal( "hello",
-                    "hello".tE( "have 4 unique letters" ) {
+                    "hello".aT( "have 4 unique letters" ) {
                       each_char.map { |e| e }.uniq.join.size == 4
                     } )
-      assert_nothing_raised do 2.tE &:even? end
-      assert_raise TErr do 3.tE &:even? end
-      assert_raise TErr do nil.tE end
+      assert_nothing_raised do 2.aT &:even? end
+      assert_raise TErr do 3.aT &:even? end
+      assert_raise TErr do nil.aT end
     end
     
     should "have #aT_not raising TypeError if block truey" do
