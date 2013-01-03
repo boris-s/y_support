@@ -66,7 +66,7 @@ class Object
   # inside the singleton class of the receiver (using #instance_exec method). If
   # no block is given, it is checked, whether the object is falsey.
   # 
-  def tE_not what_is_receiver=nil, how_comply=nil, &b
+  def aT_not what_is_receiver=nil, how_comply=nil, &b
     r = what_is_receiver ? what_is_receiver.to_s.capitalize :
       "#{self.class} instance #{object_id}"
     if block_given?
@@ -83,20 +83,20 @@ class Object
   # Fails with TypeError unless the receiver is of the prescribed class. Second
   # optional argument customizes the error message (receiver description).
   # 
-  def tE_kind_of klass, what_is_receiver=nil
+  def aT_kind_of klass, what_is_receiver=nil
     r = what_is_receiver ? what_is_receiver.to_s.capitalize :
       "#{self.class} instance #{object_id}"
     m = "#{r} is not a kind of #{klass}!"
     raise TErr, m unless kind_of? klass
     return self
   end
-  alias :tE_is_a :tE_kind_of
+  alias :aT_is_a :aT_kind_of
 
   # Fails with TypeError unless the receiver declares compliance with the
   # given class, or is a descendant of that class. Second optional argument
   # customizes the error message (receiver description).
   # 
-  def tE_class_complies klass, what_is_receiver=nil
+  def aT_class_complies klass, what_is_receiver=nil
     r = what_is_receiver ? what_is_receiver.to_s.capitalize :
       "#{self.class} instance #{object_id}"
     m = "#{r} does not comply or declare compliance with #{klass}!"
@@ -108,7 +108,7 @@ class Object
   # method. Second optional argument customizes the error message (receiver
   # description).
   # 
-  def tE_respond_to method_name, what_is_receiver=nil
+  def aT_respond_to method_name, what_is_receiver=nil
     r = what_is_receiver ? what_is_receiver.to_s.capitalize :
       "#{self.class} instance #{object_id}"
     m = "#{r} does not respond to method '#{method_name}'!"
@@ -120,7 +120,7 @@ class Object
   # equal to the argument. Two more optional arguments customize the error
   # message (receiver description and the description of the other object).
   # 
-  def tE_equal other, what_is_receiver=nil, what_is_other=nil
+  def aT_equal other, what_is_receiver=nil, what_is_other=nil
     r = what_is_receiver ? what_is_receiver.to_s.capitalize :
       "#{self.class} instance #{object_id}"
     o = what_is_other || "the prescribed value (#{other.class})"
@@ -133,7 +133,7 @@ class Object
   # from to the argument. Two more optional arguments customize the error
   # message (receiver description and the description of the other object).
   # 
-  def tE_not_equal other, what_is_receiver=nil, what_is_other=nil
+  def aT_not_equal other, what_is_receiver=nil, what_is_other=nil
     r = what_is_receiver ? what_is_receiver.to_s.capitalize :
       "#{self.class} instance #{object_id}"
     o = what_is_other || "the prescribed value (#{other.class})"
@@ -145,7 +145,7 @@ class Object
   # Fails with TypeError unless the ActiveSupport method #blank returns true
   # for the receiver.
   # 
-  def tE_blank what_is_receiver=nil
+  def aT_blank what_is_receiver=nil
     r = what_is_receiver ? what_is_receiver.to_s.capitalize :
       "#{self.class} instance #{object_id}"
     m = "#{r} fails to be #blank?!"
@@ -156,7 +156,7 @@ class Object
   # Fails with TypeError unless the ActiveSupport method #present returns true
   # for the receiver.
   # 
-  def tE_present what_is_receiver=nil
+  def aT_present what_is_receiver=nil
     r = what_is_receiver ? what_is_receiver.to_s.capitalize :
       "#{self.class} instance #{object_id}"
     m = "#{r} fails to be #present?!"
