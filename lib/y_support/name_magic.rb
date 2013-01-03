@@ -132,11 +132,13 @@ module NameMagic
       return instance_identifier if
         __instances__.keys.include? instance_identifier
       # otherwise, treat it as name
-      begin
-        __instances__.rassoc( instance_identifier )[0] ||
-          __instances__.rassoc( instance_identifier.to_sym )[0]
-      rescue NoMethodError
-      end or raise NameError, "No instance #{instance_identifier} in #{self}."
+      rassoc = begin
+                 __instances__.rassoc( instance_identifier ) ||
+                   __instances__.rassoc( instance_identifier.to_sym )
+               rescue NoMethodError
+               end or
+        raise NameError, "No instance #{instance_identifier} in #{self}."
+      return rassoc[0]
     end
 
     # In addition to its ability to assign name to the target instance when
