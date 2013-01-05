@@ -26,67 +26,7 @@ module NameMagic
   DEBUG = false
   PROBLEM_MODULES = [ 'Gem', 'Rack', 'ActiveSupport' ]
 
-  def self.included receiver         # :nodoc:
-    class << receiver
-      alias :original_method_new :new
-    end
-    receiver.extend NameMagicClassMethods
-  end
-
-  # Retrieves an instance name (demodulized).
-  # 
-  def name
-    self.class.const_magic
-    ɴ = self.class.__instances__[ self ]
-    if ɴ then
-      name_get_closure = self.class.instance_variable_get :@name_get_closure
-      return name_get_closure ? name_get_closure.( ɴ ) : ɴ
-    else
-      return nil
-    end
-  end
-  alias ɴ name
-
-  # Names an instance, cautiously (ie. no overwriting of existing names).
-  # 
-  def name=( ɴ )
-    # get previous name of this instance, if any
-    old_ɴ = self.class.__instances__[ self ]
-    # honor the hook
-    name_set_closure = self.class.instance_variable_get :@name_set_closure
-    ɴ = name_set_closure.call( ɴ, self, old_ɴ ) if name_set_closure
-    ɴ = self.class.send( :validate_capitalization, ɴ ).to_sym
-    return if old_ɴ == ɴ # already named as required; nothing to do
-    # otherwise, be cautious about name collision
-    raise NameError, "Name '#{ɴ}' already exists in " +
-      "#{self.class} namespace!" if self.class.__instances__.rassoc( ɴ )
-    # since everything's ok...
-    self.class.namespace.const_set ɴ, self # write a constant
-    self.class.__instances__[ self ] = ɴ   # write __instances__
-    self.class.__forget__ old_ɴ            # forget the old name of self
-  end
-
-  # Names an instance, aggresively (overwrites existing names).
-  # 
-  def name!( ɴ )
-    # get previous name of this instance, if any
-    old_ɴ = self.class.__instances__[ self ]
-    # honor the hook
-    name_set_closure = self.class.instance_variable_get :@name_set_closure
-    ɴ = name_set_closure.( ɴ, self, old_ɴ ) if name_set_closure
-    ɴ = self.class.send( :validate_capitalization, ɴ ).to_sym
-    return false if old_ɴ == ɴ # already named as required; nothing to do
-    # otherwise, rudely remove the collider, if any
-    pair = self.class.__instances__.rassoc( ɴ )
-    self.class.__forget__( pair[0] ) if pair
-    # and add add self to the namespace
-    self.class.namespace.const_set ɴ, self # write a constant
-    self.class.__instances__[ self ] = ɴ   # write to __instances__
-    self.class.__forget__ old_ɴ            # forget the old name of self
-    return true
-  end
-
-  module NameMagicClassMethods
+  class << self
     # Presents class-owned @instances hash of { instance => name } pairs.
     # 
     def instances
@@ -160,8 +100,8 @@ module NameMagic
         __instances__.keys.include? ɴß unless avid
       # instantiate
       args = if oo.empty? then args else args + [ oo ] end
-      new_inst = if oo.empty? then original_method_new *args, &block
-                 else original_method_new *args, oo, &block end
+      new_inst = if oo.empty? then super *args, &block
+                 else super *args, oo, &block end
       # treat is as unnamed at first
       __instances__.merge! new_inst => nil
       # honor the hook
@@ -333,5 +273,58 @@ module NameMagic
         " letter 'A'..'Z' ('#{ɴ}' was given)!" unless ( ?A..?Z ) === ɴ[0]
       return ɴ
     end
-  end # module NameMagicClassMethods
+  end
+
+  # Retrieves an instance name (demodulized).
+  # 
+  def name
+    self.class.const_magic
+    ɴ = self.class.__instances__[ self ]
+    if ɴ then
+      name_get_closure = self.class.instance_variable_get :@name_get_closure
+      return name_get_closure ? name_get_closure.( ɴ ) : ɴ
+    else
+      return nil
+    end
+  end
+  alias ɴ name
+
+  # Names an instance, cautiously (ie. no overwriting of existing names).
+  # 
+  def name=( ɴ )
+    # get previous name of this instance, if any
+    old_ɴ = self.class.__instances__[ self ]
+    # honor the hook
+    name_set_closure = self.class.instance_variable_get :@name_set_closure
+    ɴ = name_set_closure.call( ɴ, self, old_ɴ ) if name_set_closure
+    ɴ = self.class.send( :validate_capitalization, ɴ ).to_sym
+    return if old_ɴ == ɴ # already named as required; nothing to do
+    # otherwise, be cautious about name collision
+    raise NameError, "Name '#{ɴ}' already exists in " +
+      "#{self.class} namespace!" if self.class.__instances__.rassoc( ɴ )
+    # since everything's ok...
+    self.class.namespace.const_set ɴ, self # write a constant
+    self.class.__instances__[ self ] = ɴ   # write __instances__
+    self.class.__forget__ old_ɴ            # forget the old name of self
+  end
+
+  # Names an instance, aggresively (overwrites existing names).
+  # 
+  def name!( ɴ )
+    # get previous name of this instance, if any
+    old_ɴ = self.class.__instances__[ self ]
+    # honor the hook
+    name_set_closure = self.class.instance_variable_get :@name_set_closure
+    ɴ = name_set_closure.( ɴ, self, old_ɴ ) if name_set_closure
+    ɴ = self.class.send( :validate_capitalization, ɴ ).to_sym
+    return false if old_ɴ == ɴ # already named as required; nothing to do
+    # otherwise, rudely remove the collider, if any
+    pair = self.class.__instances__.rassoc( ɴ )
+    self.class.__forget__( pair[0] ) if pair
+    # and add add self to the namespace
+    self.class.namespace.const_set ɴ, self # write a constant
+    self.class.__instances__[ self ] = ɴ   # write to __instances__
+    self.class.__forget__ old_ɴ            # forget the old name of self
+    return true
+  end
 end # module NameMagic
