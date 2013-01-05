@@ -57,18 +57,29 @@ module NameMagic
       included_of_self = self.method( :included )
       pre_included_of_the_target = begin
                                      target.method( :pre_included )
+                                     puts "#pre_included method found"
                                    rescue NameError
+                                     puts "#pre_included method not found"
                                    end
       if pre_included_of_the_target then
+        puts "defining artificial #included with #pre_included"
         target.define_singleton_method :included do |ç|
+          puts "Hello from artificial #included"
           pre_included_of_the_target.( ç )
+          puts "#pre_included called"
           included_of_self.call( ç )
+          puts "#included called"
           included_of_the_target.call( ç )
+          puts "post-#included called"
         end
       else
+        puts "defining artificial #included without #pre_included"
         target.define_singleton_method :included do |ç|
+          puts "Hello from artificial #included"
           included_of_self.( ç )
+          puts "#included called"
           included_of_the_target.( ç )
+          puts "post-#included called"
         end
       end
     end
