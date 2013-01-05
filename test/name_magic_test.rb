@@ -11,7 +11,8 @@ describe NameMagic do
   before do
     puts "Hi"
     mod = Module.new do include NameMagic end
-    @ç = Class.new do mod end
+    puts "Now mod should have include method"
+    @ç = Class.new do include mod end
     @reporter = Object.new
     puts "..."
     @reporter.singleton_class.class_exec { attr_reader :report, :naming }
