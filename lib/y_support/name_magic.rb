@@ -172,7 +172,7 @@ module NameMagic
     # in some other module.
     # 
     def namespace
-      puts "Hello from original namespace"
+      puts "Hello from original namespace (#{self})."
       self
     end
 
