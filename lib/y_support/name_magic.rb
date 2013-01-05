@@ -48,7 +48,9 @@ module NameMagic
       puts "it's a boy"
       included_of_the_target = target.method( :included ).unbind
       included_of_self = self.method( :included ).unbind
+      puts 'gotten unbound methods'
       target.define_singleton_method :included do |ç|
+        puts 'artificial included being called'
         included_of_self.bind( self ).call( ç )
         # leaving the right of additional modifications to the target
         included_of_the_target.bind( self ).call( ç )
