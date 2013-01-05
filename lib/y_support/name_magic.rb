@@ -45,10 +45,21 @@ module NameMagic
     else # it is a Module; we'll infect it with this #included method
       included_of_the_target = target.method( :included )
       included_of_self = self.method( :included )
-      target.define_singleton_method :included do |ç|
-        included_of_self.call( ç )
-        # leaving the right of additional modifications to the target
-        included_of_the_target.call( ç )
+      pre_included_of_the_target = begin
+                                     target.method( :pre_included )
+                                   rescue NameError
+                                   end
+      if pre_included_of_the_target then
+        target.define_singleton_method :included do |ç|
+          pre_included_of_the_target.( ç )
+          included_of_self.call( ç )
+          included_of_the_target.call( ç )
+        end
+      else
+        target.define_singleton_method :included do |ç|
+          included_of_self.( ç )
+          included_of_the_target.( ç )
+        end
       end
     end
   end # self.included
