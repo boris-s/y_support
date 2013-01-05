@@ -57,7 +57,7 @@ module NameMagic
       included_of_self = self.method( :included )
       pre_included_of_the_target = begin
                                      target.method( :pre_included )
-                                     puts "#pre_included method found"
+                                       .tap { puts "#pre_included method found" }
                                    rescue NameError
                                      puts "#pre_included method not found"
                                    end
