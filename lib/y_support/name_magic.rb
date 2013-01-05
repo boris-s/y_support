@@ -46,12 +46,12 @@ module NameMagic
       end
     else # it is a Module; we'll infect it with this #included method
       puts "it's a boy"
-      included_of_the_target = target.method( :included )
-      included_of_self = self.method( :included )
+      included_of_the_target = target.method( :included ).unbind
+      included_of_self = self.method( :included ).unbind
       target.define_singleton_method :included do |ç|
-        included_of_self.( ç )
+        included_of_self.bind( self ).call( ç )
         # leaving the right of additional modifications to the target
-        included_of_the_target.( ç )
+        included_of_the_target.bind( self ).call( ç )
       end
     end
   end # self.included
