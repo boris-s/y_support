@@ -55,6 +55,7 @@ module NameMagic
         # leaving the right of additional modifications to the target
         included_of_the_target.bind( self ).call( ç )
       end
+      puts 'defining done'
     end
   end # self.included
 
