@@ -29,20 +29,30 @@ module NameMagic
   def self.included target
     case target
     when Class then
+      puts "it's a girl (#{target})"
       class << target
         # Make space for the decorator #new:
         alias :original_method_new :new
       end
+      puts 'new method aliased'
       # Attach the decorators etc.
       target.extend ::NameMagic::ClassMethods
+      puts "class methods added to #{target}"
       target.extend ::NameMagic::NamespaceMethods
+      puts "namespace methods added to #{target}"
       # Attach namespace methods to also to the namespace, if given.
       begin
-        target.namespace.extend ::NameMagic::NamespaceMethods unless
-          target == target.namespace
+        unless target == target.namespace
+          puts "#{target} has special namespace: #{target.namespace}"
+          target.namespace.extend ::NameMagic::NamespaceMethods
+        else
+          puts "#{target} namespace is self"
+        end
       rescue NoMethodError
+        puts "#{target}.namespace does not seem to exist"
       end
     else # it is a Module; we'll infect it with this #included method
+      puts "it's a boy (#{target})"
       included_of_the_target = target.method( :included )
       included_of_self = self.method( :included )
       pre_included_of_the_target = begin
