@@ -29,57 +29,37 @@ module NameMagic
   def self.included target
     case target
     when Class then
-      puts "it's a girl (#{target})"
       class << target
         # Make space for the decorator #new:
         alias :original_method_new :new
       end
-      puts 'new method aliased'
       # Attach the decorators etc.
       target.extend ::NameMagic::ClassMethods
-      puts "class methods added to #{target}"
       target.extend ::NameMagic::NamespaceMethods
-      puts "namespace methods added to #{target}"
       # Attach namespace methods to also to the namespace, if given.
       begin
         unless target == target.namespace
-          puts "#{target} has special namespace: #{target.namespace}"
           target.namespace.extend ::NameMagic::NamespaceMethods
-        else
-          puts "#{target} namespace is self"
         end
       rescue NoMethodError
-        puts "#{target}.namespace does not seem to exist"
       end
     else # it is a Module; we'll infect it with this #included method
-      puts "it's a boy (#{target})"
       included_of_the_target = target.method( :included )
       included_of_self = self.method( :included )
       pre_included_of_the_target = begin
                                      target.method( :pre_included )
-                                       .tap { puts "#pre_included method found" }
                                    rescue NameError
-                                     puts "#pre_included method not found"
                                    end
       if pre_included_of_the_target then
-        puts "defining artificial #included with #pre_included"
         target.define_singleton_method :included do |ç|
-          puts "Hello from artificial #included"
           pre_included_of_the_target.( ç )
-          puts "#pre_included called"
           included_of_self.call( ç )
-          puts "#included called"
           included_of_the_target.call( ç )
-          puts "post-#included called"
         end
       else
-        puts "defining artificial #included without #pre_included"
         target.define_singleton_method :included do |ç|
-          puts "Hello from artificial #included"
           included_of_self.( ç )
-          puts "#included called"
           included_of_the_target.( ç )
-          puts "post-#included called"
         end
       end
     end
@@ -172,7 +152,6 @@ module NameMagic
     # in some other module.
     # 
     def namespace
-      puts "Hello from original namespace (#{self})."
       self
     end
 
