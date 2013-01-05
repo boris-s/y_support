@@ -31,10 +31,6 @@ module NameMagic
     case target
     when Class then
       puts "it's a girl"
-      class << target
-        # Make space for the decorator #new:
-        alias :original_method_new :new
-      end
       # Attach the decorators etc.
       target.extend ::NameMagic::ClassMethods
       target.extend ::NameMagic::NamespaceMethods
@@ -42,11 +38,6 @@ module NameMagic
       begin
         target.namespace.extend ::NameMagic::NamespaceMethods unless
           target == target.namespace
-      rescue NoMethodError
-      end
-      # Afterwards, check for aliased #included method and call it
-      begin
-        original_included( receiver_class )
       rescue NoMethodError
       end
     else # it is a Module; we'll infect it with this #included method
