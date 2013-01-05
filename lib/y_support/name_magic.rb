@@ -27,10 +27,8 @@ module NameMagic
   PROBLEM_MODULES = [ 'Gem', 'Rack', 'ActiveSupport' ]
 
   def self.included target
-    puts "Hello"
     case target
     when Class then
-      puts "it's a girl"
       class << target
         # Make space for the decorator #new:
         alias :original_method_new :new
@@ -45,17 +43,13 @@ module NameMagic
       rescue NoMethodError
       end
     else # it is a Module; we'll infect it with this #included method
-      puts "it's a boy"
       included_of_the_target = target.method( :included )
       included_of_self = self.method( :included )
-      puts 'gotten unbound methods'
       target.define_singleton_method :included do |ç|
-        puts 'artificial included being called'
         included_of_self.call( ç )
         # leaving the right of additional modifications to the target
         included_of_the_target.call( ç )
       end
-      puts 'defining done'
     end
   end # self.included
 

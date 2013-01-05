@@ -9,9 +9,7 @@ require 'y_support/name_magic'
 
 describe NameMagic do
   before do
-    puts "Hi"
     mod = Module.new do include NameMagic end
-    puts "Now mod should have include method"
     @ç = Class.new do include mod end
     @reporter = Object.new
     puts "..."
