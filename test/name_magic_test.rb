@@ -9,8 +9,10 @@ require 'y_support/name_magic'
 
 describe NameMagic do
   before do
+    puts "Hi"
     @ç = Class.new do include NameMagic end
     @reporter = Object.new
+    puts "..."
     @reporter.singleton_class.class_exec { attr_reader :report, :naming }
     @ç.new_instance_closure do |instance|
       @reporter.define_singleton_method :report do
