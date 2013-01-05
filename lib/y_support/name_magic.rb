@@ -31,6 +31,10 @@ module NameMagic
     case target
     when Class then
       puts "it's a girl"
+      class << target
+        # Make space for the decorator #new:
+        alias :original_method_new :new
+      end
       # Attach the decorators etc.
       target.extend ::NameMagic::ClassMethods
       target.extend ::NameMagic::NamespaceMethods
