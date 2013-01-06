@@ -329,9 +329,7 @@ module NameMagic
     # thus providing another option for naming of the target instance.
     # 
     def new *args, &block
-      puts "args size is fucking: #{args.size}, args is #{args}"
-
-      oo = args[-1].is_a?( Hash ) ? args.pop : {} # manual extract options
+      oo = args[-1].is_a?( Hash ) ? args.pop : {} # extract hash
       # consume :name named argument if it was supplied
       ɴß = if oo[:name] then oo.delete :name
            elsif oo[:ɴ] then oo.delete :ɴ
@@ -342,17 +340,14 @@ module NameMagic
       raise NameError, "#{self} instance #{ɴß} already exists!" if
         __instances__.keys.include? ɴß unless avid
       # instantiate
-      args = if oo.empty? then args else args + [ oo ] end
-      puts "args size is fucking: #{args.size}, args is #{args}"
-
-      new_inst = if oo.empty? then original_method_new *args, &block
-                 else original_method_new *(args << oo), &block end
-      # treat is as unnamed at first
+      args << oo unless oo.empty?    # fuse hash
+      new_inst = original_method_new *args, &block
+      # treat the instance as unnamed at first
       __instances__.merge! new_inst => nil
       # honor the hook
       @new_instance_closure.call( new_inst ) if @new_instance_closure
-      # and then either name it, if name was supplied, or make it avid
-      # (avid instances will replace a competitor, if any, in the name table)
+      # and then name it if name was supplied, or make it avid
+      # (avid instances will steal names from their competitors)
       if ɴß then
         if avid then new_inst.name! ɴß else new_inst.name = ɴß end
       else
