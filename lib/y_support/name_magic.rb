@@ -343,7 +343,7 @@ module NameMagic
       # instantiate
       args = if oo.empty? then args else args + [ oo ] end
       new_inst = if oo.empty? then original_method_new *args, &block
-                 else original_method_new *args, oo, &block end
+                 else original_method_new *(args << oo), &block end
       # treat is as unnamed at first
       __instances__.merge! new_inst => nil
       # honor the hook
