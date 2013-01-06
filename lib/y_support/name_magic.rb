@@ -329,8 +329,9 @@ module NameMagic
     # thus providing another option for naming of the target instance.
     # 
     def new *args, &block
-      # extract options:
-      if args[-1].is_a? Hash then oo = args.pop else oo = {} end
+      puts "args size is fucking: #{args.size}, args is #{args}"
+
+      oo = args[-1].is_a?( Hash ) ? args.pop : {} # manual extract options
       # consume :name named argument if it was supplied
       ɴß = if oo[:name] then oo.delete :name
            elsif oo[:ɴ] then oo.delete :ɴ
@@ -342,6 +343,8 @@ module NameMagic
         __instances__.keys.include? ɴß unless avid
       # instantiate
       args = if oo.empty? then args else args + [ oo ] end
+      puts "args size is fucking: #{args.size}, args is #{args}"
+
       new_inst = if oo.empty? then original_method_new *args, &block
                  else original_method_new *(args << oo), &block end
       # treat is as unnamed at first
