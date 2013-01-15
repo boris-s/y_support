@@ -265,7 +265,7 @@ module NameMagic
         .map( &:object_id ).uniq
       ObjectSpace.each_object Module do |ɱ|
         # hack against bugs when getting constants from URI
-        next if ɱ.ancestors.include? ::BibTeX rescue
+        next if ɱ == ::BibTeX rescue
         next if ::NameMagic::PROBLEM_MODULES.any? { |problem_ς|
           ɱ.name.to_s.start_with? problem_ς
         }
