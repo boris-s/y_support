@@ -347,12 +347,17 @@ class YSupportTest < Test::Unit::TestCase
       assert_equal :Yes, (:" \nYes, \n").to_standardized_sym
     end
     
-    should "have ~@ method for ~:symbol style .respond_to?" \
-    'matching in case statements' do
+    should "have Symbol#~@ for .respond_to? case statements" do
       assert_kind_of RespondTo, ~:hello
       assert RespondTo(:<<) === "testing"
       assert case ?x; when ~:each_char then 1 else false end
       assert !case ?x; when ~:azapat then 1 else false end
     end
   end # context Symbol
+
+  context "Numeric" do
+    assert_equal 0, Integer.zero
+    assert_equal 0.0, Float.zero
+    assert_equal Complex(0, 0), Complex.zero
+  end
 end # class YSupportTest
