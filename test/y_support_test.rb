@@ -356,8 +356,10 @@ class YSupportTest < Test::Unit::TestCase
   end # context Symbol
 
   context "Numeric" do
-    assert_equal 0, Integer.zero
-    assert_equal 0.0, Float.zero
-    assert_equal Complex(0, 0), Complex.zero
+    should "have #zero public class methods" do
+      assert_equal 0, Integer.zero
+      assert_equal 0.0, Float.zero
+      assert_equal Complex(0, 0), Complex.zero
+    end
   end
 end # class YSupportTest
