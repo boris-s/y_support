@@ -1,6 +1,6 @@
 # YSupport
 
-TODO: Write a gem description
+Common support library for Y* gems.
 
 ## Installation
 
@@ -18,7 +18,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Require 'y_support/all', or require 'y_support/something', and use it.
 
 ## Contributing
 

@@ -78,6 +78,50 @@ class Matrix
   alias :number_of_columns :column_size
   alias :height :number_of_rows
   alias :width :number_of_columns
+
+  #
+  # Creates a empty matrix of +row_size+ x +column_size+.
+  # At least one of +row_size+ or +column_size+ must be 0.
+  #
+  #   m = Matrix.empty(2, 0)
+  #   m == Matrix[ [], [] ]
+  #     => true
+  #   n = Matrix.empty(0, 3)
+  #   n == Matrix.columns([ [], [], [] ])
+  #     => true
+  #   m * n
+  #     => Matrix[[0, 0, 0], [0, 0, 0]]
+  #
+  def Matrix.empty(row_size = 0, column_size = 0)
+    Matrix.Raise ArgumentError, "One size must be 0" if column_size != 0 && row_size != 0
+    Matrix.Raise ArgumentError, "Negative size" if column_size < 0 || row_size < 0
+
+    new([[]]*row_size, column_size)
+  end
+
+  #
+  # Creates a matrix of size +row_size+ x +column_size+.
+  # It fills the values by calling the given block,
+  # passing the current row and column.
+  # Returns an enumerator if no block is given.
+  #
+  #   m = Matrix.build(2, 4) {|row, col| col - row }
+  #     => Matrix[[0, 1, 2, 3], [-1, 0, 1, 2]]
+  #   m = Matrix.build(3) { rand }
+  #     => a 3x3 matrix with random elements
+  #
+  def Matrix.build(row_size, column_size = row_size)
+    row_size = CoercionHelper.coerce_to_int(row_size)
+    column_size = CoercionHelper.coerce_to_int(column_size)
+    raise ArgumentError if row_size < 0 || column_size < 0
+    return to_enum :build, row_size, column_size unless block_given?
+    rows = Array.new(row_size) do |i|
+      Array.new(column_size) do |j|
+        yield i, j
+      end
+    end
+    new rows, column_size
+  end
 end
 
 class Vector
