@@ -22,13 +22,15 @@ class Module
   # I didn't write this method by myself.
   # 
   def attr_accessor_with_default *symbols, &block
-    raise 'Default value in block required' unless block
+    raise ArgumentError, 'Block with default value required!' unless block
     symbols.each { |ß|
       module_eval {
-        attr_writer ß
+        define_method "#{ß}=" do |arg|
+          instance_variable_set "@#{ß}", arg
+        end
         define_method ß do
-          class << self; self end.module_eval { attr_reader(ß) }
-          if instance_variables.include? "@#{ß}" then 
+          singleton_class.class_eval { attr_reader ß }
+          if instance_variables.include? "@#{ß}".to_sym then
             instance_variable_get "@#{ß}"
           else
             instance_variable_set "@#{ß}", block.call

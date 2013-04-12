@@ -1,4 +1,5 @@
 #encoding: utf-8
+
 require 'matrix'
 
 class Matrix
@@ -63,7 +64,7 @@ class Matrix
       column_size == other.column_size
     return other.map { |e| e } if row_size == 0
     return Matrix.empty row_size + other.row_size, 0 if column_size == 0
-    ç[ *( row_vectors + other.row_vectors ) ]
+    self.class[ *( row_vectors + other.row_vectors ) ]
   end
   
   #join_right methods
