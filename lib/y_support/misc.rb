@@ -20,16 +20,6 @@ require 'y_support'
 # assertions, but they start with <b>tE_...</b>, meaning "enforce by raising
 # TypeError".
 
-class Object
-  # Alias for ArgumentError
-  # 
-  AErr = ArgumentError
-  
-  # Alias for TypeError
-  # 
-  TErr = TypeError
-end
-
 [ :core_ext, :stdlib_ext ].each do |ext|
   Dir["#{File.dirname( __FILE__ )}/#{ext}/*/misc.rb"].sort.each { |path|
     dir = File.dirname( path ).match( "y_support/#{ext}" ).post_match
