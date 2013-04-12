@@ -3,20 +3,20 @@
 class Module
   # Further automation of soon-to-be-deprecated #autorequire.
   # 
-  def autoreq( *ßs )
-    options = ßs.extract_options!
-    this_ɴspace = self.name
-    this_ɴspace_path = this_ɴspace.underscore
-    ɴspace_chain = this_ɴspace.split "::"
-    options.default!( descending_path: '..', ascending_path_prefix: 'lib' )
-    descending_path = options[:descending_path]
-    ascending_path_prefix = options[:ascending_path_prefix]
-    ascending_path = ascending_path_prefix + '/' + this_ɴspace_path
-    ßs.each { |ß|
-      str = ß.to_s.stripn; next if str.blank?
-      camelized_ß = str.camelize.to_sym
-      path = './' + [ descending_path, ascending_path, str ].join( '/' )
-      autoload camelized_ß, path }
+  def autoreq( *symbols, descending_path: '..', ascending_path_prefix: 'lib' )
+
+    require 'active_support/core_ext/string/inflections'
+
+    namespace = self.name
+    namespace_path = namespace.underscore
+    namespace_chain = namespace.split "::"
+    ascending_path = ascending_path_prefix + '/' + namespace_path
+    symbols.map( &:to_s ).each { |ς|
+      next if ς.strip.empty?
+      camelized_ß = ς.camelize.to_sym
+      path = './' + [ descending_path, ascending_path, ς ].join( '/' )
+      autoload camelized_ß, path
+    }
   end
   
   # I didn't write this method by myself.

@@ -12,9 +12,6 @@ class Object
     mod.const_set( const, value )
   end
 
-  # RespondTo constructor
-  def RespondTo method; RespondTo.create method end
-
   # Create public attributes (ie. with readers) and initialize them with
   # prescribed values. Takes a hash of { symbol => value } pairs. Existing methods
   # are not overwritten by the new getters, unless option :overwrite_methods

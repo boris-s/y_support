@@ -3,11 +3,8 @@
 
 require 'test/unit'
 require 'shoulda'
-require 'minitest/spec'
-require 'minitest/autorun'
-# require 'y_support/all'
 
-class YSupportTest < Test::Unit::TestCase
+class MiscTest < Test::Unit::TestCase
   context "Object" do
     setup do
       require 'y_support/core_ext/object'
@@ -15,42 +12,40 @@ class YSupportTest < Test::Unit::TestCase
 
     should "have #const_set_if_not_defined" do
       ( ◉ = Object.new ).const_set_if_not_defined :KOKO, 42
-      assert_equal 42, ◉.ⓒ::KOKO
+      assert_equal 42, ◉.singleton_class::KOKO
       ◉.const_set_if_not_defined :KOKO, 43
-      assert_equal 42, ◉.ⓒ::KOKO
+      assert_equal 42, ◉.singleton_class::KOKO
     end
 
     should "have #const_redef_without_warning" do
       ( ◉ = Object.new ).const_set_if_not_defined :KOKO, 42
       ◉.const_redefine_without_warning :KOKO, 43
-      assert_equal 43, ◉.ⓒ::KOKO
+      assert_equal 43, ◉.singleton_class::KOKO
     end
-
-#     should "have RespondTo() constructor" do
-#       assert_equal RespondTo, RespondTo(:inspect).class
-#     end
   end # context Object
   
-  # context "Module" do
-  #   should "have working #attr_accessor_with_default" do
-  #     class TestCl; attr_accessor_with_default :hello do "world" end end
-  #     testç = TestCl.new
-  #     assert_equal( "world", testç.hello )
-  #     testç2 = TestCl.new
-  #     testç2.hello
-  #     testç2.hello = "receiver.jpg"
-  #     assert_equal( "receiver.jpg", testç2.hello )
-  #   end
+  context "Module" do
+    setup do
+      require 'y_support/core_ext/module'
+    end
+
+    should "have working #attr_accessor_with_default" do
+      class TestCl; attr_accessor_with_default :hello do "world" end end
+      testç = TestCl.new
+      assert_equal( "world", testç.hello )
+      testç2 = TestCl.new
+      testç2.hello
+      testç2.hello = "receiver.jpg"
+      assert_equal( "receiver.jpg", testç2.hello )
+    end
     
-  #   should "have working autoreq" do
-  #     module TestModule
-  #       autoreq :fixture_class,
-  #         descending_path: '.', ascending_path_prefix: '.'
-  #     end
-  #     ç = TestModule::FixtureClass
-  #     assert_equal( "world", ç.new.hello )
-  #   end
-  # end # context Module
+    should "have working autoreq" do
+      module TestModule
+        autoreq :fixture_class, descending_path: '.', ascending_path_prefix: '.'
+      end
+      assert_equal "world", TestModule::FixtureClass.new.hello
+    end
+  end # context Module
 
   # context "Enumerable" do
   #   should "introduce #all_kind_of? collection qualifier" do
@@ -144,18 +139,6 @@ class YSupportTest < Test::Unit::TestCase
   #     assert_equal( {aaa: 1}, {aaa: 1}.dot! )
   #   end
   # end # context Hash
-  
-  # context "RespondTo" do
-  #   should "work" do
-  #     assert defined? RespondTo
-  #     assert_respond_to RespondTo.new(:hello), :===
-  #       assert RespondTo.new(:each_char) === "hell'o"
-  #     assert !( RespondTo.new(:each_char) === Object.new )
-  #     assert !( RespondTo.new(:azapat) === Object.new )
-  #     assert case ?x; when RespondTo.new(:each_char) then 1 else false end
-  #     assert ! case ?x; when RespondTo.new(:azapat) then 1 else false end
-  #   end
-  # end # context RespondTo
   
   # context "Matrix" do
   #   should "have #pp method" do
@@ -265,13 +248,6 @@ class YSupportTest < Test::Unit::TestCase
     
   #   should "have #to_standardized_sym" do
   #     assert_equal :Yes, (:" \nYes, \n").to_standardized_sym
-  #   end
-    
-  #   should "have Symbol#~@ for .respond_to? case statements" do
-  #     assert_kind_of RespondTo, ~:hello
-  #     assert RespondTo(:<<) === "testing"
-  #     assert case ?x; when ~:each_char then 1 else false end
-  #     assert !case ?x; when ~:azapat then 1 else false end
   #   end
   # end # context Symbol
 

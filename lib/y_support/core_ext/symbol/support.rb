@@ -16,11 +16,4 @@ class Symbol
   def to_standardized_sym
     to_s.to_standardized_sym
   end
-  
-  # Creates a RespondTo object from self. Intended use of RespondTo is in case
-  # statements (RespondTo has customized #=== method testing #respond_to?).
-  # So in a case statement, <tt>when ~:each</tt> activates when the tested
-  # object responds to #each method.
-  # 
-  def ~@; RespondTo self end
 end

@@ -128,7 +128,7 @@ class Object
     raise TErr, m unless self == other
     return self
   end
-  
+
   # Fails with TypeError unless the receiver, according to #== method, differs
   # from to the argument. Two more optional arguments customize the error
   # message (receiver description and the description of the other object).
@@ -141,7 +141,7 @@ class Object
     raise TErr, m if self == other
     return self
   end
-  
+
   # Fails with TypeError unless the ActiveSupport method #blank returns true
   # for the receiver.
   # 
@@ -152,7 +152,7 @@ class Object
     raise TErr, m unless blank?
     return self
   end
-  
+
   # Fails with TypeError unless the ActiveSupport method #present returns true
   # for the receiver.
   # 

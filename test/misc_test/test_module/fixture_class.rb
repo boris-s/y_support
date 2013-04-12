@@ -1,4 +1,4 @@
-class YSupportTest
+class MiscTest
   module TestModule
     class FixtureClass
       def hello; "world" end

@@ -1,24 +1,24 @@
 #encoding: utf-8
+
 require 'y_support'
 
 # Typing library.
 #
-# Apart from usual <em>typing by class and ancestry</em>, supported by built-in
-# #kind_of?, alias #is_a? inquirerers, this typing library provides support for
-# provides support for <em>typing by declaration</em> and <em>duck typing</em>.
+# Apart from Ruby default way of typing objects <em>by class and ancestry</em>,
+# exemplified eg. by built-in #kind_of?, alias #is_a? inquirers, y_support
+# typing library provides support for typing <em>by declaration</em>, and
+# runtime assertions for <em>duck type</em> examination.
 # 
-# 1. Using method <b>declare_compliance</b>, a module can explicitly declare that
-# it provides the interface compliant with another module. Corresponding inquirer
-# methods are <b>declared_compliance</b> (returning a list of modules with which
-# the receiver declares compliance or implicitly complies) and
-# <b>declares_compliance?( other_module )</b>, which anwers whether the receiver
-# complies with other_module. An object always implicitly complies with its class
-# and class ancestry.
+# 1. Using method <b>declare_compliance</b>, a module (class) can explicitly
+# declare, that it provides an interface compliant with another module (class).
+# Corresponding inquirer methods are <b>declared_compliance</b> (returns a list
+# of modules, to which the receiver declares compliance, or implicitly complies
+# by ancestry), and <b>declares_compliance?( other_module )</b>, which tells,
+# whether the receiver complies with a specific module. An object always
+# implicitly complies with its class and ancestry.
 # 
-# 2. Duck type enforcement for method parameters is supported by a collection of
-# enforcer methods (aka. run-time assertions). These methods look very much like
-# assertions, but they start with <b>tE_...</b>, meaning "enforce by raising
-# TypeError".
+# 2. Duck type examination is supported by a collection of runtime assertions.
+# These start with <b>tE_...</b>, meaning "enforce ... by raising TypeError".
 # 
 class Object
   # Alias for ArgumentError
@@ -30,7 +30,12 @@ class Object
   TErr = TypeError
 end
 
-[:typing].each do |part|
+directories_to_look_in = [ :typing ]
+
+# The fololowing code looks into the specified directory(ies) and requires
+# all the files in it (them).
+# 
+directories_to_look_in.each do |part|
   Dir["#{File.dirname( __FILE__ )}/#{part}/*/typing.rb"].sort.each { |path|
     dir = File.dirname( path ).match( "y_support/#{part}" ).post_match
     require "y_support/#{part}#{dir}/typing"

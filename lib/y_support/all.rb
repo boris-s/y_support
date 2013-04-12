@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+#encoding: utf-8
+
 require 'y_support'
 require 'y_support/name_magic'
 require 'y_support/typing'
@@ -7,20 +8,8 @@ require 'y_support/respond_to'
 require 'y_support/null_object'
 require 'y_support/inert_recorder'
 require 'y_support/local_object'
-require 'y_support/core_ext'
-require 'y_support/stdlib_ext'
+require 'y_support/misc'
 
-# # Redefining constants without warnings, useful for mocking.
-# def const_set_if_not_dϝ(const, value)
-#   mod = self.is_a?(Module) ? self : self.singleton_class
-#   mod.const_set(const, value) unless mod.const_defined?(const)
-# end
-
-# def const_redϝ_wo_warning(const, value)
-#   mod = self.is_a?(Module) ? self : self.singleton_class
-#   mod.send(:remove_const, const) if mod.const_defined?(const)
-#   mod.const_set(const, value)
-# end
 
 # # Test me!
 # class BlankSlate
