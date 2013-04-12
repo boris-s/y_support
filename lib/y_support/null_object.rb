@@ -1,75 +1,46 @@
 #encoding: utf-8
+
 require 'y_support'
 
-# InertRecorder class
-class InertRecorder
-  attr_reader :init_args, :init_block, :recorded_messages
-  alias ρ recorded_messages
-  
-  def initialize *args, &block
-    @init_args = args
-    @init_block = block
-    @recorded_messages = []
-  end
-  
-  def method_missing ß, *aj, &b
-    @recorded_messages << [ ß, aj, b ]
-    return self
-  end
-
-  def respond_to? ß, *aj, &b
-    true
-  end
-
-  def present?
-    true
-  end
-
-  def blank?
-    false
-  end
-end # class InertRecorder
-
-
-# YSupport implementation of null object pattern. Apart from being useful
-# as a null object, it also can have "null object type" specified, if the
-# user desires so (default is <tt>nil</tt>). Furthermore, this object acts
-# also as inert recorder – it records messages sent to it, which are then
-# available as #recorded_messages, alias #ρ.
+# Null object pattern implementation in YSupport. apart from the expected null
+# object behavior (such as returning self in response to almost all messages),
+# this null object instances can carry a signature specified by the user upon
+# creation, which can serve to hint the origin of the null object. (This
+# signature is opional, default is <tt>nil</tt>.)
 # 
 class NullObject
-  attr_reader :null_object_type, :recorded_messages
-  alias ρ recorded_messages
+  attr_reader :null_object_signature
 
-  # The only possible (optional) argument upon initialization of a null
-  # object is its "type" (which can be anything).
+  # Signature can be given as an optional argument upon initialization.
   # 
-  def initialize( type_of_null_object = nil )
-    @null_object_type = type_of_null_object
-    @recorded_messages = []
+  def initialize null_object_signature=nil
+    @null_object_signature = null_object_signature 
   end
 
-  # Inquirer whether the object is NullObject. If type is specified, the
-  # method will only return true for null objects of that type.
+  # Inquirer whether an object is a NullObject. Again, optional signature
+  # argument can be given to distinguish between different null objects.
   # 
-  def null_object? null_type = nil
-    null_object_type == null_type
+  def null_object? signature=nil
+    null_object_signature == signature
   end
   alias null? null_object?
 
-  # Always an empty array.
+  # Empty array.
   # 
   def to_a; [] end
 
-  # Description string ('null something', or simply 'null').
+  # Description string.
   # 
-  def to_s; "null #{null_object_type}".strip end
+  def to_s
+    sgn = null_object_signature
+    sgn.nil? ? "<NullObject>" : "<NullObject #{sgn}>"
+  end
 
-  # Always Float zero.
+  # Float zero.
   # 
   def to_f; 0.0 end
 
-  # Always Integer zero.
+  # Integer zero.
   # 
   def to_i; 0 end
 
@@ -85,21 +56,37 @@ class NullObject
   # 
   def blank?; true end
 
-  def inspect                        # :nodoc:
-    "NullObject #{null_object_type}".strip
+  # True if and only if the other object is a NullObject with same signature.
+  # 
+  def == other
+    other.is_a?( self.class ) &&
+      other.null_object_signature == null_object_signature
   end
 
-  def method_missing ß, *aj, &b      # :nodoc:
-    @recorded_messages << [ ß, aj, b ]; self
+  def method_missing ß, *args, &block      # :nodoc:
+    self
   end
 
-  def respond_to? ß, *aj, &b         # :nodoc:
+  def respond_to? ß, *args, &block         # :nodoc:
     true
   end
+end # class nullobject
 
-  protected
 
-  def == other                       # :nodoc:
-    null_object_type == other.null_object_type
+class Object
+  # Always false for ordinary objects, overriden in NullObject instances.
+  # 
+  def null_object? signature=nil; false end
+  alias :null? :null_object?
+
+  # Converts #nil?-positive objects to a NullObject. Second optional argument
+  # specifies the signature of the null object to be created.
+  # 
+  def Maybe object, null_object_signature=nil
+    object.nil? ? NullObject.new( null_object_signature ) : object
   end
-end # class NullObject
+
+  # NullObject constructor.
+  # 
+  def Null( signature=nil ); NullObject.new signature end
+end

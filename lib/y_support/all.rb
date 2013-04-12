@@ -3,13 +3,12 @@ require 'y_support'
 require 'y_support/name_magic'
 require 'y_support/typing'
 require 'y_support/unicode'
-=begin
 require 'y_support/respond_to'
 require 'y_support/null_object'
+require 'y_support/inert_recorder'
 require 'y_support/local_object'
 require 'y_support/core_ext'
 require 'y_support/stdlib_ext'
-=end
 
 # # Redefining constants without warnings, useful for mocking.
 # def const_set_if_not_dϝ(const, value)

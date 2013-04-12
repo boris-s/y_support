@@ -1,6 +1,6 @@
 #encoding: utf-8
+
 require 'y_support'
-require 'unicode'
 
 # This library sets forth 4 standard abbreviations of Ruby keywords:
 #
@@ -39,7 +39,7 @@ class Object
   # Square root (proxy for Math.sqrt(x)).
   # 
   def √( number ); Math.sqrt( number ) end
-  
+
   # Sum. The argument is expected to be a collection; block can be specified.
   # Basically same as chaining .reduce( :+ ) to the end; Σ() notation can be
   # more readable at times.
