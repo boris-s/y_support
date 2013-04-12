@@ -12,14 +12,6 @@ class Object
     mod.const_set( const, value )
   end
 
-  # LocalObject constructor
-  def LocalObject signature = nil; LocalObject.new signature end
-  alias :ℒ :LocalObject
-
-  # #local_object? inquirer
-  def local_object? s = nil; is_a? LocalObject and signature == s end
-  alias :ℓ? :local_object?
-
   # RespondTo constructor
   def RespondTo method; RespondTo.create method end
 

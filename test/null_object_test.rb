@@ -46,29 +46,5 @@ class NullObjectTest < Test::Unit::TestCase
       assert_equal :x, n.null_object_signature
       assert_equal "<NullObject kokotina>", NullObject.new( :kokotina ).inspect
     end
-    
-  #   should "InertRecorder exist and comply" do
-  #     assert defined? InertRecorder
-  #     assert_equal Class, InertRecorder.class
-  #     n = InertRecorder.new
-  #     assert_equal [true, false], [n.present?, n.blank?]
-  #     assert_nothing_raised { InertRecorder.new.
-  #       must_have_attr_reader( :recorded_messages ).
-  #       must_have_attr_reader( :init_args ) }
-  #     assert_respond_to InertRecorder.new, :arbitrary_message
-  #     n = InertRecorder.new :x, :y
-  #     n.arbitrary_message( :a, :b ) { "hello" }
-  #     assert_equal [:x, :y], n.init_args
-  #     assert_equal [ :arbitrary_message, [:a, :b] ], n.recorded_messages[0][0..1]
-  #     assert_equal "hello", n.recorded_messages[0][2].call
-  #   end
-    
-  #   should "LocalObject exist and comply" do
-  #     assert defined? LocalObject
-  #     assert_equal Class, LocalObject.class
-  #     n = ℒ( 'this msg' )
-  #     assert_equal 'this msg', n.signature
-  #     assert_equal 'this msg', n.σ
-  #   end
   end # context NullObject
 end # class NullObjectTest
