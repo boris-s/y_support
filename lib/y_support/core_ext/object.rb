@@ -1,1 +1,1 @@
-require 'y_support/core_ext/object/support'
+require 'y_support/core_ext/object/misc'

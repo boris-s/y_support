@@ -1,1 +1,1 @@
-require 'y_support/core_ext/numeric/support'
+require 'y_support/core_ext/numeric/misc'
