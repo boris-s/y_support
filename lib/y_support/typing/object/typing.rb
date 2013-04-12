@@ -1,5 +1,7 @@
 #encoding: utf-8
 
+require 'active_support/core_ext/object/blank'
+
 class Object
   # === Support for typing by declaration
 

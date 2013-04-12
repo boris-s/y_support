@@ -3,8 +3,6 @@
 
 require 'test/unit'
 require 'shoulda'
-require 'minitest/spec'
-require 'minitest/autorun'
 require 'y_support/typing'
 
 class TypingTest < Test::Unit::TestCase

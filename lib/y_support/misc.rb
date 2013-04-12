@@ -31,8 +31,8 @@ class Object
 end
 
 [ :core_ext, :stdlib_ext ].each do |ext|
-  Dir["#{File.dirname( __FILE__ )}/#{ext}/*/support.rb"].sort.each { |path|
+  Dir["#{File.dirname( __FILE__ )}/#{ext}/*/misc.rb"].sort.each { |path|
     dir = File.dirname( path ).match( "y_support/#{ext}" ).post_match
-    require "y_support/#{ext}#{dir}/support"
+    require "y_support/#{ext}#{dir}/misc"
   }
 end

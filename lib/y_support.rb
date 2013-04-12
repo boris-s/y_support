@@ -12,11 +12,11 @@ require "y_support/version"
 # These may or may not be required in various parts of y_support.
 # 
 # require 'active_support/core_ext/module/delegation'
-# require 'active_support/core_ext/object/blank'
+# require 'active_support/core_ext/object/blank' # in object/typing.rb
 # require 'active_support/core_ext/object/duplicable'
 # require 'active_support/core_ext/string/starts_ends_with'
 # require 'active_support/core_ext/string/strip'
-# require 'active_support/core_ext/string/inflections'
+# require 'active_support/core_ext/string/inflections' # in autoreq; module/misc.rb
 # require 'active_support/core_ext/integer/multiple'
 # require 'active_support/core_ext/integer/inflections'
 # require 'active_support/core_ext/enumerable'
