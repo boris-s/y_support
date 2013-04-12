@@ -3,8 +3,6 @@
 
 require 'test/unit'
 require 'shoulda'
-require 'minitest/spec'
-require 'minitest/autorun'
 # require 'y_support/all'
 
 class UnicodeTest < Test::Unit::TestCase
@@ -18,16 +16,24 @@ class UnicodeTest < Test::Unit::TestCase
       assert ◉.singleton_class == ◉.©
       assert ◉.singleton_class == ◉.ⓒ
       assert ◉.ç == ◉.class
-      assert_equal 2, √( 4 )
-      assert equal 10, ∑(1..4)
-      assert_equal 10, Σ(1..4)
-      # ∏ alias Π
-      # ç_variable_set
-      # ç_variable_get
-      # ç_variable_defined?
-      # remove_ç_variable
-      # λ
-      # Λ
+      assert 2 == √( 4 )
+      assert 10 == ∑(1..4)
+      assert 10 == Σ(1..4)
+      assert 24 == ∏(1..4)
+      assert 24 == Π(1..4)
+      ɱ = Module.new
+      ɱ.ç_variable_set :@@meaning, 42
+      assert ɱ.class_variable_get( :@@meaning ) == 42
+      assert ɱ.ç_variable_get( :@@meaning ) == 42
+      assert ɱ.ç_variable_defined?( :@@meaning )
+      ɱ.remove_ç_variable :@@meaning
+      assert ! ɱ.ç_variable_defined?( :@@meaning )
+      ll = λ{}
+      assert ll.is_a? Proc
+      assert ll.lambda?
+      lL = Λ{}
+      assert lL.is_a? Proc
+      assert ! lL.lambda?
     end
   end
 end

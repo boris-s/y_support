@@ -36,6 +36,10 @@ class NullObject
     sgn.nil? ? "<NullObject>" : "<NullObject #{sgn}>"
   end
 
+  # Inspection string.
+  # 
+  def inspect; to_s end
+
   # Float zero.
   # 
   def to_f; 0.0 end
