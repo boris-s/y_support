@@ -1,6 +1,7 @@
 #encoding: utf-8
 
 require 'y_support'
+require 'y_support/null_object'
 
 # Rudiments of abstract algebra in Ruby.
 #
@@ -27,8 +28,15 @@ module Algebra
   # Additive identity element: #additive_identity
   # 
   module Monoid
+    def self.included receiver
+      receiver.extend self::ClassMethods
+    end
+
     def + summand; add summand end
-    def self.zero; additive_identity end
+
+    module ClassMethods
+      def zero; additive_identity end
+    end
   end
 
   # A group is a monoid with additive inverse.
@@ -68,6 +76,7 @@ module Algebra
     def / divisor; multiply divisor.multiplicative_inverse end
   end
 end
+
 
 # Patching Integer with Algebra::Ring compliance methods.
 # 
@@ -123,7 +132,7 @@ end
 
 # Wildcard zero, stronger than ordinary numeric literal 0.
 # 
-( WILDCARD_ZERO = NullObject.newp ).instance_exec {
+( WILDCARD_ZERO = NullObject.new ).instance_exec {
   ɪ = self
   singleton_class.class_exec { define_method :zero do ɪ end }
   def * other; other.class.zero end
