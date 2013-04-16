@@ -17,4 +17,6 @@ Gem::Specification.new do |gem|
   gem.version       = YSupport::VERSION
   
   gem.add_dependency "activesupport"
+
+  gem.add_development_dependency "shoulda"
 end

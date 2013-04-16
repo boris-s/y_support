@@ -33,7 +33,7 @@ class NullObject
   # 
   def to_s
     sgn = null_object_signature
-    sgn.nil? ? "<NullObject>" : "<NullObject #{sgn}>"
+    sgn.nil? ? "#<NullObject>" : "#<NullObject #{sgn}>"
   end
 
   # Inspection string.

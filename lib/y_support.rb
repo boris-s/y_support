@@ -22,7 +22,7 @@ require "y_support/version"
 # require 'active_support/core_ext/integer/multiple'
 # require 'active_support/core_ext/integer/inflections'
 # require 'active_support/core_ext/enumerable'
-# require 'active_support/core_ext/array/extract_options'
+# require 'active_support/core_ext/array/extract_options' 
 # require 'active_support/core_ext/hash/conversions' # such as #to_xml
 # require 'active_support/core_ext/hash/reverse_merge' # aliased in hash/misc.rb
 # require 'active_support/core_ext/hash/deep_merge'

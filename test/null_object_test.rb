@@ -36,7 +36,7 @@ class NullObjectTest < Test::Unit::TestCase
 
     should "NullObject exist and comply" do
       n = NullObject.new
-      assert_equal [[], "<NullObject>", 0.0, 0], [n.to_a, n.to_s, n.to_f, n.to_i]
+      assert_equal [[], "#<NullObject>", 0.0, 0], [n.to_a, n.to_s, n.to_f, n.to_i]
       assert_equal [false, true], [n.present?, n.empty?]
       assert_nothing_raised { NullObject.new.
         must_have_attr_reader( :recorded_messages ) }
@@ -44,7 +44,7 @@ class NullObjectTest < Test::Unit::TestCase
       n = NullObject.new :x
       n.arbitrary_message( :a, :b ) { "hello" }
       assert_equal :x, n.null_object_signature
-      assert_equal "<NullObject kokotina>", NullObject.new( :kokotina ).inspect
+      assert_equal "#<NullObject kokotina>", NullObject.new( :kokotina ).inspect
     end
   end # context NullObject
 end # class NullObjectTest
