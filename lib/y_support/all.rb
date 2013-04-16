@@ -8,6 +8,7 @@ require 'y_support/respond_to'
 require 'y_support/null_object'
 require 'y_support/inert_recorder'
 require 'y_support/local_object'
+require 'y_support/abstract_algebra'
 require 'y_support/misc'
 
 
