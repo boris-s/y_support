@@ -23,8 +23,11 @@ require 'y_support'
 # Hook is provided for when the name magic is performed.
 # 
 module NameMagic
-  DEBUG = false
-  PROBLEM_MODULES = [ 'Gem', 'Rack', 'ActiveSupport' ]
+  DEBUG = true
+  # The following modules cause problems when systematically searching for
+  # newly assigned constants.
+  # 
+  PROBLEM_MODULES = [ 'Gem', 'Rack', 'ActiveSupport', 'ThreadSafe' ]
 
   def self.included target
     case target
