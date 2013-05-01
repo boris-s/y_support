@@ -1,5 +1,5 @@
 #! /usr/bin/ruby
-#encoding: utf-8
+# -*- coding: utf-8 -*-
 
 require 'test/unit'
 require 'shoulda'

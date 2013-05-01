@@ -1,4 +1,4 @@
-#encoding: utf-8
+# -*- coding: utf-8 -*-
 require 'y_support'
 
 # A mixin imitating Ruby constant magic, plus automation of :name alias :ɴ
@@ -23,27 +23,21 @@ require 'y_support'
 # Hook is provided for when the name magic is performed.
 # 
 module NameMagic
-  DEBUG = true
-  # The following modules cause problems when systematically searching for
-  # newly assigned constants.
-  # 
-  PROBLEM_MODULES = [ 'Gem', 'Rack', 'ActiveSupport', 'ThreadSafe' ]
+  DEBUG = false
 
   def self.included target
     case target
-    when Class then
+    when Class then # we will decorate its #new method
       class << target
-        # Make space for the decorator #new:
-        alias :original_method_new :new
+        alias :original_method_new :new # Make space to decorate #new
       end
       # Attach the decorators etc.
       target.extend ::NameMagic::ClassMethods
       target.extend ::NameMagic::NamespaceMethods
       # Attach namespace methods to also to the namespace, if given.
       begin
-        unless target == target.namespace
-          target.namespace.extend ::NameMagic::NamespaceMethods
-        end
+        target.namespace.extend ::NameMagic::NamespaceMethods unless
+          target.namespace == target
       rescue NoMethodError
       end
     else # it is a Module; we'll infect it with this #included method
@@ -53,13 +47,13 @@ module NameMagic
                                      target.method( :pre_included )
                                    rescue NameError
                                    end
-      if pre_included_of_the_target then
+      if pre_included_of_the_target then # target has #pre_included hook
         target.define_singleton_method :included do |ç|
           pre_included_of_the_target.( ç )
           included_of_self.call( ç )
           included_of_the_target.call( ç )
         end
-      else
+      else # target has no #pre_included hook
         target.define_singleton_method :included do |ç|
           included_of_self.( ç )
           included_of_the_target.( ç )
@@ -104,8 +98,7 @@ module NameMagic
   # Names an instance, aggresively (overwrites existing names).
   # 
   def name!( ɴ )
-    # get previous name of this instance, if any
-    old_ɴ = self.class.__instances__[ self ]
+    old_ɴ = self.class.__instances__[ self ] # get instance's old name, if any
     # honor the hook
     name_set_closure = self.class.instance_variable_get :@name_set_closure
     ɴ = name_set_closure.( ɴ, self, old_ɴ ) if name_set_closure
@@ -114,7 +107,7 @@ module NameMagic
     # otherwise, rudely remove the collider, if any
     pair = self.class.__instances__.rassoc( ɴ )
     self.class.__forget__( pair[0] ) if pair
-    # and add add self to the namespace
+    # and add self to the namespace instead
     self.class.namespace.const_set ɴ, self # write a constant
     self.class.__instances__[ self ] = ɴ   # write to __instances__
     self.class.__forget__ old_ɴ            # forget the old name of self
@@ -158,10 +151,10 @@ module NameMagic
       self
     end
 
-    # Returns the instance of the class using NameMagic, specified by the
-    # argument. NameError is raised, if the argument does not represent a valid
-    # instance name, or if the argument itself is not a valid instance (in
-    # which case it is returned unchanged).
+    # Returns an instance identiified by the argument. NameError is raised, if
+    # the argument does not identify an instance. (It can be an instance name
+    # as string, symbol, or an instance itself, in which case it is merely
+    # returned without changes.)
     # 
     def instance arg
       const_magic
@@ -227,7 +220,7 @@ module NameMagic
       }
     end
     alias :forget_nameless_instances :forget_anonymous_instances
-    
+
     # Clears class-owned references to all the instances.
     # 
     def forget_all_instances
@@ -264,35 +257,22 @@ module NameMagic
     # Checks all the constants in some module's namespace, recursively.
     # 
     def serve_all_modules
-      incriminated_ids = ( nameless_instances + __avid_instances__ )
-        .map( &:object_id ).uniq
-      ObjectSpace.each_object Module do |ɱ|
-        # hack against bugs when getting constants from URI
-        next if ::NameMagic::PROBLEM_MODULES.any? { |problem_ς|
-          begin
-            ɱ.name.to_s.start_with? problem_ς
-          rescue NoMethodError, ArgumentError
-          end
-        }
+      todo = ( nameless_instances + __avid_instances__ ).map( &:object_id ).uniq
+      ObjectSpace.each_object Module do |ɱ|     # for all the modules...
         puts ɱ if ::NameMagic::DEBUG
-        # check all the module constants:
-        ɱ.constants( false ).each do |const_ß|
-          begin # insurance against buggy dynamic loading of constants
+        ɱ.constants( false ).each do |const_ß|  # and all the constants...
+          begin # insurance against constant dynamic loading fails
             ◉ = ɱ.const_get( const_ß )
-          rescue
+          rescue LoadError, StandardError
             next
           end
-          # is it a wanted object?
-          if incriminated_ids.include? ◉.object_id then
-            if __avid_instances__.map( &:object_id ).include? ◉.object_id then
-              # name avidly
-              __avid_instances__.delete_if { |instance| # make not avid first
-                instance.object_id == ◉.object_id
-              }
-              ◉.name! const_ß      # and then name it rudely
-            else # name this anonymous instance cautiously
-              # honor name_set_closure
-              ɴ = if @name_set_closure then
+          if todo.include? ◉.object_id then # is it a wanted object?
+            if __avid_instances__.map( &:object_id ).include? ◉.object_id # avid
+              __avid_instances__ # 1. remove from avid list
+                .delete_if { |instance| instance.object_id == ◉.object_id }
+              ◉.name! const_ß    # 2. name rudely
+            else # not avid
+              ɴ = if @name_set_closure then # honor name_set_closure
                     @name_set_closure.( const_ß, ◉, nil )
                   else const_ß end
               ɴ = validate_capitalization( ɴ ).to_sym
@@ -304,14 +284,12 @@ module NameMagic
                 raise NameError, "Another #{self} named '#{ɴ}' already " +
                   "exists!" unless conflicter == ◉
               else
-                # add the instance to the namespace
-                __instances__[ ◉ ] = ɴ
-                namespace.const_set ɴ, ◉
+                __instances__[ ◉ ] = ɴ   # add the instance to the namespace
+                namespace.const_set ɴ, ◉ # add the instance to the namespace
               end
             end
-            # and stop working in case there are no more unnamed instances
-            incriminated_ids.delete ◉.object_id
-            break if incriminated_ids.empty?
+            todo.delete ◉.object_id # remove the id from todo list
+            break if todo.empty?
           end
         end # each
       end # each_object Module
@@ -319,7 +297,7 @@ module NameMagic
 
     # Checks whether a name starts with a capital letter.
     # 
-    def validate_capitalization( name )
+    def validate_capitalization name
       ɴ = name.to_s
       # check whether the name starts with 'A'..'Z'
       raise NameError, "#{self.class} name must start with a capital " +
@@ -329,48 +307,41 @@ module NameMagic
   end
 
   module ClassMethods
-    # In addition to its ability to assign name to the target instance when
-    # the instance is assigned to a constant (aka. constant magic), NameMagic
-    # redefines #new class method to consume named parameter :name, alias :ɴ,
-    # thus providing another option for naming of the target instance.
+    # In addition to 'constant magic' ability (name upon constant assignment),
+    # NameMagic redefines class method #new so that it eats parameter :name,
+    # alias :ɴ, and takes care of naming the instance accordingly. Option
+    # :name_avid can also be supplied (true/false), which makes the naming
+    # avid if true. (Avid, or aggresive naming means that the instance being
+    # named overwrites whatever was stored under that name earlier.)
     # 
     def new *args, &block
       oo = args[-1].is_a?( Hash ) ? args.pop : {} # extract hash
-      # consume :name named argument if it was supplied
-      ɴß = if oo[:name] then oo.delete :name
-           elsif oo[:ɴ] then oo.delete :ɴ
+      ɴß = if oo[:name] then oo.delete :name # consume :name if supplied
+           elsif oo[:ɴ] then oo.delete :ɴ    # consume :ɴ if supplied
            else nil end
-      # Expecting true/false, if :name_avid option is given
-      avid = oo[:name_avid] ? oo.delete( :name_avid ) : false
-      # Avoid name collisions unless avid
+      avid = oo[:name_avid] ? oo.delete( :name_avid ) : false # => true/false
+      # Avoid overwriting existing names unless avid:
       raise NameError, "#{self} instance #{ɴß} already exists!" if
         __instances__.keys.include? ɴß unless avid
-      # instantiate
+      # Instantiate:
       args << oo unless oo.empty?    # fuse hash
       new_inst = original_method_new *args, &block
-      # treat the instance as unnamed at first
-      __instances__.merge! new_inst => nil
+      __instances__.merge! new_inst => nil # Instance is created unnamed
       # honor the hook
-      @new_instance_closure.call( new_inst ) if @new_instance_closure
-      # and then name it if name was supplied, or make it avid
-      # (avid instances will steal names from their competitors)
-      if ɴß then
+      @new_instance_closure.( new_inst ) if @new_instance_closure
+      if ɴß then # name was supplied, name the instance
         if avid then new_inst.name! ɴß else new_inst.name = ɴß end
-      else
+      else # name wasn't supplied, make the instance avid
         __avid_instances__ << new_inst
       end
-      # return the new instance
-      return new_inst
+      return new_inst      # return the new instance
     end
 
-    # Compared to #new method, #new! uses avid mode: without
-    # concerns about overwriting existing named instances.
+    # Calls #new in avid mode (name_avid: true).
     # 
     def new! *args, &block
-      # extract options
-      if args[-1].is_a? Hash then oo = args.pop else oo = {} end
-      # and call #new with added name_avid: true
-      new *args, oo.merge!( name_avid: true )
+      oo = args[-1].is_a?( Hash ) ? args.pop : {} # extract options
+      new *args, oo.merge!( name_avid: true ), &block
     end
   end # module ClassMethods
 end # module NameMagic
