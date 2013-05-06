@@ -196,7 +196,7 @@ class Matrix
       if empty? then # if empty?, then reduce uses WILDCARD_ZERO
         rows = Array.new row_size do |i|
           Array.new arg.column_size do |j|
-            ( 0...column_size ).reduce self.zero do |sum, c|
+            ( 0...column_size ).reduce WILDCARD_ZERO do |sum, c|
               sum + arg[c, j] * self[i, c]
             end
           end
