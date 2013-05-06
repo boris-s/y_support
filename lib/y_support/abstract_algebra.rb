@@ -174,6 +174,12 @@ end
 # on the operation one wants to do with such matrices.
 #
 class Matrix
+  attr_writer :zero
+  
+  def zero
+    if empty? then @zero else self[0, 0] * 0 end
+  end
+
   # Matrix multiplication.
   #
   def * arg # arg is matrix or vector or number
@@ -190,7 +196,7 @@ class Matrix
       if empty? then # if empty?, then reduce uses WILDCARD_ZERO
         rows = Array.new row_size do |i|
           Array.new arg.column_size do |j|
-            ( 0...column_size ).reduce WILDCARD_ZERO do |sum, c|
+            ( 0...column_size ).reduce self.zero do |sum, c|
               sum + arg[c, j] * self[i, c]
             end
           end
@@ -202,7 +208,9 @@ class Matrix
           end
         end
       end
-      return new_matrix( rows, arg.column_size )
+      new_instance = new_matrix( row, arg.column_size )
+      new_instance.zero = self.zero * arg.zero
+      return new_instance
     when SY::Magnitude # newly added - multiplication by a magnitude
       # I am not happy with this explicit switch on SY::Magnitude type here.
       # Perhaps coerce should handle this?
@@ -211,7 +219,9 @@ class Matrix
           self[i, j] * arg
         end
       end
-      return self.class[ *rows ]
+      new_instance = self.class[ *rows ]
+      new_instance.zero = self.zero * arg
+      return new_instance
     else
       compat_1, compat_2 = arg.coerce self
       return compat_1 * compat_2
