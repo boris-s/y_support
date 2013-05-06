@@ -208,9 +208,7 @@ class Matrix
           end
         end
       end
-      new_instance = new_matrix( row, arg.column_size )
-      new_instance.zero = self.zero * arg.zero
-      return new_instance
+      return new_matrix( rows, arg.column_size )
     when SY::Magnitude # newly added - multiplication by a magnitude
       # I am not happy with this explicit switch on SY::Magnitude type here.
       # Perhaps coerce should handle this?
@@ -219,9 +217,7 @@ class Matrix
           self[i, j] * arg
         end
       end
-      new_instance = self.class[ *rows ]
-      new_instance.zero = self.zero * arg
-      return new_instance
+      return self.class[ *rows ]
     else
       compat_1, compat_2 = arg.coerce self
       return compat_1 * compat_2
