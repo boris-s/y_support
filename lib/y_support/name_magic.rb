@@ -79,6 +79,7 @@ module NameMagic
   def name_or_object_id
     name || object_id
   end
+  alias ɴ_ name_or_object_id
 
   # Names an instance, cautiously (ie. no overwriting of existing names).
   # 
