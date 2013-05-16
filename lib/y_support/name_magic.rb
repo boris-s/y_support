@@ -69,12 +69,16 @@ module NameMagic
     ɴ = self.class.__instances__[ self ]
     if ɴ then
       name_get_closure = self.class.instance_variable_get :@name_get_closure
-      return name_get_closure ? name_get_closure.( ɴ ) : ɴ
-    else
-      return nil
-    end
+      name_get_closure ? name_get_closure.( ɴ ) : ɴ
+    else nil end
   end
   alias ɴ name
+
+  # Retrieves either an instance name (if present), or an object id.
+  # 
+  def name_or_object_id
+    name || object_id
+  end
 
   # Names an instance, cautiously (ie. no overwriting of existing names).
   # 
