@@ -1,5 +1,4 @@
-#encoding: utf-8
-
+# -*- coding: utf-8 -*-
 require 'y_support'
 
 # Object, whose business is to stay local to methods. Optional signature
