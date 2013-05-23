@@ -1,26 +1,34 @@
 # -*- coding: utf-8 -*-
 require 'y_support'
 
-# A mixin imitating Ruby constant magic, plus automation of :name alias :ɴ
-# named argument. This allows to write:
+# This mixin imitates Ruby constant magic and automates the named argument
+# :name (alias :ɴ). One thus can write:
 #
+# <tt>class Someclass; include NameMagic end</tt>
 # <tt>SomeName = SomeClass.new</tt>
 #
 # and the resulting object will know its #name:
 #
 # <tt>SomeName.name = "SomeName"</tt>
 #
-# This is done by searching the whole Ruby namespace for constants to which
-# the object is assigned. The search is performed by calling #const_magic.
-# This is only done until the name is found - once the object is named, its
-# subsequent assignment to constants is without effect.
+# This is done by searching the whole Ruby namespace for constants, to which
+# the object might have been assigned. The search is performed by the method
+# #const_magic defined by this mixin. Once the object is found to be assigned
+# to a constant, and named accordingly, its subsequent assignments to other
+# constants have no additional effect.
 #
-# Alternatively, a named object can be created by using :name alias :ɴ
+# Alternative way to create a named object is by specifying :name (alias :ɴ)
 # named argument:
 #
-# SomeName.new arg1, arg2, ..., name: "SomeName", named_arg1: val1, ...
+# <tt>SomeClass.new a, b, ..., name: "SomeName", aa: v1, bb: v2 ...</tt>
 #
-# Hook is provided for when the name magic is performed.
+# Lastly, a name can be assigned by #name= accssor, as in
+#
+# <tt>o = SomeClass.new</tt>
+# <tt>o.name = "SomeName"</tt>
+#
+# Hook is provided for when the name magic is performed, as well as when the
+# name is retrieved.
 # 
 module NameMagic
   DEBUG = false
@@ -163,6 +171,10 @@ module NameMagic
     # 
     def instance arg
       const_magic
+      # Reject nil argument. (In @instances hash, nameless instances are given
+      # name nil, so 'nil' cannot be a real name.)
+      fail TypeError, "'nil' is not a valid argument type for " +
+        "NameMagic#instance method!" if arg.nil?
       # if the argument is an actual instance, just return it
       return arg if __instances__.keys.include? arg
       # otherwise, treat it as name
