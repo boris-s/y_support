@@ -91,6 +91,10 @@ module Conscience
       end
     end
 
+    def method_missing sym, *args
+      _object_.send sym, *args
+    end
+
     private
 
     def _describe_ obj=_object_

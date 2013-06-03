@@ -42,29 +42,32 @@ module NameMagic
       # Attach the decorators etc.
       target.extend ::NameMagic::ClassMethods
       target.extend ::NameMagic::NamespaceMethods
-      # Attach namespace methods to also to the namespace, if given.
+      # Attach namespace methods also to the namespace, if given.
       begin
-        target.namespace.extend ::NameMagic::NamespaceMethods unless
-          target.namespace == target
+        if target.namespace == target then
+          target.define_singleton_method :namespace do target end
+        else
+          target.namespace.extend ::NameMagic::NamespaceMethods
+        end
       rescue NoMethodError
       end
     else # it is a Module; we'll infect it with this #included method
-      included_of_the_target = target.method( :included )
-      included_of_self = self.method( :included )
-      pre_included_of_the_target = begin
-                                     target.method( :pre_included )
-                                   rescue NameError
-                                   end
-      if pre_included_of_the_target then # target has #pre_included hook
+      target_included = target.method( :included )
+      this_included = self.method( :included )
+      target_pre_included = begin
+                              target.method( :pre_included )
+                            rescue NameError
+                            end
+      if target_pre_included then # target has #pre_included hook
         target.define_singleton_method :included do |ç|
-          pre_included_of_the_target.( ç )
-          included_of_self.call( ç )
-          included_of_the_target.call( ç )
+          target_pre_included.( ç )
+          this_included.( ç )
+          target_included.( ç )
         end
       else # target has no #pre_included hook
         target.define_singleton_method :included do |ç|
-          included_of_self.( ç )
-          included_of_the_target.( ç )
+          this_included.( ç )
+          target_included.( ç )
         end
       end
     end

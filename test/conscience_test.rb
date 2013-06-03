@@ -61,4 +61,15 @@ describe Try do
       end
     end
   end
+
+  describe 'case 3' do
+    it "should work" do
+      o = Object.new
+      class << o
+        def to_s; "THIS OBJECT" end
+        def hello!; "hello hello" end
+      end
+      o.try "to call a missing method" do hello! end
+    end
+  end
 end
