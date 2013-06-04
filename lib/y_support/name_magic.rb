@@ -33,42 +33,29 @@ require 'y_support'
 module NameMagic
   DEBUG = false
 
-  def self.included target
-    case target
+  def self.included ɱ
+    case ɱ
     when Class then # we will decorate its #new method
-      class << target
+      class << ɱ
         alias :original_method_new :new # Make space to decorate #new
       end
       # Attach the decorators etc.
-      target.extend ::NameMagic::ClassMethods
-      target.extend ::NameMagic::NamespaceMethods
+      ɱ.extend ::NameMagic::ClassMethods
+      ɱ.extend ::NameMagic::NamespaceMethods
       # Attach namespace methods also to the namespace, if given.
       begin
-        if target.namespace == target then
-          target.define_singleton_method :namespace do target end
+        if ɱ.namespace == ɱ then
+          ɱ.define_singleton_method :namespace do ɱ end
         else
-          target.namespace.extend ::NameMagic::NamespaceMethods
+          ɱ.namespace.extend ::NameMagic::NamespaceMethods
         end
       rescue NoMethodError
       end
-    else # it is a Module; we'll infect it with this #included method
-      target_included = target.method( :included )
-      this_included = self.method( :included )
-      target_pre_included = begin
-                              target.method( :pre_included )
-                            rescue NameError
-                            end
-      if target_pre_included then # target has #pre_included hook
-        target.define_singleton_method :included do |ç|
-          target_pre_included.( ç )
-          this_included.( ç )
-          target_included.( ç )
-        end
-      else # target has no #pre_included hook
-        target.define_singleton_method :included do |ç|
-          this_included.( ç )
-          target_included.( ç )
-        end
+    else # it is a Module; we'll infect it with our #included method
+      ɱ_included, this_included = ɱ.method( :included ), method( :included )
+      ɱ.define_singleton_method :included do |ç|
+        this_included.( ç )
+        ɱ_included.( ç )
       end
     end
   end # self.included
@@ -95,12 +82,14 @@ module NameMagic
   # Names an instance, cautiously (ie. no overwriting of existing names).
   # 
   def name=( ɴ )
+    puts "NameMagic: Naming with argument #{ɴ}." if DEBUG
     # get previous name of this instance, if any
     old_ɴ = self.class.__instances__[ self ]
     # honor the hook
     name_set_closure = self.class.instance_variable_get :@name_set_closure
     ɴ = name_set_closure.call( ɴ, self, old_ɴ ) if name_set_closure
     ɴ = self.class.send( :validate_capitalization, ɴ ).to_sym
+    puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
     return if old_ɴ == ɴ # already named as required; nothing to do
     # otherwise, be cautious about name collision
     raise NameError, "Name '#{ɴ}' already exists in " +
@@ -114,11 +103,13 @@ module NameMagic
   # Names an instance, aggresively (overwrites existing names).
   # 
   def name!( ɴ )
+    puts "NameMagic: Rudely naming with argument #{ɴ}." if DEBUG
     old_ɴ = self.class.__instances__[ self ] # get instance's old name, if any
     # honor the hook
     name_set_closure = self.class.instance_variable_get :@name_set_closure
     ɴ = name_set_closure.( ɴ, self, old_ɴ ) if name_set_closure
     ɴ = self.class.send( :validate_capitalization, ɴ ).to_sym
+    puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
     return false if old_ɴ == ɴ # already named as required; nothing to do
     # otherwise, rudely remove the collider, if any
     pair = self.class.__instances__.rassoc( ɴ )
@@ -168,10 +159,12 @@ module NameMagic
     end
 
     # Makes the class use the namespace supplied as the argument. If no argument
-    # is given, self will be the namespace.
+    # is given, the class/module itself will be made its own namespace. Returns
+    # self.
     # 
     def namespace! namespc=self
-      namespc.tap { |n| define_singleton_method :namespace do n end }
+      namespc.extend ::NameMagic::NamespaceMethods unless namespc == self
+      tap { define_singleton_method :namespace do namespc end }
     end
 
     # Returns the instance identified by the argument. NameError is raised, if
@@ -181,6 +174,7 @@ module NameMagic
     # 
     def instance arg
       # In @instances hash, name 'nil' means nameless!
+      puts "NameMagic: #instance called with argument #{arg}." if DEBUG
       msg = "'nil' is not a valid argument type for NameMagic#instance method!"
       fail TypeError, msg if arg.nil?
       # if the argument is an actual instance, just return it
@@ -283,31 +277,38 @@ module NameMagic
     def serve_all_modules
       todo = ( nameless_instances + __avid_instances__ ).map( &:object_id ).uniq
       ObjectSpace.each_object Module do |ɱ|     # for all the modules...
-        puts ɱ if ::NameMagic::DEBUG
+        # ( puts ɱ if DEBUG ) rescue
         ɱ.constants( false ).each do |const_ß|  # and all the constants...
           begin # insurance against constant dynamic loading fails
             ◉ = ɱ.const_get( const_ß )
           rescue LoadError, StandardError
             next
           end
-          if todo.include? ◉.object_id then # is it a wanted object?
+          if todo.include? ◉.object_id then # we found a wanted object
+            puts "NameMagic: Wanted object found under #{const_ß}." if DEBUG
             if __avid_instances__.map( &:object_id ).include? ◉.object_id # avid
+              puts "NameMagic: It is avid." if DEBUG
               __avid_instances__ # 1. remove from avid list
                 .delete_if { |instance| instance.object_id == ◉.object_id }
               ◉.name! const_ß    # 2. name rudely
             else # not avid
+              puts "NameMagic: It is not avid." if DEBUG
               ɴ = if @name_set_closure then # honor name_set_closure
                     @name_set_closure.( const_ß, ◉, nil )
+                      .tap { |r| puts "The resulting name is #{r}." }
                   else const_ß end
               ɴ = validate_capitalization( ɴ ).to_sym
+              puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
               conflicter = begin # be cautious
                              namespace.const_get( ɴ )
                            rescue NameError
                            end
               if conflicter then
+                puts "NameMagic: Conflicter exists named #{ɴ}." if DEBUG
                 raise NameError, "Another #{self} named '#{ɴ}' already " +
                   "exists!" unless conflicter == ◉
               else
+                puts "NameMagic: No conflicter named #{ɴ}, about to use it." if DEBUG
                 __instances__[ ◉ ] = ɴ   # add the instance to the namespace
                 namespace.const_set ɴ, ◉ # add the instance to the namespace
               end
