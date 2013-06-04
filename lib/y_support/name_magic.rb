@@ -135,7 +135,7 @@ module NameMagic
     # 
     def instances
       const_magic
-      __instances__.keys
+      __instances__.keys.select { |i| i.kind_of? self }
     end
 
     # Presents an array of all the instance names (disregarding anonymous
@@ -148,14 +148,14 @@ module NameMagic
     # Presents class-owned @instances without const_magic.
     # 
     def __instances__
-      namespace.instance_variable_get( :@instances ) or
+      namespace.instance_variable_get( :@instances ) ||
         namespace.instance_variable_set( :@instances, {} )
     end
 
     # Presents class-owned @avid_instances (no const_magic).
     # 
     def __avid_instances__
-      namespace.instance_variable_get( :@avid_instances ) or
+      namespace.instance_variable_get( :@avid_instances ) ||
         namespace.instance_variable_set( :@avid_instances, [] )
     end
 
@@ -167,26 +167,23 @@ module NameMagic
       self
     end
 
-    # Returns an instance identiified by the argument. NameError is raised, if
+    # Returns the instance identified by the argument. NameError is raised, if
     # the argument does not identify an instance. (It can be an instance name
-    # as string, symbol, or an instance itself, in which case it is merely
-    # returned without changes.)
+    # as string, symbol, or an instance itself, in which case, the instance in
+    # question is merely returned without changes.)
     # 
     def instance arg
-      const_magic
-      # Reject nil argument. (In @instances hash, nameless instances are given
-      # name nil, so 'nil' cannot be a real name.)
-      fail TypeError, "'nil' is not a valid argument type for " +
-        "NameMagic#instance method!" if arg.nil?
+      # In @instances hash, name 'nil' means nameless!
+      msg = "'nil' is not a valid argument type for NameMagic#instance method!"
+      fail TypeError, msg if arg.nil?
       # if the argument is an actual instance, just return it
-      return arg if __instances__.keys.include? arg
-      # otherwise, treat it as name
-      r = begin
-            __instances__.rassoc( arg ) || __instances__.rassoc( arg.to_sym )
-          rescue NoMethodError
-          end or
-        raise NameError, "No instance #{arg} in #{namespace}."
-      return r[0]
+      ii = instances
+      return arg if ii.include? arg
+      # otherwise, assume arg is a name
+      begin
+        ii.find { |i| i.name == arg || i.name == arg.to_sym }
+      rescue NoMethodError
+      end or raise NameError, "No instance #{arg} in #{namespace}."
     end
 
 
