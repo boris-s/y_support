@@ -167,6 +167,13 @@ module NameMagic
       self
     end
 
+    # Makes the class use the namespace supplied as the argument. If no argument
+    # is given, self will be the namespace.
+    # 
+    def namespace! namespc=self
+      namespc.tap { |n| define_singleton_method :namespace do n end }
+    end
+
     # Returns the instance identified by the argument. NameError is raised, if
     # the argument does not identify an instance. (It can be an instance name
     # as string, symbol, or an instance itself, in which case, the instance in
