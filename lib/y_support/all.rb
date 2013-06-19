@@ -10,6 +10,7 @@ require 'y_support/inert_recorder'
 require 'y_support/local_object'
 require 'y_support/abstract_algebra'
 require 'y_support/kde'
+require 'y_support/x'
 require 'y_support/misc'
 
 
