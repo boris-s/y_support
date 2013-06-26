@@ -69,8 +69,3 @@ class Module
   alias :ç_variable_defined? :class_variable_defined?
   alias :remove_ç_variable :remove_class_variable
 end
-
-module Kernel
-  alias :λ :lambda
-  alias :Λ :proc
-end

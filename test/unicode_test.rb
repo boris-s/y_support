@@ -28,12 +28,6 @@ class UnicodeTest < Test::Unit::TestCase
       assert ɱ.ç_variable_defined?( :@@meaning )
       ɱ.remove_ç_variable :@@meaning
       assert ! ɱ.ç_variable_defined?( :@@meaning )
-      ll = λ{}
-      assert ll.is_a? Proc
-      assert ll.lambda?
-      lL = Λ{}
-      assert lL.is_a? Proc
-      assert ! lL.lambda?
     end
   end
 end
