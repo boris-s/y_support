@@ -29,21 +29,7 @@ describe Module do
     require 'y_support/core_ext/module'
   end
 
-  it "should have working #attr_accessor_with_default" do
-    class Klass
-      attr_accessor_with_default :hello do "world" end
-    end
-    assert_equal "world", Klass.new.hello
-    instance = Klass.new
-    instance.hello = "certain string"             # testing setter
-    assert_equal "certain string", instance.hello # testing getter
-  end
-    
-  it "should have working autoreq" do
-    module TestModule
-      autoreq :fixture_class, descending_path: '.', ascending_path_prefix: '.'
-    end
-    assert_equal "world", TestModule::FixtureClass.new.hello
+  it "presently has no extensions" do
   end
 end
 
@@ -71,21 +57,22 @@ describe Enumerable do
   end
 end
 
+
 describe Array do
   before do
     require 'y_support/core_ext/array'
   end
   
-  it "should have #to_hash" do
+  it "has #to_hash" do
     assert_equal( {a: :b, c: :d}, [[:a, :b],[:c, :d]].to_hash )
     assert_equal( {k: :kokot, p: :pica}, [[:k, :o, :kokot], [:p, :i, :pica]].to_hash(2) )
   end
   
-  it "should have #to_proc in style &[function, *args]" do
+  it "has #to_proc in style &[function, *args]" do
     assert_equal [2, 3], [1, 2].map( &[:+, 1] )
   end
   
-  it "should have #push/pop_ordered/named" do
+  it "has #push/pop_ordered/named" do
     a = [1, 2, foo: 3]
     a.pop_named( :foo ).must_equal 3
     a.pop_named( :bar ).must_equal nil
@@ -154,137 +141,141 @@ describe Hash do
   end
 end
 
-# context "Matrix" do
-#   setup do
-#     require 'y_support/stdlib_ext/matrix'
-  #   end
-    
-  #   should "have #pp method" do
-  #     assert_respond_to Matrix[[1, 2], [3, 4]], :pretty_print
-  #     assert_respond_to Matrix[[1, 2], [3, 4]], :pp
-  #   end
 
-  #   should "have #correspondence_matrix method" do
-  #     assert_respond_to Matrix, :correspondence_matrix
-  #     assert_equal Matrix[[1, 0, 0], [0, 1, 0]],
-  #                  Matrix.correspondence_matrix( [:a, :b, :c], [:a, :b] )
-  #     assert_equal Matrix.column_vector( [1, 2] ),
-  #                  Matrix.correspondence_matrix( [:a, :b, :c], [:a, :b] ) *
-  #                    Matrix.column_vector( [1, 2, 3] )
-  #     assert_equal 2, Matrix.correspondence_matrix( [1, 2], [1] ).column_size
-  #   end
+describe "Matrix" do
+  before do
+    require 'matrix'
+    require 'y_support/stdlib_ext/matrix'
+  end
 
-  #   should "have #column_to_a & #row_to_a" do
-  #     assert_equal [1, 2, 3], Matrix[[1], [2], [3]].column_to_a
-  #     assert_equal [2, 3, 4], Matrix[[1, 2], [2, 3], [3, 4]].column_to_a( 1 )
-  #     assert_equal nil, Matrix.empty( 5, 0 ).column_to_a
-  #     assert_equal [1], Matrix[[1], [2], [3]].row_to_a
-  #     assert_equal [3], Matrix[[1], [2], [3]].row_to_a( 2 )
-  #   end
+  it "should have #pp method" do
+    assert_respond_to Matrix[[1, 2], [3, 4]], :pretty_print
+    assert_respond_to Matrix[[1, 2], [3, 4]], :pp
+  end
 
-  #   should "have aliased #row_vector, #column_vector methods" do
-  #     assert_equal Matrix.column_vector( [1, 2, 3] ),
-  #                  Matrix.cv( [1, 2, 3] )
-  #     assert_equal Matrix.row_vector( [1, 2, 3] ),
-  #                  Matrix.rv( [1, 2, 3] )
-  #   end
+  it "should have #correspondence_matrix method" do
+    assert_respond_to Matrix, :correspondence_matrix
+    assert_equal Matrix[[1, 0, 0], [0, 1, 0]],
+    Matrix.correspondence_matrix( [:a, :b, :c], [:a, :b] )
+    assert_equal Matrix.column_vector( [1, 2] ),
+    Matrix.correspondence_matrix( [:a, :b, :c], [:a, :b] ) *
+      Matrix.column_vector( [1, 2, 3] )
+    assert_equal 2, Matrix.correspondence_matrix( [1, 2], [1] ).column_size
+  end
 
-  #   should "have #join_bottom and #join_right" do
-  #     assert_equal Matrix[[1, 2], [3, 4]],
-  #                  Matrix[[1, 2]].join_bottom( Matrix[[3, 4]] )
-  #     assert_equal Matrix[[1, 2, 3, 4]],
-  #                  Matrix[[1, 2]].join_right( Matrix[[3, 4]] )
-  #   end
+  it "should have #column_to_a & #row_to_a" do
+    assert_equal [1, 2, 3], Matrix[[1], [2], [3]].column_to_a
+    assert_equal [2, 3, 4], Matrix[[1, 2], [2, 3], [3, 4]].column_to_a( 1 )
+    assert_equal nil, Matrix.empty( 5, 0 ).column_to_a
+    assert_equal [1], Matrix[[1], [2], [3]].row_to_a
+    assert_equal [3], Matrix[[1], [2], [3]].row_to_a( 2 )
+  end
 
-  #   should "have aliased #row_size, #column_size methods" do
-  #     assert_equal 3, Matrix.zero(3, 2).height
-  #     assert_equal 3, Matrix.zero(3, 2).number_of_rows
-  #     assert_equal 2, Matrix.zero(3, 2).width
-  #     assert_equal 2, Matrix.zero(3, 2).number_of_columns
-  #   end
-  # end # context Matrix
-  
-  # context "String" do
-  #   setup do
-  #     require 'y_support/core_ext/string'
-  #   end
+  it "should have aliased #row_vector, #column_vector methods" do
+    assert_equal Matrix.column_vector( [1, 2, 3] ),
+    Matrix.cv( [1, 2, 3] )
+    assert_equal Matrix.row_vector( [1, 2, 3] ),
+    Matrix.rv( [1, 2, 3] )
+  end
 
-  #   should "have #can_be_integer? returning the integer or false if not convertible" do
-  #     assert_equal 33, "  33".to_Integer
-  #     assert_equal 8, " 010 ".to_Integer
-  #     assert_equal false, "garbage".to_Integer
-  #   end
-    
-  #   should "have #can_be_float? returning the float or false if not convertible" do
-  #     assert_equal 22.2, ' 2.22e1'.to_Float
-  #     assert_equal 10, " 010 ".to_Float
-  #     assert_equal false, "garbage".to_Float
-  #   end
-    
-  #   should "have #default! defaulter" do
-  #     assert_equal "default", "".default!("default")
-  #     assert_equal "default", " ".default!(:default)
-  #     assert_equal "default", " \n ".default!("default")
-  #     assert_equal "kokot", "kokot".default!("default")
-  #     a = ""
-  #     assert_equal a.object_id, a.default!("tata").object_id
-  #   end
-    
-  #   should "have #stripn upgrade of #strip, which also strips newlines" do
-  #     assert_equal "test test", " \n test test \n\n  \n ".stripn
-  #   end
-    
-  #   should "have #compact for joining indented lines (esp. heredocs)" do
-  #     assert_equal "test test test",
-  #                  "test\n test\n\n   \n   test\n  ".wring_heredoc
-  #     funny_string = <<-FUNNY_STRING.wring_heredoc
-  #                       This
-  #                         is
-  #                           a funny string.
-  #                       FUNNY_STRING
-  #     assert_equal( 'This is a funny string.', funny_string )
-  #   end
-    
-  #   should "be able #underscore_spaces" do
-  #     assert_equal "te_st_test", "te st test".underscore_spaces
-  #   end
-    
-  #   should "have #symbolize stripping, removing capitalization and diacritics " \
-  #   'as if to make a suitable symbol material' do
-  #     assert_equal "Yes_sir!", " \nYes, sir!.; \n \n".standardize
-  #   end
-    
-  #   should "have #to_standardized_sym chaining #standardize and #to_sym" do
-  #     assert_equal :Yes,  " \nYes,.; \n \n".to_standardized_sym
-  #   end
-  # end # context String
+  it "should have #join_bottom and #join_right" do
+    assert_equal Matrix[[1, 2], [3, 4]],
+    Matrix[[1, 2]].join_bottom( Matrix[[3, 4]] )
+    assert_equal Matrix[[1, 2, 3, 4]],
+    Matrix[[1, 2]].join_right( Matrix[[3, 4]] )
+  end
 
-  # context "Symbol" do
-  #   setup do
-  #     require 'y_support/core_ext/symbol'
-  #   end
+  it "should have aliased #row_size, #column_size methods" do
+    assert_equal 3, Matrix.zero(3, 2).height
+    assert_equal 3, Matrix.zero(3, 2).number_of_rows
+    assert_equal 2, Matrix.zero(3, 2).width
+    assert_equal 2, Matrix.zero(3, 2).number_of_columns
+  end
+end
 
-  #   should "have #default! defaulter going through String#default!" do
-  #     assert_equal :default, "".to_sym.default!(:default)
-  #     assert_equal :default, "".to_sym.default!("default")
-  #     assert_equal :default, " ".to_sym.default!("default")
-  #     assert_equal :default, " \n ".to_sym.default!("default")
-  #     assert_equal :kokot, :kokot.default!("default")
-  #   end
-    
-  #   should "have #to_standardized_sym" do
-  #     assert_equal :Yes, (:" \nYes, \n").to_standardized_sym
-  #   end
-  # end # context Symbol
+describe String do
+  before do
+    require 'y_support/core_ext/string'
+  end
 
-  # context "Numeric" do
-  #   setup do
-  #     require 'y_support/core_ext/numeric'
-  #   end
+  it "should have #can_be_integer? returning the integer or false if not convertible" do
+    assert_equal 33, "  33".to_Integer
+    assert_equal 8, " 010 ".to_Integer
+    assert_equal false, "garbage".to_Integer
+  end
 
-  #   should "have #zero public class methods" do
-  #     assert_equal 0, Integer.zero
-  #     assert_equal 0.0, Float.zero
-  #     assert_equal Complex(0, 0), Complex.zero
-  #   end
-  # end
+  it "should have #can_be_float? returning the float or false if not convertible" do
+    assert_equal 22.2, ' 2.22e1'.to_Float
+    assert_equal 10, " 010 ".to_Float
+    assert_equal false, "garbage".to_Float
+  end
+
+  it "should have #default! defaulter" do
+    assert_equal "default", "".default!("default")
+    assert_equal "default", " ".default!(:default)
+    assert_equal "default", " \n ".default!("default")
+    assert_equal "kokot", "kokot".default!("default")
+    a = ""
+    assert_equal a.object_id, a.default!("tata").object_id
+  end
+
+  it "should have #stripn upgrade of #strip, which also strips newlines" do
+    assert_equal "test test", " \n test test \n\n  \n ".stripn
+  end
+
+  it "should have #compact for joining indented lines (esp. heredocs)" do
+    assert_equal "test test test",
+    "test\n test\n\n   \n   test\n  ".wring_heredoc
+    funny_string = <<-FUNNY_STRING.wring_heredoc
+                        This
+                          is
+                            a funny string.
+                        FUNNY_STRING
+    assert_equal( 'This is a funny string.', funny_string )
+  end
+
+  it "should be able #underscore_spaces" do
+    assert_equal "te_st_test", "te st test".underscore_spaces
+  end
+
+  it "should have #symbolize stripping, removing capitalization and diacritics " \
+  'as if to make a suitable symbol material' do
+    assert_equal "Yes_sir!", " \nYes, sir!.; \n \n".standardize
+  end
+
+  it "should have #to_standardized_sym chaining #standardize and #to_sym" do
+    assert_equal :Yes,  " \nYes,.; \n \n".to_standardized_sym
+  end
+end
+
+
+describe Symbol do
+  before do
+    require 'y_support/core_ext/symbol'
+  end
+
+  it "should have #default! defaulter going through String#default!" do
+    assert_equal :default, "".to_sym.default!(:default)
+    assert_equal :default, "".to_sym.default!("default")
+    assert_equal :default, " ".to_sym.default!("default")
+    assert_equal :default, " \n ".to_sym.default!("default")
+    assert_equal :kokot, :kokot.default!("default")
+  end
+
+  it "should have #to_standardized_sym" do
+    assert_equal :Yes, (:" \nYes, \n").to_standardized_sym
+  end
+end
+
+
+describe Numeric do
+  before do
+    require 'y_support/core_ext/numeric'
+  end
+
+  it "should have #zero public class methods" do
+    assert_equal 0, Integer.zero
+    assert_equal 0.0, Float.zero
+    assert_equal Complex(0, 0), Complex.zero
+  end
+end
