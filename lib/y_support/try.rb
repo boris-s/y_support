@@ -124,7 +124,7 @@ class Object
   # available, which builds up the context information for a good error message,
   # should the risky action raise one.
   # 
-  def try receiver_NL_description=to_s, attempt_NL_description, &block
+  def try receiver_NL_description=self, attempt_NL_description, &block
     Consciously::Try.new( object: receiver_NL_description,
                          text: attempt_NL_description,
                          &block ).__invoke__

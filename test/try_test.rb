@@ -67,7 +67,15 @@ describe Consciously do
         def to_s; "THIS OBJECT" end
         def hello!; "hello hello" end
       end
-      -> { o.try "to call a missing method" do hello! end }.must_raise NoMethodError
+      # Object's methods must be callable
+      o.try "to say hello" do hello! end.must_equal "hello hello"
+      begin
+        o.try "to call a weird method" do goodbye! end
+      rescue NoMethodError => err
+        err.message.must_include "When trying to call a weird method, " +
+          "NoMethodError occurred: undefined method"
+        err.message.must_include "goodbye!"
+      end
     end
   end
 
