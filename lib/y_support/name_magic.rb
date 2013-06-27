@@ -158,13 +158,19 @@ module NameMagic
       self
     end
 
-    # Makes the class use the namespace supplied as the argument. If no argument
-    # is given, the class/module itself will be made its own namespace. Returns
-    # self.
+    # Makes the class use the namespace supplied as an argument.
     # 
-    def namespace! namespc=self
+    def namespace= namespc
       namespc.extend ::NameMagic::NamespaceMethods unless namespc == self
       tap { define_singleton_method :namespace do namespc end }
+    end
+      
+    # Makes the class/module use itself as a namespace. (Useful eg. with
+    # parametrized subclassing to tell the subclasses to maintain each their
+    # own namespaces.)
+    # 
+    def namespace!
+      self.namespace = self
     end
 
     # Returns the instance identified by the argument. NameError is raised, if
@@ -186,7 +192,6 @@ module NameMagic
       rescue NoMethodError
       end or raise NameError, "No instance #{arg} in #{namespace}."
     end
-
 
     # The method will search all the modules in the the object space for
     # receiver class objects assigned to constants, and name these instances

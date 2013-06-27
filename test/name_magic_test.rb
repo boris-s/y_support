@@ -53,5 +53,17 @@ describe NameMagic do
     @reporter.name_get.must_equal "Name get closure called on UFO"
     Elaine = @ç.new
     Elaine.name.must_equal :Elaine
+    m = Module.new
+    XXX = m
+    @ç.namespace = XXX
+    @ç.namespace.must_equal m
+    Rover = @ç.new
+    @ç.const_magic
+    XXX::Rover.must_be_kind_of @ç
+    @ç.namespace!
+    Spot = @ç.new
+    @ç.const_magic
+    -> { XXX::Spot }.must_raise NameError
+    @ç.const_get( :Spot ).must_be_kind_of @ç
   end
 end
