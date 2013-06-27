@@ -1,5 +1,5 @@
 class Array
-  # Converts an array, whose elements are also arrays, to a hash.  Head
+  # Converts an array, whose elements are also arrays, to a hash. Head
   # (position 0) of each array is made to point at the rest of the array
   # (tail), normally starting immediately after the head (position 1). The
   # starting position of the tail can be controlled by an optional
@@ -12,26 +12,51 @@ class Array
     }
   end
   
-  # Does things for each consecutive pair (expects a binary block).
-  # 
-  def each_consecutive_pair
-    if block_given?
-      return self if ( n = self.size - 1 ) <= 0
-      n.times.with_index{|i| yield( self[i], self[i+1] ) }
-      return self
-    else
-      return Enumerator.new do |yielder|
-        n.times.with_index{|i| yielder << [ self[i], self[i+1] ] } unless
-          ( n = self.size - 1 ) <= 0
-      end
-    end
-  end
-  
   # Allows style &[ function, *arguments ]
   # 
   def to_proc
     proc { |receiver| receiver.send *self }
   end # def to_proc
+
+  # With array construction syntax [:foo, bar: 42] now possible in Ruby, arrays
+  # become closer to argument collections, and supporting methods might come
+  # handy. This method pushes an element on top of the "ordered arguments" part
+  # of the array.
+  # 
+  def push_ordered element
+    return push oo unless last.is_a? Hash
+    push pop.tap { push element }
+  end
+
+  # With array construction syntax [:foo, bar: 42] now possible in Ruby, arrays
+  # become closer to argument collections, and supporting methods might come
+  # handy. This method pushes an element on top of the "named arguments" part
+  # of the array.
+  # 
+  def push_named **oo
+    l = last
+    return push oo unless l.is_a? Hash
+    tap { l.update oo }
+  end
+
+  # With array construction syntax [:foo, bar: 42] now possible in Ruby, arrays
+  # become closer to argument collections, and supporting methods might come
+  # handy. This method pops an element from the "ordered arguments" array part.
+  # 
+  def pop_ordered
+    l = pop
+    return l unless l.is_a? Hash
+    pop.tap { push l }
+  end
+
+  # With array construction syntax [:foo, bar: 42] now possible in Ruby, arrays
+  # become closer to argument collections, and supporting methods might come
+  # handy. This method pops an element from the "ordered arguments" array part.
+  # 
+  def pop_named key
+    l = last
+    l.delete( key ).tap { pop if l.empty? } if l.is_a? Hash
+  end
   
   # TEST ME
   # def pretty_inspect
