@@ -24,7 +24,7 @@ class Array
   # of the array.
   # 
   def push_ordered element
-    return push oo unless last.is_a? Hash
+    return push element unless last.is_a? Hash
     push pop.tap { push element }
   end
 

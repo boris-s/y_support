@@ -4,70 +4,72 @@
 require 'minitest/spec'
 require 'minitest/autorun'
 
-#   context "Object" do
-#     setup do
-#       require 'y_support/core_ext/object'
-#     end
+describe Object do
+  before do
+    require 'y_support/core_ext/object'
+  end
 
-#     should "have #const_set_if_not_defined" do
-#       ( ◉ = Object.new ).const_set_if_not_defined :KOKO, 42
-#       assert_equal 42, ◉.singleton_class::KOKO
-#       ◉.const_set_if_not_defined :KOKO, 43
-#       assert_equal 42, ◉.singleton_class::KOKO
-#     end
+  it "should have #const_set_if_not_defined" do
+    ( ◉ = Object.new ).const_set_if_not_defined :KOKO, 42
+    assert_equal 42, ◉.singleton_class::KOKO
+    ◉.const_set_if_not_defined :KOKO, 43
+    assert_equal 42, ◉.singleton_class::KOKO
+  end
 
-#     should "have #const_redef_without_warning" do
-#       ( ◉ = Object.new ).const_set_if_not_defined :KOKO, 42
-#       ◉.const_redefine_without_warning :KOKO, 43
-#       assert_equal 43, ◉.singleton_class::KOKO
-#     end
-#   end # context Object
-  
-#   context "Module" do
-#     setup do
-#       require 'y_support/core_ext/module'
-#     end
+  it "should have #const_redef_without_warning" do
+    ( ◉ = Object.new ).const_set_if_not_defined :KOKO, 42
+    ◉.const_redefine_without_warning :KOKO, 43
+    assert_equal 43, ◉.singleton_class::KOKO
+  end
+end
 
-#     should "have working #attr_accessor_with_default" do
-#       class Klass
-#         attr_accessor_with_default :hello do "world" end
-#       end
-#       assert_equal "world", Klass.new.hello
-#       instance = Klass.new
-#       instance.hello = "certain string"             # testing setter
-#       assert_equal "certain string", instance.hello # testing getter
-#     end
+
+describe Module do
+  before do
+    require 'y_support/core_ext/module'
+  end
+
+  it "should have working #attr_accessor_with_default" do
+    class Klass
+      attr_accessor_with_default :hello do "world" end
+    end
+    assert_equal "world", Klass.new.hello
+    instance = Klass.new
+    instance.hello = "certain string"             # testing setter
+    assert_equal "certain string", instance.hello # testing getter
+  end
     
-#     should "have working autoreq" do
-#       module TestModule
-#         autoreq :fixture_class, descending_path: '.', ascending_path_prefix: '.'
-#       end
-#       assert_equal "world", TestModule::FixtureClass.new.hello
-#     end
-#   end # context Module
+  it "should have working autoreq" do
+    module TestModule
+      autoreq :fixture_class, descending_path: '.', ascending_path_prefix: '.'
+    end
+    assert_equal "world", TestModule::FixtureClass.new.hello
+  end
+end
 
-#   context "Enumerable" do
-#     setup do
-#       require 'y_support/core_ext/enumerable'
-#     end
 
-#     should "introduce #all_kind_of? collection qualifier" do
-#       assert_equal true, [ 1, 1.0 ].all_kind_of?( Numeric )
-#       assert_equal false, [ 1, [1.0] ].all_kind_of?( Numeric )
-#     end
+describe Enumerable do
+  before do
+    require 'y_support/core_ext/enumerable'
+  end
+
+  it "should introduce #all_kind_of? collection qualifier" do
+    assert_equal true, [ 1, 1.0 ].all_kind_of?( Numeric )
+    assert_equal false, [ 1, [1.0] ].all_kind_of?( Numeric )
+  end
     
-#     should "introduce #all_numeric? collection qualifier" do
-#       assert_equal true, [1, 1.0].all_numeric?
-#       assert_equal false, [:a, 1].all_numeric?
-#     end
-    
-#     should "have #subset_of? collection qualifier" do
-#       assert_equal( true, [1,2].subset_of?( [1,2,3,4] ) )
-#       assert_equal( false, [1,2].subset_of?( [2,3] ) )
-#       assert_equal( true, [1,2].subset_of?( [1,2] ) )
-#       assert_equal( true, [1, 1.0].subset_of?( [1.0, 2.0] ) )
-#     end
-#   end # context Enumerable
+  it "should introduce #all_numeric? collection qualifier" do
+    assert_equal true, [1, 1.0].all_numeric?
+    assert_equal false, [:a, 1].all_numeric?
+  end
+
+  it "should have #subset_of? collection qualifier" do
+    assert_equal( true, [1,2].subset_of?( [1,2,3,4] ) )
+    assert_equal( false, [1,2].subset_of?( [2,3] ) )
+    assert_equal( true, [1,2].subset_of?( [1,2] ) )
+    assert_equal( true, [1, 1.0].subset_of?( [1.0, 2.0] ) )
+  end
+end
 
 describe Array do
   before do
@@ -96,65 +98,65 @@ describe Array do
   end
 end
 
-  # context "Hash" do
-  #   setup do
-  #     require 'y_support/core_ext/hash'
-  #   end
+describe Hash do
+  before do
+    require 'y_support/core_ext/hash'
+  end
 
-  #   should "have #default! custom defaulter" do
-  #     defaults = { a: 1, b: nil }
-  #     test = {}
-  #     result = test.default!( defaults )
-  #     assert_equal defaults, result
-  #     assert_equal result.object_id, test.object_id
-  #     test = { a: 11, b: 22 }
-  #     assert_equal( { a: 11, b: 22 }, test.default!( defaults ) )
-  #     test = { a: 11, c: 22 }
-  #     assert_equal( { a: 11, b: nil, c: 22 }, test.default!( defaults ) )
-  #   end
-    
-  #   should "have #with_keys and #modify_keys" do
-  #     assert_equal( {"a" => :b, "c" => :d}, {a: :b, c: :d}.with_keys( &:to_s ) )
-  #     assert_equal( {"a1" => 1, "c2" => 2}, {a: 1, c: 2}.modify_keys { |k, v|
-  #                     k.to_s + v.to_s } )
-  #     assert_equal( {"a1" => 1, "c2" => 2}, {a: 1, c: 2}.modify_keys {|p|
-  #                     p[0].to_s + p[1].to_s } )
-  #     assert_equal( {2 => 1, 4 => 2}, {1 => 1, 2 => 2}.modify_keys { |k, v|
-  #                     k + v } )
-  #     assert_equal( {2 => 1, 4 => 2}, {1 => 1, 2 => 2}.modify_keys { |p|
-  #                     p[0] + p[1] } )
-  #   end
-    
-  #   should "have #with_values and #modify_values" do
-  #     assert_equal( { a: "b", c: "d" }, {a: :b, c: :d}.with_values( &:to_s ) )
-  #     assert_equal( {a: "ab", c: "cd"}, {a: :b, c: :d}.modify_values { |k, v|
-  #                     k.to_s + v.to_s } )
-  #     assert_equal( {a: "ab", c: "cd"}, {a: :b, c: :d}.modify_values { |p|
-  #                     p[0].to_s + p[1].to_s } )
-  #     hh = { a: 1, b: 2 }
-  #     hh.with_values! &:to_s
-  #     assert_equal ["1", "2"], hh.values
-  #     hh.modify_values! &:join
-  #     assert_equal ["a1", "b2"], hh.values
-  #   end
+  it "should have #default! custom defaulter" do
+    defaults = { a: 1, b: nil }
+    test = {}
+    result = test.default!( defaults )
+    assert_equal defaults, result
+    assert_equal result.object_id, test.object_id
+    test = { a: 11, b: 22 }
+    assert_equal( { a: 11, b: 22 }, test.default!( defaults ) )
+    test = { a: 11, c: 22 }
+    assert_equal( { a: 11, b: nil, c: 22 }, test.default!( defaults ) )
+  end
 
-  #   should "have #modify" do
-  #     assert_equal( { ab: "ba", cd: "dc" },
-  #                   { a: :b, c: :d }
-  #                     .modify { |k, v| ["#{k}#{v}".to_sym, "#{v}#{k}"] } )
-  #   end
-    
-  #   should "have #dot! meta patcher for dotted access to keys" do
-  #     h = Hash.new.merge!(aaa: 1, taint: 2)
-  #     assert_raise ArgumentError do h.dot! end
-  #     assert_nothing_raised do h.dot!( overwrite_methods: true ) end
-  #     assert_equal( {aaa: 1}, {aaa: 1}.dot! )
-  #   end
-  # end # context Hash
-  
-  # context "Matrix" do
-  #   setup do
-  #     require 'y_support/stdlib_ext/matrix'
+  it "should have #with_keys and #modify_keys" do
+    assert_equal( {"a" => :b, "c" => :d}, {a: :b, c: :d}.with_keys( &:to_s ) )
+    assert_equal( {"a1" => 1, "c2" => 2}, {a: 1, c: 2}.modify_keys { |k, v|
+                    k.to_s + v.to_s } )
+    assert_equal( {"a1" => 1, "c2" => 2}, {a: 1, c: 2}.modify_keys {|p|
+                    p[0].to_s + p[1].to_s } )
+    assert_equal( {2 => 1, 4 => 2}, {1 => 1, 2 => 2}.modify_keys { |k, v|
+                    k + v } )
+    assert_equal( {2 => 1, 4 => 2}, {1 => 1, 2 => 2}.modify_keys { |p|
+                    p[0] + p[1] } )
+  end
+
+  it "should have #with_values and #modify_values" do
+    assert_equal( { a: "b", c: "d" }, {a: :b, c: :d}.with_values( &:to_s ) )
+    assert_equal( {a: "ab", c: "cd"}, {a: :b, c: :d}.modify_values { |k, v|
+                    k.to_s + v.to_s } )
+    assert_equal( {a: "ab", c: "cd"}, {a: :b, c: :d}.modify_values { |p|
+                    p[0].to_s + p[1].to_s } )
+    hh = { a: 1, b: 2 }
+    hh.with_values! &:to_s
+    assert_equal ["1", "2"], hh.values
+    hh.modify_values! &:join
+    assert_equal ["a1", "b2"], hh.values
+  end
+
+  it "should have #modify" do
+    assert_equal( { ab: "ba", cd: "dc" },
+                  { a: :b, c: :d }
+                    .modify { |k, v| ["#{k}#{v}".to_sym, "#{v}#{k}"] } )
+  end
+
+  it "should have #dot! meta patcher for dotted access to keys" do
+    h = Hash.new.merge!(aaa: 1, taint: 2)
+    -> { h.dot! }.must_raise ArgumentError
+    h.dot!( overwrite_methods: true ) # instead of #assert_nothing_raised
+    assert_equal( {aaa: 1}, {aaa: 1}.dot! )
+  end
+end
+
+# context "Matrix" do
+#   setup do
+#     require 'y_support/stdlib_ext/matrix'
   #   end
     
   #   should "have #pp method" do
