@@ -5,14 +5,12 @@ require 'minitest/autorun'
 # require 'y_support/conscience'     # tested component itself
 require './../lib/y_support/conscience'
 
-include Conscience
-
-describe Try do
+describe Conscience::Try do
   before do
-    @try = Try.new object: "Dummy", text: "to fire" do
+    @try = Conscience::Try.new object: "Dummy", text: "to fire" do
       note is: "dummy"
       note has: "no care in the world"
-      n = note "the number", is: 42
+      n = note "its number", is: 42
       raise TypeError, 'foo'
     end
   end
