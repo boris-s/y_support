@@ -2,29 +2,60 @@
 
 require 'y_support'
 require_relative 'name_magic/array'
-require_relative 'name_magic/class_methods'
 require_relative 'name_magic/namespace_methods'
+require_relative 'name_magic/class_methods'
 
 # This mixin imitates Ruby constant magic and automates the named argument
-# :name (alias :ɴ). One thus can write:
+# :name (alias :ɴ). One can write:
 #
-# <tt>class Someclass; include NameMagic end</tt>
-# <tt>SomeName = SomeClass.new</tt>
+#   require 'y_support/name_magic'
+#   class Foo; include NameMagic end
+#   Bar = Foo.new
 #
 # and the resulting object will know its #name:
 #
-# <tt>SomeName.name = "SomeName"</tt>
+#   Bar.name #=> :Bar
+#   Foo::Bar #=> <Foo:0x.....>
 #
-# This is done by searching the whole Ruby namespace for constants, to which
-# the object might have been assigned. The search is performed by the method
-# #const_magic defined by this mixin. Once the object is found to be assigned
-# to a constant, and named accordingly, its subsequent assignments to other
-# constants have no additional effect.
+# This is done by searching whole Ruby namespace for constants, triggered by the
+# method #const_magic defined in the namespace mixin. (Once the object is named,
+# subsequent constant assignments have no effects.) By default, the namespace
+# is the class, in which NameMagic is included, but it is possible to prescribe
+# another module as a namespace:
 #
-# Alternative way to create a named object is by specifying :name (alias :ɴ)
-# named argument:
+#   Quux = Module.new
+#   class FooBar
+#     include NameMagic
+#     self.namespace = Quux
+#   end
+#   FooBar.new name: "Baz"
+#   FooBar::Baz #=> NameError
+#   Quux::Baz #=> <FooBar:0x.....>
 #
-# <tt>SomeClass.new a, b, ..., name: "SomeName", aa: v1, bb: v2 ...</tt>
+# When subclassing the classes with NameMagic included, namespace setting does
+# not change:
+#
+#   class Animal; include NameMagic end
+#   class Dog < Animal; end
+#   class Cat < Animal; end
+#   Dog.namespace #=> Animal
+#   Cat.namespace #=> Animal
+#   Livia = Cat.new
+#   Cat.instance_names #=> []
+#   Animal.instance_names #=> [:Livia]
+#
+# To make the subclasses use each their own namespace, use +#namespace!+ method:
+#
+#   Dog.namespace!
+#   
+# NameMagic also provides an alternative way to create named objects by taking
+# care of :name (alias :ɴ) named argument of the constructor:
+#
+#   Dog.new name: "Spot"
+#   Dog.new ɴ: :Rover
+#   Dog.instance_names #=> [:Spot, :Rover]
+#   Animal.instance_names #=> []
+#   
 #
 # Lastly, a name can be assigned by #name= accssor, as in
 #
@@ -37,30 +68,25 @@ require_relative 'name_magic/namespace_methods'
 module NameMagic
   DEBUG = false
 
-  def self.included ɱ
-    case ɱ
-    when Class then # we will decorate its #new method
-      class << ɱ
-        alias :original_method_new :new # Make space to decorate #new
+  def self.included modul
+    if modul.is_a? Class then # decorate #new
+      class << modul
+        alias :new_before_name_magic :new
       end
-      # Attach the decorators etc.
-      ɱ.extend ::NameMagic::ClassMethods
-      ɱ.extend ::NameMagic::NamespaceMethods
-      # Attach namespace methods also to the namespace, if given.
+      modul.extend NameMagic::NamespaceMethods
+      modul.extend NameMagic::ClassMethods
+      # Attach namespace methods also to the namespace, if given
       begin
-        if ɱ.namespace == ɱ then
-          ɱ.define_singleton_method :namespace do ɱ end
+        if modul.namespace == modul then
+          modul.define_singleton_method :namespace do modul end
         else
-          ɱ.namespace.extend ::NameMagic::NamespaceMethods
+          modul.namespace.extend NameMagic::NamespaceMethods
         end
       rescue NoMethodError
       end
-    else # it is a Module; we'll infect it with our #included method
-      ɱ_included, this_included = ɱ.method( :included ), method( :included )
-      ɱ.define_singleton_method :included do |ç|
-        this_included.( ç )
-        ɱ_included.( ç )
-      end
+    else # it is a Module -- infect it with this #include
+      orig, this = modul.method( :included ), method( :included )
+      modul.define_singleton_method :included do |m| this.( m ); orig.( m ) end
     end
   end # self.included
 
@@ -70,70 +96,57 @@ module NameMagic
     self.class.namespace
   end
 
-  # Retrieves an instance name (demodulized).
+  # Retrieves an instance name.
   # 
   def name
     self.class.const_magic
-    __name__
-  end
-
-  # Retrieves an instance name. (Does not trigger #const_magic before doing so.)
-  # 
-  def __name__
-    ɴ = self.class.__instances__[ self ]
-    if ɴ then
-      namespace.name_get_closure.( ɴ )
-      name_get_closure ? name_get_closure.( ɴ ) : ɴ
-    else nil end
+    __name__ or ( yield self if block_given? )
   end
   alias ɴ name
 
-  # Retrieves either an instance name (if present), or an object id.
+  # Retrieves the instance name. Does not trigger #const_magic before doing so.
   # 
-  def name_or_object_id
-    name || object_id
+  def __name__
+    ɴ = self.class.__instances__[ self ]
+    namespace.name_get_closure.( ɴ ) if ɴ
   end
-  alias ɴ_ name_or_object_id
 
   # Names an instance, cautiously (ie. no overwriting of existing names).
   # 
   def name=( ɴ )
-    puts "NameMagic: Naming with argument #{ɴ}." if DEBUG
-    # get previous name of this instance, if any
-    old_ɴ = self.class.__instances__[ self ]
-    # honor the hook
-    name_set_closure = self.class.instance_variable_get :@name_set_closure
-    ɴ = name_set_closure.call( ɴ, self, old_ɴ ) if name_set_closure
-    ɴ = self.class.send( :validate_capitalization, ɴ ).to_sym
-    puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
-    return if old_ɴ == ɴ # already named as required; nothing to do
-    # otherwise, be cautious about name collision
-    raise NameError, "Name '#{ɴ}' already exists in " +
-      "#{self.class} namespace!" if self.class.__instances__.rassoc( ɴ )
-    # since everything's ok...
-    self.class.namespace.const_set ɴ, self # write a constant
-    self.class.__instances__[ self ] = ɴ   # write __instances__
-    self.class.__forget__ old_ɴ            # forget the old name of self
+    old_ɴ = namespace.__instances__[ self ]    # previous name
+    if ɴ then puts "NameMagic: Naming with argument #{ɴ}." if DEBUG
+      ɴ = namespace.send( :validate_name,     # honor the hook
+                          namespace.name_set_closure.( ɴ, self, old_ɴ ) ).to_sym
+      puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
+      return if old_ɴ == ɴ                     # already named as required
+      fail NameError, "Name '#{ɴ}' already exists in #{namespace} namespace!" if
+        self.class.__instances__.rassoc( ɴ )
+      namespace.const_set ɴ, self           # write a constant
+      namespace.__instances__[ self ] = ɴ   # write to @instances
+      namespace.__forget__ old_ɴ            # forget the old name of self
+    else puts "NameMagic: Unnaming #{old_ɴ || self}" if DEBUG
+      namespace.__instances__.update( self => nil ) # unname in @instances
+      namespace.send :remove_const, old_ɴ if old_ɴ  # remove namespace const.
+    end
   end
 
   # Names an instance, aggresively (overwrites existing names).
   # 
   def name!( ɴ )
-    puts "NameMagic: Rudely naming with argument #{ɴ}." if DEBUG
-    old_ɴ = self.class.__instances__[ self ] # get instance's old name, if any
-    # honor the hook
-    name_set_closure = self.class.instance_variable_get :@name_set_closure
-    ɴ = name_set_closure.( ɴ, self, old_ɴ ) if name_set_closure
-    ɴ = self.class.send( :validate_capitalization, ɴ ).to_sym
-    puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
-    return false if old_ɴ == ɴ # already named as required; nothing to do
-    # otherwise, rudely remove the collider, if any
-    pair = self.class.__instances__.rassoc( ɴ )
-    self.class.__forget__( pair[0] ) if pair
-    # and add self to the namespace instead
-    self.class.namespace.const_set ɴ, self # write a constant
-    self.class.__instances__[ self ] = ɴ   # write to __instances__
-    self.class.__forget__ old_ɴ            # forget the old name of self
-    return true
+    old_ɴ = namespace.__instances__[ self ]   # previous name
+    if ɴ then puts "NameMagic: Rudely naming with #{ɴ}." if DEBUG
+      ɴ = namespace.send( :validate_name,     # honor the hook
+                          namespace.name_set_closure.( ɴ, self, old_ɴ ) ).to_sym
+      puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
+      return false if old_ɴ == ɴ # already named as required
+      pair = namespace.__instances__.rassoc( ɴ )
+      namespace.__forget__( pair[0] ) if pair # rudely forget the collider
+      namespace.const_set ɴ, self             # write a constant
+      namespace.__instances__[ self ] = ɴ     # write to @instances
+      namespace.__forget__ old_ɴ              # forget the old name of self
+    else
+      self.name = nil # unnaming, no collider issues
+    end
   end
 end # module NameMagic

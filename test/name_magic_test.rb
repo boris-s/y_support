@@ -14,12 +14,10 @@ describe NameMagic do
     @reporter = Object.new
     puts "..."
     @reporter.singleton_class.class_exec { attr_reader :report, :naming }
-    @ç.new_instance_closure do |instance|
-      @reporter.define_singleton_method :report do
-        "New instance reported"
-      end
+    @ç.namespace.new_instance_closure do |instance|
+      @reporter.define_singleton_method :report do "Instance reported" end
     end
-    @ç.name_set_closure do |name, instance, old_name|
+    @ç.namespace.name_set_closure do |name, instance, old_name|
       @reporter.define_singleton_method :name_set do
         "Name of the new instance was #{name}"
       end
@@ -39,14 +37,14 @@ describe NameMagic do
     @ç.nameless_instances.must_be_empty
     @reporter.report.must_equal nil
     x = @ç.new( name: "Boris" )
-    @reporter.report.must_equal "New instance reported"
+    @reporter.report.must_equal "Instance reported"
     @reporter.name_set.must_equal "Name of the new instance was Boris"
     x.name.must_equal :Boris
     @reporter.name_get.must_equal "Name get closure called on Boris"
     ufo = @ç.new
     @ç.nameless_instances.must_equal [ufo]
     UFO = @ç.new
-    @reporter.report.must_equal "New instance reported"
+    @reporter.report.must_equal "Instance reported"
     @reporter.name_set.must_equal "Name of the new instance was Boris"
     UFO.name
     @reporter.name_set.must_equal "Name of the new instance was UFO"

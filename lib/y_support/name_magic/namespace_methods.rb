@@ -2,31 +2,39 @@
 
 module NameMagic
   module NamespaceMethods
-    # Presents the instances registered by the namespace. Takes one optional
-    # argument. If set to _false_, the method returns all the instances
-    # registered by the namespace. If set to _true_ (default), only returns
-    # those instances registered by the namespace, which are of the exact same
-    # class as the method's receiver. Example:
+    # Presents class-owned namespace. By default, this is the class itself, but
+    # may be overriden to use some other module as a namespace.
+    # 
+    def namespace
+      self
+    end
+
+    # Sets the namespace of the class.
+    # 
+    def namespace= modul
+      modul.extend ::NameMagic::NamespaceMethods unless modul == self
+      tap { define_singleton_method :namespace do modul end }
+    end
+
+    # Makes the class/module its own namespace. This is useful especially to tell
+    # the subclasses of a class using NameMagic to maintain their own namespaces.
+    # 
+    def namespace!
+      nil.tap { self.namespace = self }
+    end
+
+    # Presents the instances registered by the namespace.
     #
-    #   class Animal; include NameMagic end
-    #   Cat, Dog = Class.new( Animal ), Class.new( Animal )
-    #   Spot = Dog.new
-    #   Livia = Cat.new
-    #   Animal.instances #=> returns 2 instances
-    #   Dog.instances #=> returns 1 instance
-    #   Dog.instances( false ) #=> returns 2 instances of the namespace Animal
-    #
-    def instances option=false
+    def instances
       const_magic
-      return __instances__.keys if option
-      __instances__.keys.select { |i| i.kind_of? self }
+      __instances__.keys
     end
 
     # Presents the instance names. Takes one optional argument, same as
     # #instances method. Unnamed instances are completely disregarded.
     #
-    def instance_names option=false
-      instances( option ).names( false )
+    def instance_names
+      instances.names( false )
     end
 
     # Presents namespace-owned @instances hash of pairs <code>{ instance =>
@@ -34,7 +42,8 @@ module NameMagic
     # method does not trigger #const_magic.)
     #
     def __instances__
-      @instances ||= {}
+      namespace.instance_variable_get( :@instances ) ||
+        namespace.instance_variable_set( :@instances, {} )
     end
 
     # Presents namespace-owned @avid_instances array of avid instances. "Avid"
@@ -42,7 +51,8 @@ module NameMagic
     # registered instance. (Also, this method does not trigger const_magic).
     #
     def __avid_instances__
-      @avid_instances ||= []
+      namespace.instance_variable_get( :@avid_instances ) ||
+        namespace.instance_variable_set( :@avid_instances, [] )
     end
 
     # Returns the instance identified by the argument. NameError is raised, if
@@ -52,23 +62,20 @@ module NameMagic
     #
     def instance identifier
       puts "#instance( #{identifier} )" if DEBUG
-      msg = "'nil' is not a valid argument type for NameMagic#instance method!"
       # In @instances hash, value 'nil' indicates a nameless instance!
-      fail TypeError, "'nil' cannot be an instance identifier!" if arg.nil?
+      fail TypeError, "'nil' is not an instance identifier!" if identifier.nil?
       ii = instances
-      # if the argument is a registered instance, just return it back
-      return identifier if ii.include? identifier
-      begin # otherwise, try to use instance_identifier as a name
-        ii.find.with_object [identifier, identifier.to_sym] do |i, ary|
-          ary.include? i.name
-        end
+      return identifier if ii.include? identifier # return the instance back
+      begin # identifier not a registered instace -- treat it as a name
+        ary = [identifier, identifier.to_sym]
+        ii.find do |i| ary.include? i.name end
       rescue NoMethodError
       end or raise NameError, "No instance #{identifier} in #{self}."
     end
 
-    # The method will search all the modules in the the object space for the
-    # receiver class objects assigned to constants, and name these instances
-    # accordingly. Number of the remaining nameless instances is returned.
+    # Searches all the modules in the the object space for constants containing
+    # receiver class objects, and names the found instances accordingly. The
+    # number of the remaining nameless instances is returned.
     #
     def const_magic
       return 0 if nameless_instances.size == 0
@@ -98,7 +105,7 @@ module NameMagic
       namespace.send :remove_const, ɴ if ɴ   # clear constant assignment
       __instances__.delete( inst )           # remove @instances entry
       __avid_instances__.delete( inst )      # remove if any
-      return inst                            # return forgotten instance
+      return inst                            # return the forgotten instance
     end
 
     # Clears namespace-owned references to an instance, without performing
@@ -113,7 +120,7 @@ module NameMagic
       end
     end
 
-    # Clears class-owned references to all the anonymous instances.
+    # Clears namespace-owned references to all the anonymous instances.
     # 
     def forget_nameless_instances
       nameless_instances.each { |inst, ɴ|
@@ -124,7 +131,7 @@ module NameMagic
     alias forget_unnamed_instances forget_nameless_instances
     alias forget_anonymous_instances forget_nameless_instances
 
-    # Clears class-owned references to all the instances.
+    # Clears namespace-owned references to all the instances.
     # 
     def forget_all_instances
       __instances__.clear           # clears @instances
@@ -139,6 +146,7 @@ module NameMagic
     # instantiation, but before naming.
     # 
     def new_instance_closure &block
+      namespace.new_instance_closure &block unless namespace == self
       @new_instance_closure = block if block
       @new_instance_closure ||= -> instance { instance }
     end
@@ -152,6 +160,7 @@ module NameMagic
     # usable as a constant name etc.)
     # 
     def name_set_closure &block
+      namespace.name_set_closure &block unless namespace == self
       @name_set_closure = block if block
       @name_set_closure ||= -> name, instance, old_name=nil { name }
     end
@@ -162,6 +171,7 @@ module NameMagic
     # to the name_get_closure before being returned as instance name.
     # 
     def name_get_closure &block
+      namespace.name_get_closure &block unless namespace == self
       @name_get_closure = block if block
       @name_get_closure ||= -> name { name }
     end
@@ -208,7 +218,7 @@ module NameMagic
     def validate_name name
       name.to_s.tap do |ɴ| # check whether the name starts with 'A'..'Z'
         fail NameError, "#{self}-registered name must start with a capital " +
-        " letter 'A'..'Z' ('#{ɴ}' was given)!" unless ( ?A..?Z ) === ɴ[0]
+        " letter 'A'..'Z' ('#{ɴ}' given)!" unless ( ?A..?Z ) === ɴ[0]
       end
     end
   end # module NamespaceMethods

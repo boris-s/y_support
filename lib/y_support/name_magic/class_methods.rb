@@ -1,25 +1,31 @@
 # -*- coding: utf-8 -*-
 
 module NameMagic::ClassMethods
-  # Presents class-owned namespace. By default, this is the class itself, but
-  # may be overriden to use some other module as a namespace.
-  # 
-  def namespace
-    self
+  # Presents the instances registered by the namespace. Takes one optional
+  # argument. If set to _false_, the method returns all the instances
+  # registered by the namespace. If set to _true_ (default), only returns
+  # those instances registered by the namespace, which are of the exact same
+  # class as the method's receiver. Example:
+  #
+  #   class Animal; include NameMagic end
+  #   Cat, Dog = Class.new( Animal ), Class.new( Animal )
+  #   Spot = Dog.new
+  #   Livia = Cat.new
+  #   Animal.instances #=> returns 2 instances
+  #   Dog.instances #=> returns 1 instance
+  #   Dog.instances( false ) #=> returns 2 instances of the namespace Animal
+  #
+  def instances option=false
+    const_magic
+    return __instances__.keys if option
+    __instances__.keys.select { |i| i.kind_of? self }
   end
 
-  # Sets the namespace of the class.
-  # 
-  def namespace= modul
-    modul.extend ::NameMagic::NamespaceMethods unless modul == self
-    tap { define_singleton_method :namespace do modul end }
-  end
-      
-  # Makes the class/module its own namespace. This is useful especially to tell
-  # the subclasses of a class using NameMagic to maintain their own namespaces.
-  # 
-  def namespace!
-    self.namespace = self
+  # Presents the instance names. Takes one optional argument, same as
+  # #instances method. Unnamed instances are completely disregarded.
+  #
+  def instance_names option=false
+    instances( option ).names( false )
   end
 
   # In addition the ability to name objects upon constant assignment, as common
@@ -39,7 +45,7 @@ module NameMagic::ClassMethods
     fail NameError, "#{self} instance #{nm} already exists!" if
       __instances__.keys.include? nm unless avid
     args << oo unless oo.empty?    # prepare the arguments
-    original_method_new( *args, &block ).tap do |new_inst| # instantiate
+    new_before_name_magic( *args, &block ).tap do |new_inst| # instantiate
       __instances__.update new_inst => nil # Instance is created unnamed...
       namespace.new_instance_closure.tap { |λ|
         λ.( new_inst ) if λ
