@@ -114,10 +114,9 @@ module NameMagic
     # 
     def __forget__( instance )
       return false unless __instances__.keys.include? instance
-      __instances__.delete instance.tap do |name| # remove @instances entry
-        __avid_instances__.delete( instance ) # also from here
-        namespace.send :remove_const, name if name
-      end
+      namespace.send :remove_const, instance.name if instance.name
+      __avid_instances__.delete( instance )
+      __instances__.delete instance
     end
 
     # Clears namespace-owned references to all the anonymous instances.
