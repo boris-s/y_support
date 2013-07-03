@@ -62,16 +62,25 @@ describe Array do
   before do
     require 'y_support/core_ext/array'
   end
-  
+
   it "has #to_hash" do
     assert_equal( {a: :b, c: :d}, [[:a, :b],[:c, :d]].to_hash )
     assert_equal( {k: :kokot, p: :pica}, [[:k, :o, :kokot], [:p, :i, :pica]].to_hash(2) )
   end
-  
+
+  it "has #zip_to_hash" do
+    assert_equal( {a: 1, b: 2}, [:a, :b].zip_to_hash( [1, 2] ) )
+    assert_equal( {a: "a"}, [:a].zip_to_hash( &:to_s ) )
+  end
+
+  it "has #>>" do
+    assert_equal( {a: 1, b: 2}, [:a, :b] >> [1, 2] )
+  end
+
   it "has #to_proc in style &[function, *args]" do
     assert_equal [2, 3], [1, 2].map( &[:+, 1] )
   end
-  
+
   it "has #push/pop_ordered/named" do
     a = [1, 2, foo: 3]
     a.pop_named( :foo ).must_equal 3
