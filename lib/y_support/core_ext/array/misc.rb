@@ -20,7 +20,7 @@ class Array
     if block_given? then
       fail ArgumentError, "Argument not allowed if block given!" unless
         collection.nil?
-      Hash[ zip( collection.map { |e| yield e } ) ]
+      Hash[ zip( map { |e| yield e } ) ]
     else
       fail ArgumentError "A second collection expected as an argument!" unless
         collection.respond_to? :each
