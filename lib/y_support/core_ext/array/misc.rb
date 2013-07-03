@@ -14,16 +14,7 @@ class Array
 
 
   # Zips this array with another collection into a hash. If a block is given,
-  # it is applied
-  # and an optional block, and returns a hash whose keys are the collection
-  # members, and whose values are given by the supplied othe arguments and/or
-  # block in the following way: If there is no additional argument, but a block
-  # is supplied, this is applied to the collection. If there is exactly one
-  # other argument, and it is also a collection, it is used as values.
-  # Otherwise, these other arguments are treated as a message to be sent to
-  # self (via #send), expecting it to return a collection to be used as hash
-  # values. Optional block (which is always assumed to be unary) can be used
-  # to additionally modify the second collection.
+  # it is applied to each element of the array to get the hash values.
   # 
   def zip_to_hash collection=nil
     if block_given? then
@@ -37,8 +28,11 @@ class Array
     end
   end
 
-
+  # Zips this array with another collection into a hash.
+  # 
   def >> collection
+    zip_to_hash collection
+  end
 
   # Allows style &[ function, *arguments ]
   # 
