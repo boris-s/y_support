@@ -37,17 +37,20 @@ module YSupport::X
       vbox.pack_start_defaults( tlabel_widget )
       vbox.pack_start_defaults( hbox )
       w.add(vbox)
-      
+
+      memo = ""
+      memo_closure = -> txt { memo << txt }
+
       ebox_widget.signal_connect("key-release-event") do |sender, event| # cc
         kn = Gdk::Keyval.to_name(k = event.keyval)
         if kn == "Return"
+          memo_closure.( sender.text )
           block.( sender.text )
           Gtk.main_quit
         end
       end
 
-      w.show_all                                                         # cc
-      Gtk.main
+      memo.tap { w.show_all; Gtk.main }
     end
 
     # Message box.
