@@ -45,7 +45,7 @@ module YSupport::X
         kn = Gdk::Keyval.to_name(k = event.keyval)
         if kn == "Return"
           memo_closure.( sender.text )
-          block.( sender.text )
+          block.( sender.text ) if block
           Gtk.main_quit
         end
       end
