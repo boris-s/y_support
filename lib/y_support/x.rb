@@ -5,13 +5,13 @@ module YSupport::X
   # Echo a string to the primary X clip with `xsel -b -i`.
   # 
   def echo_primary_clipboard( string )
-    system 'echo -n "' + string + '" | xsel -b -i'
+    system 'echo -n ' + string.inspect + ' | xsel -b -i'
   end
 
   # Echo a string to the secondary X clip with `xsel -b -i`.
   # 
   def echo_secondary_clipboard( string )
-    system 'echo -n "' + string + '" | xsel -s -i'
+    system 'echo -n "' + string.inspect + '" | xsel -s -i'
   end
 
   # Dialog box querying for a string.
