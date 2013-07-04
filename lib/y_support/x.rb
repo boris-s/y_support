@@ -60,5 +60,6 @@ module YSupport::X
       w.set_default_size( 600, 120 ).show_all
       Gtk.main
     end
+    alias popup message_box
   end
 end # module YSupport::X
