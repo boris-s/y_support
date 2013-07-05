@@ -47,15 +47,15 @@ class Object
   # checked, whether the object is truey.
   # 
   def aT what_is_receiver=nil, how_comply=nil, &b
-    r = what_is_receiver ? what_is_receiver.to_s.capitalize :
-      "#{self.class} instance #{object_id}"
-    if block_given?
-      m = "#{r} fails #{how_comply ? 'to %s' % how_comply : 'its duck type'}!"
-      raise TErr, m unless ( b.arity == 0 ) ? instance_exec( &b ) : b.( self )
-    else
-      raise TErr, m unless self
-    end
-    return self
+    tap {
+      if block_given? then
+        m = "%s fails #{how_comply ? 'to %s' % how_comply : 'its duck type'}!" %
+          if what_is_receiver then what_is_receiver.to_s.capitalize else
+            "#{self.class} instance #{object_id}"
+          end
+        b.( self ) or fail TypeError, m
+      else self or fail TypeError end
+    }
   end
   
   # This method takes a block and fails with TypeError, unless the receiver
@@ -68,17 +68,15 @@ class Object
   # no block is given, it is checked, whether the object is falsey.
   # 
   def aT_not what_is_receiver=nil, how_comply=nil, &b
-    r = what_is_receiver ? what_is_receiver.to_s.capitalize :
-      "#{self.class} instance #{object_id}"
-    if block_given?
-      m = how_comply ? "#{r} must not #{how_comply}!" :
-        "#{r} fails its duck type!"
-      raise TErr, m if ( b.arity == 0 ) ? instance_exec( &b ) : b.( self )
-    else
-      m = "#{r} is not falsey!"
-      raise TErr, m if self
-    end
-    return self
+    tap {
+      if block_given? then
+        m = how_comply ? "%s must not #{how_comply}!" : "%s fails its duck type!"
+        m %= if what_is_receiver then what_is_receiver.to_s.capitalize else
+               "#{self.class} instance #{object_id}"
+             end
+        fail TypeError, m if b.( self )
+      else fail TypeError if self end
+    }
   end
 
   # Fails with TypeError unless the receiver is of the prescribed class. Second

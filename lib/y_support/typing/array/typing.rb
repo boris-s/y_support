@@ -7,9 +7,10 @@ class Array
   # error message (element description).
   # 
   def aT_includes element, what_is_self="array", what_is_element=nil
-    e = what_is_element ? what_is_element.to_s.capitalize :
-      "Element (#{element.class} instance)"
-    m = "#{e} is absent from #{what_is_self}!"
+    m = "%s is absent from #{what_is_self}!" %
+      if what_is_element then what_is_element.to_s.capitalize else
+        "Element (#{element.class} instance)"
+      end
     tap { include? element or fail TypeError, m }
   end
   alias :aT_include :aT_includes
