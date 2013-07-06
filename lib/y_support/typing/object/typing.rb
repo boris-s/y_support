@@ -47,15 +47,13 @@ class Object
   # checked, whether the object is truey.
   # 
   def aT what_is_receiver=nil, how_comply=nil, &b
-    tap {
-      if block_given? then
-        m = "%s fails #{how_comply ? 'to %s' % how_comply : 'its duck type'}!" %
-          if what_is_receiver then what_is_receiver.to_s.capitalize else
-            "#{self.class} instance #{object_id}"
-          end
-        b.( self ) or fail TypeError, m
-      else self or fail TypeError end
-    }
+    if block_given? then
+      m = "%s fails #{how_comply ? 'to %s' % how_comply : 'its duck type'}!" %
+        if what_is_receiver then what_is_receiver.to_s.capitalize else
+          "#{self.class} instance #{object_id}"
+        end
+      tap { b.( self ) or fail TypeError, m }
+    else self or fail TypeError end
   end
   
   # This method takes a block and fails with TypeError, unless the receiver
@@ -68,26 +66,24 @@ class Object
   # no block is given, it is checked, whether the object is falsey.
   # 
   def aT_not what_is_receiver=nil, how_comply=nil, &b
-    tap {
-      if block_given? then
-        m = how_comply ? "%s must not #{how_comply}!" : "%s fails its duck type!"
-        m %= if what_is_receiver then what_is_receiver.to_s.capitalize else
-               "#{self.class} instance #{object_id}"
-             end
-        fail TypeError, m if b.( self )
-      else fail TypeError if self end
-    }
+    if block_given? then
+      m = how_comply ? "%s must not #{how_comply}!" : "%s fails its duck type!"
+      m %= if what_is_receiver then what_is_receiver.to_s.capitalize else
+             "#{self.class} instance #{object_id}"
+           end
+      tap { fail TypeError, m if b.( self ) }
+    else tap { fail TypeError if self } end
   end
 
   # Fails with TypeError unless the receiver is of the prescribed class. Second
   # optional argument customizes the error message (receiver description).
   # 
   def aT_kind_of klass, what_is_receiver=nil
-    r = what_is_receiver ? what_is_receiver.to_s.capitalize :
-      "#{self.class} instance #{object_id}"
-    m = "#{r} is not a kind of #{klass}!"
-    raise TErr, m unless kind_of? klass
-    return self
+    m = "%s is not a kind of #{klass}!" %
+      if what_is_receiver then what_is_receiver.to_s.capitalize else
+        "#{self.class} instance #{object_id}"
+      end
+    tap { kind_of? klass or fail TypeError, m }
   end
   alias :aT_is_a :aT_kind_of
 
@@ -96,11 +92,11 @@ class Object
   # customizes the error message (receiver description).
   # 
   def aT_class_complies klass, what_is_receiver=nil
-    r = what_is_receiver ? what_is_receiver.to_s.capitalize :
-      "#{self.class} instance #{object_id}"
-    m = "#{r} does not comply or declare compliance with #{klass}!"
-    raise TErr, m unless class_complies? klass
-    return self
+    m = "%s does not comply or declare compliance with #{klass}!" %
+      if what_is_receiver then what_is_receiver.to_s.capitalize else
+        "#{self.class} instance #{object_id}"
+      end
+    tap { class_complies? klass or fail TypeError, m }
   end
   
   # Fails with TypeError unless the receiver responds to the given
@@ -108,11 +104,11 @@ class Object
   # description).
   # 
   def aT_respond_to method_name, what_is_receiver=nil
-    r = what_is_receiver ? what_is_receiver.to_s.capitalize :
-      "#{self.class} instance #{object_id}"
-    m = "#{r} does not respond to method '#{method_name}'!"
-    raise TErr, m unless respond_to? method_name
-    return self
+    m = "%s does not respond to method '#{method_name}'!" %
+      if what_is_receiver then what_is_receiver.to_s.capitalize else
+        "#{self.class} instance #{object_id}"
+      end
+    tap { respond_to? method_name or fail TypeError, m }
   end
   alias :aT_responds_to :aT_respond_to
   
@@ -124,9 +120,8 @@ class Object
     r = what_is_receiver ? what_is_receiver.to_s.capitalize :
       "#{self.class} instance #{object_id}"
     o = what_is_other || "the prescribed value (#{other.class})"
-    m = "#{r} is not equal (==) to #{o}!"
-    raise TErr, m unless self == other
-    return self
+    m = "%s is not equal (==) to %s!" % [r, o]
+    tap { self == other or fail TypeError, m }
   end
 
   # Fails with TypeError unless the receiver, according to #== method, differs
@@ -137,31 +132,31 @@ class Object
     r = what_is_receiver ? what_is_receiver.to_s.capitalize :
       "#{self.class} instance #{object_id}"
     o = what_is_other || "the prescribed value (#{other.class})"
-    m = "#{r} fails to differ from #{o}!"
-    raise TErr, m if self == other
-    return self
+    m = "%s fails to differ from %s!" % [r, o]
+    tap { fail TypeError, m if self == other }
   end
 
   # Fails with TypeError unless the ActiveSupport method #blank returns true
   # for the receiver.
   # 
   def aT_blank what_is_receiver=nil
-    r = what_is_receiver ? what_is_receiver.to_s.capitalize :
-      "#{self.class} instance #{object_id}"
-    m = "#{r} fails to be #blank?!"
-    raise TErr, m unless blank?
-    return self
+    r = 
+    m = "#%s fails to be blank!" %
+      if what_is_receiver then what_is_receiver.to_s.capitalize else
+        "#{self.class} instance #{object_id}"
+      end
+    tap { blank? or fail TypeError, m }
   end
 
   # Fails with TypeError unless the ActiveSupport method #present returns true
   # for the receiver.
   # 
   def aT_present what_is_receiver=nil
-    r = what_is_receiver ? what_is_receiver.to_s.capitalize :
-      "#{self.class} instance #{object_id}"
-    m = "#{r} fails to be #present?!"
-    raise TErr, m unless present?
-    return self
+    m = "%s fails to be present!" %
+      if what_is_receiver then what_is_receiver.to_s.capitalize else
+        "#{self.class} instance #{object_id}"
+      end
+    tap { present? or fail TypeError, m }
   end
 
   private
