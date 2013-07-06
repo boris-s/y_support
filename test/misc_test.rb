@@ -92,6 +92,10 @@ describe Array do
     a.pop_named( :foo ).must_equal 3
     a.push_ordered( 42 ).must_equal [1, 2, 42, bar: 4] 
   end
+
+  it "has #to_column_vector" do
+    [1, 2, 3].to_column_vector.must_equal Matrix[[1, 2, 3]]
+  end
 end
 
 describe Hash do

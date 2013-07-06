@@ -1,3 +1,5 @@
+require 'matrix'
+
 class Array
   # Converts an array, whose elements are also arrays, to a hash. Head
   # (position 0) of each array is made to point at the rest of the array
@@ -11,7 +13,6 @@ class Array
       a.merge( { e[0] => tail.size >= 2 ? tail : tail[0] } )
     }
   end
-
 
   # Zips this array with another collection into a hash. If a block is given,
   # it is applied to each element of the array to get the hash values.
@@ -78,6 +79,12 @@ class Array
   def pop_named key
     l = last
     l.delete( key ).tap { pop if l.empty? } if l.is_a? Hash
+  end
+
+  # Converts the array to a +Matrix#column_vector+.
+  # 
+  def to_column_vector
+    Matrix.column_vector self
   end
   
   # TEST ME
