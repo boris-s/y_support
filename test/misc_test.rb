@@ -94,7 +94,7 @@ describe Array do
   end
 
   it "has #to_column_vector" do
-    [1, 2, 3].to_column_vector.must_equal Matrix[[1, 2, 3]]
+    [1, 2, 3].to_column_vector.must_equal Matrix[[1], [2], [3]]
   end
 end
 

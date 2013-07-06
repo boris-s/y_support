@@ -2,6 +2,7 @@
 
 require 'y_support'
 require_relative 'name_magic/array'
+require_relative 'name_magic/hash'
 require_relative 'name_magic/namespace_methods'
 require_relative 'name_magic/class_methods'
 

@@ -58,10 +58,15 @@ describe NameMagic do
     Rover = @ç.new
     @ç.const_magic
     XXX::Rover.must_be_kind_of @ç
+    Rover.name.must_equal :Rover
     @ç.namespace!
     Spot = @ç.new
     @ç.const_magic
+    Spot.name.must_equal :Spot
     -> { XXX::Spot }.must_raise NameError
     @ç.const_get( :Spot ).must_be_kind_of @ç
+    # Array
+    [ Spot ].names.must_equal [ :Spot ]
+    { Spot => 42 }.keys_to_names.must_equal( { Spot: 42 } )
   end
-end
+end    
