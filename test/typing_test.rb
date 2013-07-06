@@ -172,8 +172,8 @@ class TypingTest < Test::Unit::TestCase
       old = a.dup
       assert_nothing_raised do a.may_have :z end
       assert_nothing_raised do a.has? :z end
-      assert_raises TErr do a.may_have( :a, syn!: :b ) end
-      assert_raises TErr do a.has?( :a, syn!: :b ) end
+      assert_raises TypeError do a.may_have( :a, syn!: :b ) end
+      assert_raises TypeError do a.has?( :a, syn!: :b ) end
       assert_equal false, a.has?( :z )
       assert_equal nil, a.may_have( :z )
       assert_equal false, a.has?( :z )
@@ -192,7 +192,7 @@ class TypingTest < Test::Unit::TestCase
       a = { infile: 'a', csv_out_file: 'b', k: 'k', o: 'k', t: 'k' }
       assert_respond_to a, :aT_has
       old = a.dup
-      assert_raises TErr do a.aT_has :z end
+      assert_raises TypeError do a.aT_has :z end
       assert_nothing_raised do a.aT_has :infile end
       assert_nothing_raised do a.aT_has :csv_out_file end
       class TestClass; def initialize( args )
@@ -201,12 +201,12 @@ class TypingTest < Test::Unit::TestCase
                          args.aT_has :k
                        end end
       assert_nothing_raised do TestClass.new a end
-      assert_raises TErr do a.aT_has( :a, syn!: :b ) end
+      assert_raises TypeError do a.aT_has( :a, syn!: :b ) end
       assert_equal "a", a.aT_has( :infile )
       assert_equal "k", a.aT_has( :k, syn!: [:o, :t] )
       assert_equal "b", a.aT_has( :c, syn!: :csv_out_file )
       assert_equal( { infile: 'a', c: 'b', k: 'k' }, a )
-      assert_raises TErr do a.aT_has(:c) {|val| val == 'c'} end
+      assert_raises TypeError do a.aT_has(:c) {|val| val == 'c'} end
       assert_nothing_raised do a.aT_has(:c) {|val| val == 'b'} end
     end
   end # context Hash
