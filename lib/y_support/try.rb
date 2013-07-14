@@ -129,4 +129,5 @@ class Object
                          text: attempt_NL_description,
                          &block ).__invoke__
   end
+  alias consciously try
 end
