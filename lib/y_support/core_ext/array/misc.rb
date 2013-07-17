@@ -86,7 +86,20 @@ class Array
   def to_column_vector
     Matrix.column_vector self
   end
+
+  # Returns correspondence matrix to another array.
+  # 
+  def correspondence_matrix other
+    Matrix.correspondence_matrix self, other
+  end
   
+  # Returns indices of elements of another array in this array (inverse of
+  # #values_at).
+  # 
+  def indices_of other
+    other.map { |e| index e }
+  end
+
   # TEST ME
   # def pretty_inspect
   #   each_slice( 4 ) { |slice|
