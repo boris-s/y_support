@@ -209,7 +209,7 @@ class Matrix
         end
       end
       return new_matrix( rows, arg.column_size )
-    when SY::Magnitude # newly added - multiplication by a magnitude
+    when ( SY::Magnitude rescue :SY_Magnitude_absent ) # newly added - multiplication by a magnitude
       # I am not happy with this explicit switch on SY::Magnitude type here.
       # Perhaps coerce should handle this?
       rows = Array.new row_size do |i|

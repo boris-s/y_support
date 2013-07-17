@@ -61,6 +61,16 @@ class Hash
       ꜧ[key] = val
     end
   end
+
+  # A bit like Array#slice, but only takes 1 argument, which is either a Range,
+  # or an Array, and returns the selection of the hash for the keys that match
+  # the range or are present in the array. 
+  # 
+  def slice matcher
+    case matcher
+    when Array then values_at *matcher
+    else select { |key, _| matcher === key } end
+  end
   
   # Makes hash keys accessible as methods. If the hash keys collide with
   # its methods, ArgumentError is raised, unless :overwrite_methods
