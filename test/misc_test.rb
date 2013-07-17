@@ -146,6 +146,12 @@ describe Hash do
                     .modify { |k, v| ["#{k}#{v}".to_sym, "#{v}#{k}"] } )
   end
 
+  it "should have #slice" do
+    { a: 1, b: 2, c: 3 }.slice( [:a, :b] ).must_equal( { a: 1, b: 2 } )
+    { 1 => :a, 2 => :b, 3 => :c, 4 => :d }.slice( 2..3.5 )
+      .must_equal( { 2 => :b, 3 => :c } )
+  end
+
   it "should have #dot! meta patcher for dotted access to keys" do
     h = Hash.new.merge!(aaa: 1, taint: 2)
     -> { h.dot! }.must_raise ArgumentError

@@ -68,7 +68,7 @@ class Hash
   # 
   def slice matcher
     case matcher
-    when Array then values_at *matcher
+    when Array then select { |key, _| matcher.include? key }
     else select { |key, _| matcher === key } end
   end
   
