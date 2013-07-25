@@ -14,11 +14,12 @@ class Object
     }
   end
 
-  # Expects a hash of pairs { name: class }, and a hash of parameters. Creates
-  # subclasses parametrized with the supplied parameters as the object attributes
-  # and makes them accessible under the supplied names (as reader methods).
+  # Makes the receiver own parametrized subclasses of the supplied classes.
+  # Expects a hash of pairs { reader_symbol: class }, and a hash of parameters,
+  # with which the class(es) is (are) parametrized. Parametrized subclasses
+  # are made accessible under the supplied reader symbol.
   # 
-  def parametrizes hash, with: (fail ArgumentError, "No parameters!")
+  def param_class hash, with: (fail ArgumentError, "No parameters!")
     hash.each { |ß, ç| set_attr_with_readers ß => ç.parametrize( **with ) }
     return nil
   end

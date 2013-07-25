@@ -9,9 +9,9 @@ describe Object do
     require 'y_support/core_ext/object'
   end
 
-  it "should have #parametrizes" do
+  it "should have #param_class" do
     o = Object.new
-    o.parametrizes( { Array: Array, foo: Hash }, with: { mother: o } )
+    o.param_class( { Array: Array, foo: Hash }, with: { mother: o } )
     assert o.Array < Array
     o.Array.mother.must_equal( o )
     o.foo.mother.must_equal( o )
