@@ -34,6 +34,20 @@ describe Module do
 end
 
 
+describe Class do
+  before do
+    require 'y_support/core_ext/class'
+  end
+
+  it "has #parametrize method" do
+    a = Class.new
+    -> { a.foo }.must_raise NoMethodError
+    b = a.parametrize foo: 42
+    b.foo.must_equal 42
+  end
+end
+
+
 describe Enumerable do
   before do
     require 'y_support/core_ext/enumerable'
