@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+# encoding: utf-8
+
+require 'y_support/core_ext/module/misc'
 
 class Object
   # Sets a constant to a value if this has not been previously defined.
