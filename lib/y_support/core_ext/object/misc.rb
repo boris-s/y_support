@@ -1,31 +1,41 @@
 # -*- coding: utf-8 -*-
 
 class Object
+  # Sets a constant to a value if this has not been previously defined.
+  # 
   def const_set_if_not_defined( const, value )
-    mod = self.is_a?(Module) ? self : self.singleton_class
-    mod.const_set( const, value ) unless mod.const_defined?( const )
+    singleton_class.const_set_if_not_defined( const, value )
   end
 
-  def const_redefine_without_warning( const, value )
-    mod = self.is_a?(Module) ? self : self.singleton_class
-    mod.send(:remove_const, const) if mod.const_defined?( const )
-    mod.const_set( const, value )
+  # Redefines a constant without warning.
+  # 
+  def const_reset! const, value
+    singleton_class.const_reset! const, value
   end
 
-  # Create public attributes (ie. with readers) and initialize them with
-  # prescribed values. Takes a hash of { symbol => value } pairs. Existing methods
-  # are not overwritten by the new getters, unless option :overwrite_methods
-  # is set to true.
-  def singleton_set_attr_with_readers( hash, oo = {} )
-    hash.each { |key, val|
-      key = key.aE_respond_to( :to_sym, "key of the attr hash" ).to_sym
-      instance_variable_set( "@#{key}", val )
-      if oo[:overwrite_methods] then ⓒ.module_exec { attr_reader key }
-      elsif methods.include? key
-        raise "Attempt to add \##{key} getter failed: " +
-          "method \##{key} already defined."
-      else ⓒ.module_exec { attr_reader key } end
+  # Assigns prescribed atrributes to the object and makes them accessible with
+  # getter (reader) methods. Optional argument +:overwrite_methods+ enables the
+  # readers to overwrite existing methods.
+  # 
+  def set_attr_with_readers( overwrite_methods: false, **hash )
+    hash.each_pair { |symbol, value|
+      instance_variable_set "@#{symbol}", value
+      fail NameError, "Method \##{symbol} already defined!" if
+        methods.include? symbol unless overwrite_methods == true
+      singleton_class.class_exec { attr_reader key }
     }
   end
-  alias :ⓒ_set_attr_w_readers :singleton_set_attr_with_readers
+
+  # Expects one name of a class, and a hash of parameters, and establishes
+  # a subclass of the supplied class name, parametrized with the hash of
+  # parameters. The parametrized subclass is then assigned to the appropriately
+  # named instance variable owned by the receiver class. Also, attribute reader
+  # is established in the receiver class, providing access to the newly created
+  # parametrized subclass.
+  # 
+  def has_parametrized_class name, **parameters
+    subclass = const_get( name ).parametrize **parameters
+    instance_variable_set "@#{name}", subclass
+    class_exec do attr_reader( name ) end
+  end
 end

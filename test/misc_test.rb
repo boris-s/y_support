@@ -9,17 +9,27 @@ describe Object do
     require 'y_support/core_ext/object'
   end
 
-  it "should have #const_set_if_not_defined" do
-    ( ◉ = Object.new ).const_set_if_not_defined :KOKO, 42
-    assert_equal 42, ◉.singleton_class::KOKO
-    ◉.const_set_if_not_defined :KOKO, 43
-    assert_equal 42, ◉.singleton_class::KOKO
+  it "should have #const_set_if_not_defined and #const_reset!" do
+    o = Object.new
+    o.const_set_if_not_defined :Foo, 42
+    assert_equal 42, o.singleton_class::Foo
+    o.const_reset! :Foo, 43
+    assert_equal 43, o.singleton_class::Foo
   end
 
-  it "should have #const_redef_without_warning" do
-    ( ◉ = Object.new ).const_set_if_not_defined :KOKO, 42
-    ◉.const_redefine_without_warning :KOKO, 43
-    assert_equal 43, ◉.singleton_class::KOKO
+  it "should have #set_attr_with_readers" do
+    o = Object.new
+    o.set_attr_with_readers foo: 42
+    o.foo.must_equal 42
+    o.set_attr_with_readers to_s: 43, overwrite_methods: true
+    o.to_s.must_equal 43
+  end
+
+  it "should have #has_parametrized_class method" do
+    o = Object.new
+    o.has_parametrized_class :Array, mother: o
+    o.Array.must_be_kind_of Array
+    o.Array.mother.must_equal( o )
   end
 end
 
@@ -29,7 +39,12 @@ describe Module do
     require 'y_support/core_ext/module'
   end
 
-  it "presently has no extensions" do
+  it "has #const_set_if_not_defined and #const_reset!" do
+    m = Module.new
+    m.const_set_if_not_defined :Foo, 42
+    m::Foo.must_equal 42
+    m.const_reset! :Foo, 43
+    m::Foo.must_equal 43
   end
 end
 
