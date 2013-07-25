@@ -1,20 +1,6 @@
 # encoding: utf-8
 
-require 'y_support/core_ext/module/misc'
-
 class Object
-  # Sets a constant to a value if this has not been previously defined.
-  # 
-  def const_set_if_not_defined( const, value )
-    singleton_class.const_set_if_not_defined( const, value )
-  end
-
-  # Redefines a constant without warning.
-  # 
-  def const_reset! const, value
-    singleton_class.const_reset! const, value
-  end
-
   # Assigns prescribed atrributes to the object and makes them accessible with
   # getter (reader) methods. Optional argument +:overwrite_methods+ enables the
   # readers to overwrite existing methods.
@@ -24,20 +10,16 @@ class Object
       instance_variable_set "@#{symbol}", value
       fail NameError, "Method \##{symbol} already defined!" if
         methods.include? symbol unless overwrite_methods == true
-      singleton_class.class_exec { attr_reader key }
+      singleton_class.class_exec { attr_reader symbol }
     }
   end
 
-  # Expects one name of a class, and a hash of parameters, and establishes
-  # a subclass of the supplied class name, parametrized with the hash of
-  # parameters. The parametrized subclass is then assigned to the appropriately
-  # named instance variable owned by the receiver class. Also, attribute reader
-  # is established in the receiver class, providing access to the newly created
-  # parametrized subclass.
+  # Expects a hash of pairs { name: class }, and a hash of parameters. Creates
+  # subclasses parametrized with the supplied parameters as the object attributes
+  # and makes them accessible under the supplied names (as reader methods).
   # 
-  def has_parametrized_class name, **parameters
-    subclass = const_get( name ).parametrize **parameters
-    instance_variable_set "@#{name}", subclass
-    class_exec do attr_reader( name ) end
+  def parametrizes hash, with: (fail ArgumentError, "No parameters!")
+    hash.each { |ß, ç| set_attr_with_readers ß => ç.parametrize( **with ) }
+    return nil
   end
 end

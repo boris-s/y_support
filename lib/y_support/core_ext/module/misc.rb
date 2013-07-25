@@ -9,7 +9,7 @@ class Module
 
   # Redefines a constant without warning.
   # 
-  def const_redefine!( const, value )
+  def const_reset!( const, value )
     send :remove_const, const if const_defined? const
     const_set( const, value )
   end
