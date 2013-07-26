@@ -6,7 +6,7 @@ class Class
   # singleton method(s) named "symbol" be defined on the subclass, returning
   # "value".
   # 
-  def parametrize **parameters
+  def parametrize parameters
     Class.new( self ).tap do |subclass|
       parameters.each_pair { |symbol, value|
         subclass.define_singleton_method symbol do value end
