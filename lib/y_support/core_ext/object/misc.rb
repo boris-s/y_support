@@ -19,10 +19,10 @@ class Object
   # with which the class(es) is (are) parametrized. Parametrized subclasses
   # are made accessible under the supplied reader symbol.
   # 
-  def param_class hash, with: (fail ArgumentError, "No parameters!")
+  def param_class hash, with: (fail ArgumentError, "No parameters!"), **nn
     hash.each { |ß, ç|
       sub = ç.parametrize with
-      set_attr_with_readers( ß => sub )
+      set_attr_with_readers( ß => sub, **nn )
     }
     return nil
   end
