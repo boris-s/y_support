@@ -61,7 +61,7 @@ module NameMagic::ClassMethods
   # Calls #new in _avid_ _mode_ (name_avid: true); see #new method for avid mode
   # explanation.
   # 
-  def new! *args, &block
+  def avid *args, &block
     oo = args[-1].is_a?( Hash ) ? args.pop : {} # extract options
     new *args, oo.update( name_avid: true ), &block
   end
