@@ -1,18 +1,20 @@
 require 'matrix'
 
 class Array
-  # Converts an array, whose elements are also arrays, to a hash. Head
-  # (position 0) of each array is made to point at the rest of the array
-  # (tail), normally starting immediately after the head (position 1). The
-  # starting position of the tail can be controlled by an optional
-  # argument. Tails of 2 and more elements are represented as arrays.
+  # This would collide with built-in #to_hash method.
   # 
-  def to_hash( tail_from = 1 )
-    self.reject { | e | e[0].nil? }.reduce({}) { |a, e|
-      tail = e[tail_from..-1]
-      a.merge( { e[0] => tail.size >= 2 ? tail : tail[0] } )
-    }
-  end
+  # # Converts an array, whose elements are also arrays, to a hash. Head
+  # # (position 0) of each array is made to point at the rest of the array
+  # # (tail), normally starting immediately after the head (position 1). The
+  # # starting position of the tail can be controlled by an optional
+  # # argument. Tails of 2 and more elements are represented as arrays.
+  # # 
+  # def to_hash( tail_from = 1 )
+  #   self.reject { | e | e[0].nil? }.reduce({}) { |a, e|
+  #     tail = e[tail_from..-1]
+  #     a.merge( { e[0] => tail.size >= 2 ? tail : tail[0] } )
+  #   }
+  # end
 
   # Zips this array with another collection into a hash. If a block is given,
   # it is applied to each element of the array to get the hash values.
