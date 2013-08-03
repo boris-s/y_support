@@ -59,7 +59,7 @@ end
 #
 class Numeric
   def √ number
-    number ** ( 1 / self )
+    number ** ( 1.0 / self )
   end
 
 

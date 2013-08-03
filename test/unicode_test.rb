@@ -13,10 +13,10 @@ describe "y_support/unicode" do
     o = Object.new
     assert o.singleton_class == o.ⓒ
     assert o.ç == o.class
-    assert 2 == √( 4 )
     assert 10 == Σ(1..4)
     assert 24 == Π(1..4)
-    2.must_equal 3.√( 8 )
+    2.must_equal 4.sqrt
+    3.√( 8 ).must_equal 2
     ɱ = Module.new
     ɱ.ç_variable_set :@@meaning, 42
     assert ɱ.class_variable_get( :@@meaning ) == 42
