@@ -68,7 +68,7 @@ class Hash
   def slice matcher
     case matcher
     when Array then select { |key, _| matcher.include? key }
-    else select { |key, _| matcher === key } end
+    else self.class[ select { |key, _| matcher === key } ] end
   end
   
   # Makes hash keys accessible as methods. If the hash keys collide with
