@@ -87,6 +87,7 @@ class << Integer
   def additive_inverse; -self end
   def multiply( other ); self * other end
   def multiplicative_identity; 1 end
+  alias one multiplicative_identity
 end
 
 # Patching Float with Algebra::Field compliance methods.
