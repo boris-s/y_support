@@ -1,6 +1,5 @@
 #! /usr/bin/ruby
 
-require 'minitest/spec'
 require 'minitest/autorun'
 # require 'y_support/try'     # tested component itself
 require './../lib/y_support/try'

@@ -15,5 +15,10 @@ class XTest < Test::Unit::TestCase
     should "have clipboard as expected" do
       assert_equal '"foo" bar', [`xsel -b`, `xsel -s`].join(' ')
     end
+
+    should "know #query_box and #message_box methods" do
+      assert_respond_to YSupport::X, :query_box
+      assert_respond_to YSupport::X, :message_box
+    end
   end # context X
 end # class XTest

@@ -1,9 +1,6 @@
 #! /usr/bin/ruby
 #encoding: utf-8
 
-require 'test/unit'
-require 'shoulda'
-require 'minitest/spec'
 require 'minitest/autorun'
 require 'y_support/name_magic'
 

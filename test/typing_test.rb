@@ -37,12 +37,12 @@ class TypingTest < Test::Unit::TestCase
       assert_equal ::ArgumentError, ::AErr
     end
     
-    should "have #aE raising ArgumentError if block falsey" do
-      assert_raise TErr do 0.aT "yada yada" do self == 1 end end
-      assert_nothing_raised do 0.aT "yada yada" do self == 0 end end
+    should "have #aT raising TypeError if block falsey" do
+      assert_raise TErr do 0.aT "yada yada" do |rcvr| rcvr == 1 end end
+      assert_nothing_raised do 0.aT "yada yada" do |rcvr| rcvr == 0 end end
       assert_equal( "hello",
-                    "hello".aT( "have 4 unique letters" ) {
-                      each_char.map { |e| e }.uniq.join.size == 4
+                    "hello".aT( "have 4 unique letters" ) { |str|
+                      str.each_char.map { |e| e }.uniq.join.size == 4
                     } )
       assert_nothing_raised do 2.aT &:even? end
       assert_raise TErr do 3.aT &:even? end
@@ -50,9 +50,9 @@ class TypingTest < Test::Unit::TestCase
     end
     
     should "have #aT_not raising TypeError if block truey" do
-      assert_raise TErr do 0.aT_not { self < 1 } end
-      assert_nothing_raised do 1.aT_not { self == 2 } end
-      assert_equal( "hello", "hello".aT_not( "have x" ) { include? 'x' } )
+      assert_raise TErr do 0.aT_not { |rcvr| rcvr < 1 } end
+      assert_nothing_raised do 1.aT_not { |rcvr| rcvr == 2 } end
+      assert_equal( "hello", "hello".aT_not( "have x" ) { |rcvr| rcvr.include? 'x' } )
       assert_nothing_raised do 3.aT_not &:even? end
       assert_raise TErr do 2.aT_not &:even? end
       assert_raise TErr do "".aT_not end

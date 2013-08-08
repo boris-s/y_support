@@ -1,7 +1,6 @@
 #! /usr/bin/ruby
 #encoding: utf-8
 
-require 'minitest/spec'
 require 'minitest/autorun'
 
 describe "y_support/unicode" do

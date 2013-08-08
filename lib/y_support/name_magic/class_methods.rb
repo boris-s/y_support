@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# encoding: utf-8
 
 module NameMagic::ClassMethods
   # Presents the instances registered by the namespace. Takes one optional

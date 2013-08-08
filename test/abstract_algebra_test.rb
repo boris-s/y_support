@@ -4,6 +4,8 @@
 require 'test/unit'
 require 'shoulda'
 
+# This whole test is one big FIXME
+
 class AbstractAlgebraTest < Test::Unit::TestCase
   context "Algebra" do
     setup do

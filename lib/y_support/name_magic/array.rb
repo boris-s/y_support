@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# encoding: utf-8
 
 class Array
   # Maps an array to an array of the element names, obtained by applying +#name+
