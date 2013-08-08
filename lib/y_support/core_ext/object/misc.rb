@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+require 'y_support/core_ext/class'
+
 class Object
   # Assigns prescribed atrributes to the object and makes them accessible with
   # getter (reader) methods. Raises NameError should any of the getters shadow /

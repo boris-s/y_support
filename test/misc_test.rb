@@ -77,11 +77,6 @@ describe Array do
     require 'y_support/core_ext/array'
   end
 
-  it "has #to_hash" do
-    assert_equal( {a: :b, c: :d}, [[:a, :b],[:c, :d]].to_hash )
-    assert_equal( {k: :kokot, p: :pica}, [[:k, :o, :kokot], [:p, :i, :pica]].to_hash(2) )
-  end
-
   it "has #zip_to_hash" do
     assert_equal( {a: 1, b: 2}, [:a, :b].zip_to_hash( [1, 2] ) )
     assert_equal( {a: "a"}, [:a].zip_to_hash( &:to_s ) )
