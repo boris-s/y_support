@@ -1,7 +1,6 @@
 #! /usr/bin/ruby
 # -*- coding: utf-8 -*-
 
-require 'minitest/spec'
 require 'minitest/autorun'
 
 describe Object do
