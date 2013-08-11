@@ -87,4 +87,21 @@ class Hash
     end
     return self
   end
+
+  # Pretty-prints the hash consisting of names as keys, and numeric values.
+  # Takes 2 named arguments: +:gap+ and +:precision+.
+  # 
+  def pretty_print gap: 0, precision: 2
+    lmax = hsh.keys
+      .map( &:to_s ).map( &:size ).max
+    rmax = hsh.values
+      .map { |n| "%.#{precision}e" % n }
+      .map( &:to_s ).map( &:size ).max
+    lgap = gap / 2
+    rgap = gap - lgap
+    hsh.map do |key, val|
+      "%- #{lmax+lgap+1}s%#{rmax+rgap+1}.#{precision}e" % [ key, val ]
+    end.each &:puts
+    return nil
+  end
 end
