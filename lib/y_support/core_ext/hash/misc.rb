@@ -92,10 +92,8 @@ class Hash
   # Takes 2 named arguments: +:gap+ and +:precision+.
   # 
   def pretty_print_numeric_values gap: 0, precision: 2
-    lmax = hsh.keys
-      .map( &:to_s ).map( &:size ).max
-    rmax = hsh.values
-      .map { |n| "%.#{precision}e" % n }
+    lmax = keys.map( &:to_s ).map( &:size ).max
+    rmax = values.map { |n| "%.#{precision}e" % n }
       .map( &:to_s ).map( &:size ).max
     lgap = gap / 2
     rgap = gap - lgap
