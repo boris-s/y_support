@@ -99,7 +99,7 @@ class Hash
     rgap = gap - lgap
     map do |key, val|
       "%- #{lmax+lgap+1}s%#{rmax+rgap+1}.#{precision}e" % [ key, val ]
-    end.each &:puts
+    end.each { |line| puts line }
     return nil
   end
 end
