@@ -99,7 +99,7 @@ class Hash
       .map( &:to_s ).map( &:size ).max
     lgap = gap / 2
     rgap = gap - lgap
-    hsh.map do |key, val|
+    map do |key, val|
       "%- #{lmax+lgap+1}s%#{rmax+rgap+1}.#{precision}e" % [ key, val ]
     end.each &:puts
     return nil
