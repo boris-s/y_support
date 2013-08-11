@@ -91,7 +91,7 @@ class Hash
   # Pretty-prints the hash consisting of names as keys, and numeric values.
   # Takes 2 named arguments: +:gap+ and +:precision+.
   # 
-  def pretty_print gap: 0, precision: 2
+  def pretty_print_numeric_values gap: 0, precision: 2
     lmax = hsh.keys
       .map( &:to_s ).map( &:size ).max
     rmax = hsh.values
