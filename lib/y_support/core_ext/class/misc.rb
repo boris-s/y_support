@@ -11,6 +11,7 @@ class Class
       parameters.each_pair { |symbol, value|
         subclass.define_singleton_method symbol do value end
       }
+      subclass.define_singleton_method inspect do subclass.superclass.inspect + "<" end
     end
   end
 end
