@@ -92,13 +92,13 @@ class Hash
   # Takes 2 named arguments: +:gap+ and +:precision+.
   # 
   def pretty_print_numeric_values gap: 0, precision: 2
-    lmax = keys.map( &:to_s ).map( &:size ).max
-    rmax = values.map { |n| "%.#{precision}e" % n }
-      .map( &:to_s ).map( &:size ).max
+    key_strings = key.map &:to_s
+    value_strings = values.map { |n| "%.#{precision}e" % n rescue "%s" % s }
+    lmax, rmax = keys_strings.map( &:size ).max, values_strings.map( &:size ).max
     lgap = gap / 2
     rgap = gap - lgap
-    map do |key, val|
-      "%- #{lmax+lgap+1}s%#{rmax+rgap+1}.#{precision}e" % [ key, val ]
+    key_strings.zip( value_strings ).map do |kς, vς|
+      "%- #{lmax+lgap+1}s%#{rmax+rgap+1}.#{precision}e" % [ kς, vς ]
     end.each { |line| puts line }
     return nil
   end
