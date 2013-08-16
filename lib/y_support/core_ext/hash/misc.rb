@@ -1,4 +1,4 @@
-#encoding: utf-8
+# encoding: utf-8
 
 require 'active_support/core_ext/hash/reverse_merge'
 
@@ -63,14 +63,17 @@ class Hash
 
   # A bit like Array#slice, but only takes 1 argument, which is either a Range,
   # or an Array, and returns the selection of the hash for the keys that match
-  # the range or are present in the array. 
+  # the range or are present in the array.
   # 
   def slice matcher
-    case matcher
-    when Array then select { |key, _| matcher.include? key }
-    else self.class[ select { |key, _| matcher === key } ] end
+    self.class[ case matcher
+                when Array then
+                  select { |key, _| matcher.include? key }
+                else
+                  select { |key, _| matcher === key }
+                end ]
   end
-  
+
   # Makes hash keys accessible as methods. If the hash keys collide with
   # its methods, ArgumentError is raised, unless :overwrite_methods
   # option == true.
@@ -93,7 +96,7 @@ class Hash
   # 
   def pretty_print_numeric_values gap: 0, precision: 2
     key_strings = key.map &:to_s
-    value_strings = values.map { |n| "%.#{precision}e" % n rescue "%s" % s }
+    value_strings = values.map do |n| "%.#{precision}e" % n rescue "%s" % s end
     lmax, rmax = keys_strings.map( &:size ).max, values_strings.map( &:size ).max
     lgap = gap / 2
     rgap = gap - lgap
