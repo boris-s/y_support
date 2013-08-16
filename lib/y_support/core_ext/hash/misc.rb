@@ -5,7 +5,7 @@ require 'active_support/core_ext/hash/reverse_merge'
 class Hash
   # reversed merge!: defaults.merge( self! )
   alias :default! :reverse_merge!
-  
+
   # Applies a block as a mapping on all keys, returning a new hash.
   # 
   def with_keys
@@ -13,7 +13,7 @@ class Hash
       hsh[ yield hash_key ] = self[ hash_key ]
     end
   end
-  
+
   # The difference from #with_keys is that modify_keys expects block that takes
   # 2 arguments (key: value pair) and returns the new key.
   # 
@@ -22,19 +22,19 @@ class Hash
       hsh[ yield( hash_pair ) ] = self[ hash_pair[0] ]
     end
   end
-  
+
   # Applies a block as a mapping on all values, returning a new hash.
   # 
   def with_values
     each_with_object self.class.new do |(k, v), hsh| hsh[ k ] = yield v end
   end
-  
+
   # Like #do_with_values, but modifies the receiver.
   # 
   def with_values!
     each_with_object self do |(k, v), hsh| hsh[ k ] = yield v end
   end
-  
+
   # The difference from #do_with_values is that modify_values expects block
   # that takes 2 arguments (key: value pair) and returns the new value.
   # 
@@ -43,7 +43,7 @@ class Hash
       ꜧ[ hash_pair[0] ] = yield( hash_pair )
     end
   end
-  
+
   # Like #modify_values, but modifies the receiver.
   # 
   def modify_values!
@@ -51,7 +51,7 @@ class Hash
       ꜧ[ hash_pair[0] ] = yield( hash_pair )
     end
   end
-  
+
   # Like #map that returns a hash.
   # 
   def modify
@@ -59,6 +59,12 @@ class Hash
       key, val = yield hash_pair
       ꜧ[key] = val
     end
+  end
+
+  # Checking mainly against the collision with ActiveSupport's Hash#slice.
+  if Hash.instance_methods.include? :slice then
+    fail LoadError, "Collision: Method #slice already defined on Hash! (%s)" %
+      Hash.instance_method( :slice ).source_location
   end
 
   # A bit like Array#slice, but only takes 1 argument, which is either a Range,
