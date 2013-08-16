@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# encoding: utf-8
 
 require 'y_support'
 require 'y_support/core_ext/hash/misc'

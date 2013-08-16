@@ -167,6 +167,10 @@ describe Hash do
     h.dot!( overwrite_methods: true ) # instead of #assert_nothing_raised
     assert_equal( {aaa: 1}, {aaa: 1}.dot! )
   end
+
+  it "should be safeguarded against redefining #slice" do
+    -> { class Hash; def slice; end end }.must_raise LoadError
+  end
 end
 
 
