@@ -111,4 +111,12 @@ class Hash
     end.each { |line| puts line }
     return nil
   end
+
+  class << self
+    def method_added( sym )
+      if sym == :slice then
+        fail LoadError, "Attempt to overwrite YSupport's Hash##{sym} method!"
+      end
+    end
+  end
 end
