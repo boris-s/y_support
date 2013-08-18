@@ -9,7 +9,6 @@ class Hash
     # 
     def method_added( sym )
       if sym == :slice then
-        puts "Method added activated on :slice"
         # Unless it is our method, overwrite it.
         unless instance_method( sym ).source_location.include? 'y_support'
           # Let's now make a cache of this very method being called
@@ -18,7 +17,7 @@ class Hash
           # would ensue.
           singleton_class.class_exec { remove_method :method_added }
           # And let's redefine the +:slice+ method now:
-          warn "Attempt to overwrite Hash#slice method has occured, reverting."
+          warn "Attempt to overwrite Hash##{sym} method has occured, reverting."
 
           class_exec do
             # A bit like Array#slice, but only takes 1 argument, which is either
