@@ -1,24 +1,57 @@
 # YSupport
 
-Common support library for Y* gems.
+`YSupport` is a common support library for Y* gems (`y_petri`, `yzz`,
+`y_nelson`, `sy`...). At the moment, it is a collection of all and sundry
+helpful methods, which can be divided as follows
 
-## Installation
+  * `NameMagic` (`lib/name_magic.rb`) -- its main feature is that it allows
+    constant magic known from classes to work with any objects.
+  * Miscellaneous helpful methods (`lib/misc.rb`)
+  * Typing (runtime assertions, `lib/typing.rb`)
+  * Other smaller components:
+    - `unicode.rb` -- shortcut letter for class (ç), singleton class (ⓒ) etc.
+    - `null_object.rb`
+    - `try.rb` -- a different kind of `#try` method
+    - several other small fry components
 
-Add this line to your application's Gemfile:
+## NameMagic
 
-    gem 'y_support'
+Try for example:
+```ruby
+  require 'y_support/name_magic'
 
-And then execute:
+  class Animal
+    include NameMagic
+    def sound; "squeak" end
+    def speak; 2.times { puts sound.capitalize << ?! } end
+  end
 
-    $ bundle
+  class Dog < Animal; def sound; "bark" end end
+  class Cat < Animal; def sound; "meow" end end
 
-Or install it yourself as:
+  Pochi = Dog.new
+  unnamed_kitten = Cat.new
+```
+Mixin `NameMagic` makes class `Animal` keep registry of its instances:
+```ruby
+  Animal.instances.names
+  #=> [:Pochi, nil]
+  Tama = unnamed_kitten
+  Animal.instances.names
+  #=> [:Pochi, :Tama]
+  Cheburashka = Animal.new
+  Animal.instances.names
+  #=> [:Pochi, :Tama, :Cheburashka]
+  Dog.instances.names
+  #=> [:Pochi]
+  Animal.instances.each &:speak
+  Dog.instances.each &:speak
+  Cat.instances.each &:speak
+```
 
-    $ gem install y_support
+## Other components
 
-## Usage
-
-Require 'y_support/all', or require 'y_support/something', and use it.
+Read the documentation of the individual methods.
 
 ## Contributing
 
