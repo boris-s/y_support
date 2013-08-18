@@ -4,10 +4,16 @@ require 'active_support/core_ext/hash/reverse_merge'
 
 class Hash
   class << self
+    # This kluge method guards against overwriting of the #slice method by
+    # ActiveSupport.
+    # 
     def method_added( sym )
       if sym == :slice then
+        # Unless it is our method, overwrite it.
         unless instance_method( sym ).source_location.include? 'y_support'
           self.class_exec do
+            ma = instance_method :method_added
+            remove_method :method_added
             # A bit like Array#slice, but only takes 1 argument, which is either
             # a Range, or an Array, and returns the selection of the hash for
             # the keys that match the range or are present in the array.
@@ -19,6 +25,10 @@ class Hash
                           else
                             select { |key, _| matcher === key }
                           end ]
+            end
+            # And now bind it to self again.
+            define_method :method_added do
+              ma.bind( self ).call
             end
           end
         end
