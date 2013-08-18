@@ -169,7 +169,9 @@ describe Hash do
   end
 
   it "should be safeguarded against redefining #slice" do
-    -> { class Hash; def slice; end end }.must_raise LoadError
+    m = Hash.instance_method :slice
+    class Hash; def slice( *args ); fail "This should not happen!" end end
+    {}.slice( :a )
   end
 end
 

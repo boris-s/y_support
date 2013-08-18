@@ -9,11 +9,20 @@ class Hash
     # 
     def method_added( sym )
       if sym == :slice then
+        puts "Method added activated on :slice"
         # Unless it is our method, overwrite it.
         unless instance_method( sym ).source_location.include? 'y_support'
-          self.class_exec do
-            ma = instance_method :method_added
-            remove_method :method_added
+          puts "Self is #{self}"
+          puts "Self class is #{self.class}"
+          # Let's now make a cache of this very method being called
+          ma = singleton_class.instance_method :method_added
+          # Let's remove the :method_added hook, or otherwise infinite recursion
+          # would ensue.
+          singleton_class.class_exec { remove_method :method_added }
+          # And let's redefine the +:slice+ method now:
+          warn "Attempt to overwrite Hash#slice method has occured, reverting."
+
+          class_exec do
             # A bit like Array#slice, but only takes 1 argument, which is either
             # a Range, or an Array, and returns the selection of the hash for
             # the keys that match the range or are present in the array.
@@ -26,10 +35,11 @@ class Hash
                             select { |key, _| matcher === key }
                           end ]
             end
-            # And now bind it to self again.
-            define_method :method_added do
-              ma.bind( self ).call
-            end
+          end
+
+          # Finally, let's bind the +:method_added+ method to self again.
+          singleton_class.class_exec do
+            define_method :method_added do |sym| ma.bind( self ).call( sym ) end
           end
         end
       end
@@ -96,7 +106,7 @@ class Hash
 
   # Checking mainly against the collision with ActiveSupport's Hash#slice.
   if Hash.instance_methods.include? :slice then
-    fail LoadError, "Collision: Method #slice already defined on Hash! (%s)" %
+    warn "Collision: Method #slice already defined on Hash! (%s)" %
       Hash.instance_method( :slice ).source_location
   end
 
