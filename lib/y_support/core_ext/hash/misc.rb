@@ -142,7 +142,7 @@ class Hash
   # 
   def pretty_print_numeric_values gap: 0, precision: 2
     key_strings = keys.map &:to_s
-    value_strings = values.map { |n| "%.#{precision}f" % n rescue "%s" % s }
+    value_strings = values.map { |n| "%.#{precision}f" % n rescue "%s" % n }
     lmax, rmax = key_strings.map( &:size ).max, value_strings.map( &:size ).max
     lgap = gap / 2
     rgap = gap - lgap
