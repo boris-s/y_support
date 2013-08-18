@@ -3,6 +3,29 @@
 require 'active_support/core_ext/hash/reverse_merge'
 
 class Hash
+  class << self
+    def method_added( sym )
+      if sym == :slice then
+        unless instance_method( sym ).source_location.include? 'y_support'
+          self.class_exec do
+            # A bit like Array#slice, but only takes 1 argument, which is either
+            # a Range, or an Array, and returns the selection of the hash for
+            # the keys that match the range or are present in the array.
+            # 
+            define_method sym do |matcher|
+              self.class[ case matcher
+                          when Array then
+                            select { |key, _| matcher.include? key }
+                          else
+                            select { |key, _| matcher === key }
+                          end ]
+            end
+          end
+        end
+      end
+    end
+  end
+
   # reversed merge!: defaults.merge( self! )
   alias :default! :reverse_merge!
 
@@ -110,13 +133,5 @@ class Hash
       "%- #{lmax+lgap+1}s%#{rmax+rgap+1}.#{precision}e" % [ kς, vς ]
     end.each { |line| puts line }
     return nil
-  end
-
-  class << self
-    def method_added( sym )
-      if sym == :slice then
-        fail LoadError, "Attempt to overwrite YSupport's Hash##{sym} method!"
-      end
-    end
   end
 end
