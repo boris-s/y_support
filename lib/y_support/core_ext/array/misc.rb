@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'matrix'
 
 class Array
@@ -102,7 +104,17 @@ class Array
     other.map { |e| index e }
   end
 
-  # TEST ME
+  # TEST ME ** FUCK OFF TESTS
+  
+  # Pretty-prints the array as line, with prescribed +:precision+ and +:gap+
+  # (both are named arguments).
+  # 
+  def print precision: 2, distance: precision + 4
+    element_strings = map { |n| "%.#{precision}e" % n rescue "%s" % s }
+      .map { |ς| "%- #{distance}s" % ς[ 0, distance ] }
+    puts element_strings.join
+  end
+
   # def pretty_inspect
   #   each_slice( 4 ) { |slice|
   #     slice.map { |e|
