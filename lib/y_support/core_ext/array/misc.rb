@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'matrix'
+nrequire 'matrix'
 
 class Array
   # This would collide with built-in #to_hash method.
@@ -110,7 +110,7 @@ class Array
   # (both are named arguments).
   # 
   def print_as_line precision: 2, distance: precision + 4
-    element_strings = map { |n| "%.#{precision}f" % n rescue "%s" % s }
+    element_strings = map { |e| "%.#{precision}f" % e rescue "%s" % e }
       .map { |ς| "%- #{distance}s" % ς[ 0, distance ] }
     puts element_strings.join
   end
