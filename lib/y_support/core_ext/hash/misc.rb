@@ -12,8 +12,6 @@ class Hash
         puts "Method added activated on :slice"
         # Unless it is our method, overwrite it.
         unless instance_method( sym ).source_location.include? 'y_support'
-          puts "Self is #{self}"
-          puts "Self class is #{self.class}"
           # Let's now make a cache of this very method being called
           ma = singleton_class.instance_method :method_added
           # Let's remove the :method_added hook, or otherwise infinite recursion
