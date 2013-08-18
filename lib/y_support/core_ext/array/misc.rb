@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-nrequire 'matrix'
+require 'matrix'
 
 class Array
   # This would collide with built-in #to_hash method.
