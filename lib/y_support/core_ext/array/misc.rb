@@ -109,8 +109,8 @@ class Array
   # Pretty-prints the array as line, with prescribed +:precision+ and +:gap+
   # (both are named arguments).
   # 
-  def print precision: 2, distance: precision + 4
-    element_strings = map { |n| "%.#{precision}e" % n rescue "%s" % s }
+  def print_as_line precision: 2, distance: precision + 4
+    element_strings = map { |n| "%.#{precision}f" % n rescue "%s" % s }
       .map { |ς| "%- #{distance}s" % ς[ 0, distance ] }
     puts element_strings.join
   end
