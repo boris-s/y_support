@@ -17,7 +17,7 @@ class Hash
           # would ensue.
           singleton_class.class_exec { remove_method :method_added }
           # And let's redefine the +:slice+ method now:
-          warn "Attempt to overwrite Hash##{sym} method has occured, reverting."
+          warn "Warning: Attempt to redefine Hash##{sym} occured, reverting."
 
           class_exec do
             # A bit like Array#slice, but only takes 1 argument, which is either
