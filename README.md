@@ -5,7 +5,8 @@
 helpful methods, which can be divided as follows
 
   * `NameMagic` (`lib/name_magic.rb`) -- its main feature is that it allows
-    constant magic known from classes to work with any objects.
+    constant magic so well known from Ruby classes (`Foo = Class.new;
+    Foo.name #=> "Foo"`) to work with any objects.
   * Miscellaneous helpful methods (`lib/misc.rb`)
   * Typing (runtime assertions, `lib/typing.rb`)
   * Other smaller components:
@@ -16,7 +17,17 @@ helpful methods, which can be divided as follows
 
 ## NameMagic
 
-Try for example:
+Ruby classes are well known for their "constant magic": When they are assigned
+to constants, they acquire `name` attribute corresponding to the constant name.
+```ruby
+  x = Class.new
+  x.name #=> nil
+  Foo = x
+  x.name #=> "Foo"
+```
+NameMagic mixin lends this feature to any Ruby class. The class in which
+NameMagic is mixed in will also hold the registry of the instances, named or
+unnamed. Example code:
 ```ruby
   require 'y_support/name_magic'
 
@@ -30,16 +41,20 @@ Try for example:
   class Cat < Animal; def sound; "meow" end end
 
   Pochi = Dog.new
-  unnamed_kitten = Cat.new
+  anonymous_kitten = Cat.new
 ```
 Mixin `NameMagic` makes class `Animal` keep registry of its instances:
 ```ruby
   Animal.instances.names
   #=> [:Pochi, nil]
-  Tama = unnamed_kitten
+  Tama = anonymous_kitten
   Animal.instances.names
   #=> [:Pochi, :Tama]
-  Cheburashka = Animal.new
+  # Name can also be supplied to the constructor explicitly:
+  Animal.new name: :Cheburashka
+  Animal.instance( "Cheburashka" )
+  Animal.instance( "Cheburashka" ).name
+  :Cheburashka
   Animal.instances.names
   #=> [:Pochi, :Tama, :Cheburashka]
   Dog.instances.names
@@ -47,6 +62,14 @@ Mixin `NameMagic` makes class `Animal` keep registry of its instances:
   Animal.instances.each &:speak
   Dog.instances.each &:speak
   Cat.instances.each &:speak
+```
+The registry of instances is maintained by the namespace, so the instances can
+only be garbage collected after the namespace is garbage collected. If the user
+wants to enable this earlier, the namespace can be ordered to forget them:
+```ruby
+  Animal.forget_all_instances
+  Animal.instances
+  []
 ```
 
 ## Other components

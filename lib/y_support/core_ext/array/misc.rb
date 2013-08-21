@@ -3,20 +3,24 @@
 require 'matrix'
 
 class Array
-  # This would collide with built-in #to_hash method.
+  # Converts an array, whose elements are also arrays, to a hash. Head
+  # (position 0) of each array is made to point at the rest of the array
+  # (tail), normally starting immediately after the head (position 1). The
+  # starting position of the tail can be controlled by an optional
+  # argument. Tails of 2 and more elements are represented as arrays.
   # 
-  # # Converts an array, whose elements are also arrays, to a hash. Head
-  # # (position 0) of each array is made to point at the rest of the array
-  # # (tail), normally starting immediately after the head (position 1). The
-  # # starting position of the tail can be controlled by an optional
-  # # argument. Tails of 2 and more elements are represented as arrays.
-  # # 
-  # def to_hash( tail_from = 1 )
-  #   self.reject { | e | e[0].nil? }.reduce({}) { |a, e|
-  #     tail = e[tail_from..-1]
-  #     a.merge( { e[0] => tail.size >= 2 ? tail : tail[0] } )
-  #   }
-  # end
+  def arrays_to_hash( tail_from = 1 )
+    no_nil_heads = begin
+                     self.reject { | e | e[0].nil? }
+                   rescue NoMethodError => err
+                     raise TypeError, "The receiver must be an array of " +
+                       "arrays! (#{err})"
+                   end
+    no_nil_heads.each_with_object Hash.new do |element, memo|
+      tail = element[ tail_from .. -1 ]
+      memo.update element.first => ( tail.size > 1 ? tail : tail.first )
+    end
+  end
 
   # Zips this array with another collection into a hash. If a block is given,
   # it is applied to each element of the array to get the hash values.
@@ -37,6 +41,37 @@ class Array
   # 
   def >> collection
     zip_to_hash collection
+  end
+
+  # Assuming an array of comparable elements ordered in an ascending order,
+  # this method expects an argument comparable with the elements, and returns
+  # the nearest smaller or equal element. The second optional ordered argument,
+  # true by default, controls whether equality is OK. If set to false, then
+  # the nearest _smaller_ element is sought.
+  # 
+  def ascending_floor arg, accept_equal=true
+    idx = if accept_equal then
+            find_index { |e| e > arg }
+          else find_index { |e| e >= arg } end
+    case idx
+    when 0 then nil
+    when nil then last
+    else fetch idx - 1 end
+  end
+
+  # Assuming an array of comparable elements ordered in an ascending order,
+  # this method expects an argument comparable with the elements, and returns
+  # the neares greater or equal element. The second optional ordered argument,
+  # true by default, controls whether equality is OK. If set to false, then the
+  # nearest _greater_ element is sought.
+  # 
+  def ascending_ceiling arg, accept_equal=true
+    idx = if accept_equal then
+            find_index { |e| not e < arg }
+          else find_index { |e| not e <= arg } end
+    case idx
+    when nil then nil
+    else fetch idx end
   end
 
   # Allows style &[ function, *arguments ]
@@ -104,8 +139,6 @@ class Array
     other.map { |e| index e }
   end
 
-  # TEST ME ** FUCK OFF TESTS
-  
   # Pretty-prints the array as line, with prescribed +:precision+ and +:gap+
   # (both are named arguments).
   # 

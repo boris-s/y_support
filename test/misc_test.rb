@@ -76,6 +76,13 @@ describe Array do
     require 'y_support/core_ext/array'
   end
 
+  it "has #arrays_to_hash" do
+    [ [ :a, 1 ], [ :b, 2 ] ].arrays_to_hash
+      .must_equal( { a: 1, b: 2 } )
+    [ [ :a, 1, 2 ], [ :b, 2, 3 ] ].arrays_to_hash
+      .must_equal( { a: [ 1, 2 ], b: [ 2, 3 ] } )
+  end
+
   it "has #zip_to_hash" do
     assert_equal( {a: 1, b: 2}, [:a, :b].zip_to_hash( [1, 2] ) )
     assert_equal( {a: "a"}, [:a].zip_to_hash( &:to_s ) )
@@ -83,6 +90,26 @@ describe Array do
 
   it "has #>>" do
     assert_equal( {a: 1, b: 2}, [:a, :b] >> [1, 2] )
+  end
+
+  it "has #ascending_floor" do
+    a = 1, 2, 3
+    a.ascending_floor( 0.5 ).must_equal nil
+    a.ascending_floor( 1 ).must_equal 1
+    a.ascending_floor( 1.5 ).must_equal 1
+    a.ascending_floor( 3.5 ).must_equal 3
+    a.ascending_floor( 1, false ).must_equal nil
+    a.ascending_floor( 3, false ).must_equal 2
+  end
+
+  it "has #ascending_ceiling" do
+    a = 1, 2, 3
+    a.ascending_ceiling( 0.5 ).must_equal 1
+    a.ascending_ceiling( 1.5 ).must_equal 2
+    a.ascending_ceiling( 3 ).must_equal 3
+    a.ascending_ceiling( 3.1 ).must_equal nil
+    a.ascending_ceiling( 3, false ).must_equal nil
+    a.ascending_ceiling( 2, false ).must_equal 3
   end
 
   it "has #to_proc in style &[function, *args]" do
