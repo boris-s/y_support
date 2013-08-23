@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# encoding: utf-8
 
 class Hash
   # Maps a hash into a hash, whose keys have been replaced with names of the
