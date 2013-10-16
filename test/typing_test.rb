@@ -1,4 +1,4 @@
-#! /usr/bin/ruby
+#! /Usr/Bin/ruby
 #encoding: utf-8
 
 require 'test/unit'
@@ -38,31 +38,31 @@ class TypingTest < Test::Unit::TestCase
     end
     
     should "have #aT raising TypeError if block falsey" do
-      assert_raise TErr do 0.aT "yada yada" do |rcvr| rcvr == 1 end end
+      assert_raise TypeError do 0.aT "yada yada" do |rcvr| rcvr == 1 end end
       assert_nothing_raised do 0.aT "yada yada" do |rcvr| rcvr == 0 end end
       assert_equal( "hello",
                     "hello".aT( "have 4 unique letters" ) { |str|
                       str.each_char.map { |e| e }.uniq.join.size == 4
                     } )
       assert_nothing_raised do 2.aT &:even? end
-      assert_raise TErr do 3.aT &:even? end
-      assert_raise TErr do nil.aT end
+      assert_raise TypeError do 3.aT &:even? end
+      assert_raise TypeError do nil.aT end
     end
     
     should "have #aT_not raising TypeError if block truey" do
-      assert_raise TErr do 0.aT_not { |rcvr| rcvr < 1 } end
+      assert_raise TypeError do 0.aT_not { |rcvr| rcvr < 1 } end
       assert_nothing_raised do 1.aT_not { |rcvr| rcvr == 2 } end
       assert_equal( "hello", "hello".aT_not( "have x" ) { |rcvr| rcvr.include? 'x' } )
       assert_nothing_raised do 3.aT_not &:even? end
-      assert_raise TErr do 2.aT_not &:even? end
-      assert_raise TErr do "".aT_not end
+      assert_raise TypeError do 2.aT_not &:even? end
+      assert_raise TypeError do "".aT_not end
     end
     
-    should "have #aT_kind_of, alias #aT_is_a TErr enforcers" do
-      assert_raise TErr do :o.aT_kind_of Numeric end
+    should "have #aT_kind_of, alias #aT_is_a TypeError enforcers" do
+      assert_raise TypeError do :o.aT_kind_of Numeric end
       assert_nothing_raised do 0.aT_kind_of Numeric end
       assert_equal( "hello", "hello".aT_kind_of( String ) )
-      assert_raise TErr do :o.aT_is_a Numeric end
+      assert_raise TypeError do :o.aT_is_a Numeric end
       assert_nothing_raised do 0.aT_is_a Numeric end
       assert_equal( "hello", "hello".aT_is_a( String ) )
     end
@@ -71,42 +71,42 @@ class TypingTest < Test::Unit::TestCase
       Koko = Class.new; Pipi = Class.new
       koko = Koko.new; pipi = Pipi.new
       pipi.declare_class_compliance! koko.class
-      assert_raise TErr do koko.aT_class_complies pipi.class end
+      assert_raise TypeError do koko.aT_class_complies pipi.class end
       assert_nothing_raised do koko.aT_class_complies koko.class end
       assert_nothing_raised do pipi.aT_class_complies pipi.class end
       assert_nothing_raised do pipi.aT_class_complies koko.class end
-      assert_raise TErr do koko.aT_class_complies Pipi end
+      assert_raise TypeError do koko.aT_class_complies Pipi end
       assert_nothing_raised do pipi.aT_class_complies Pipi end
       assert_nothing_raised do pipi.aT_class_complies Koko end
       assert_equal koko, koko.aT_class_complies( Koko )
     end
     
-    should "have #aT_respond_to enforcer" do
-      assert_raise TErr do :o.aT_respond_to :each end
+    should "have #aT_respond_to assertion" do
+      assert_raise TypeError do :o.aT_respond_to :each end
       assert_nothing_raised do {}.aT_respond_to :each end
       assert_equal( [:hello], [:hello].aT_respond_to( :each ) )
     end
     
     should "have #aT_equal enforcer" do
-      assert_raise TErr do 0.aT_equal 1 end
+      assert_raise TypeError do 0.aT_equal 1 end
       assert_nothing_raised do 1.aT_equal 2.0/2.0 end
       assert_equal( "hello", "hello".aT_equal( " hello ".strip ) )
     end
     
     should "have #aT_not_equal enforcer" do
-      assert_raise TErr do 1.aT_not_equal 1.0 end
+      assert_raise TypeError do 1.aT_not_equal 1.0 end
       assert_nothing_raised do 7.aT_not_equal 42 end
       assert_equal( "hello", "hello".aT_not_equal( "goodbye" ) )
     end
     
     should "have #aT_blank enforcer" do
-      assert_raise TErr do "x".aT_blank end
+      assert_raise TypeError do "x".aT_blank end
       assert_nothing_raised do ["", []].each{|e| e.aT_blank } end
       assert_equal( {}, {}.aT_blank )
     end
     
     should "have #aT_present enforcer" do
-      assert_raise TErr do nil.aT_present end
+      assert_raise TypeError do nil.aT_present end
       assert_nothing_raised do 0.aT_present end
       assert_equal( "hello", "hello".aT_present )
     end
@@ -114,34 +114,34 @@ class TypingTest < Test::Unit::TestCase
     
   context "Enumerable" do
     should "have #aT_all enforcer" do
-      assert_raise TErr do [1, 2, 7].aT_all { |e| e < 5 } end
+      assert_raise TypeError do [1, 2, 7].aT_all { |e| e < 5 } end
       assert_nothing_raised do [1, 2, 4].aT_all { |e| e < 5 } end
     end
 
     should "have #aT_all_kind_of enforcer" do
-      assert_raise TErr do [1.0, 2.0, :a].aT_all_kind_of Numeric end
+      assert_raise TypeError do [1.0, 2.0, :a].aT_all_kind_of Numeric end
       assert_nothing_raised do [1.0, 2.0, 3].aT_all_kind_of Numeric end
     end
 
     should "have #aT_all_comply class compliance enforcer" do
-      assert_raise TErr do [1.0, 2.0, :a].aT_all_comply Numeric end
+      assert_raise TypeError do [1.0, 2.0, :a].aT_all_comply Numeric end
       assert_nothing_raised do [1.0, 2.0, 3].aT_all_comply Numeric end
     end
 
     should "have #aT_all_numeric enforcer" do
-      assert_raise TErr do [:a].aT_all_numeric end
+      assert_raise TypeError do [:a].aT_all_numeric end
       assert_nothing_raised do [1, 2.0].aT_all_numeric end
     end
     
     should "have #aT_subset_of enforcer" do
-      assert_raise TErr do [6].aT_subset_of [*0..5] end
+      assert_raise TypeError do [6].aT_subset_of [*0..5] end
       assert_nothing_raised do [1,2].aT_subset_of [*0..5] end
     end
   end # context Enumerable
 
   context "Array" do
     should "have #aT_includes (alias #aT_include) enforcer" do
-      assert_raise TErr do [1, 2, 4].aT_includes 3 end
+      assert_raise TypeError do [1, 2, 4].aT_includes 3 end
       assert_nothing_raised do [1, 2, 4].aT_includes( 4 ).aT_include( 4 ) end
       assert_equal [6, 7], [6, 7].aT_includes( 6 )
       assert_equal [6, 7], [6, 7].aT_include( 6 )
@@ -160,7 +160,7 @@ class TypingTest < Test::Unit::TestCase
       assert_equal true, a.merge_synonym_keys!( :k, :o, :t )
       assert_equal( { a: 'a', b: 'b', k: 'k' }, a )
       old = a.dup
-      assert_raise TErr do a.merge_synonym_keys!( :a, :b ) end
+      assert_raise TypeError do a.merge_synonym_keys!( :a, :b ) end
       assert_equal old, a
       assert_equal true, a.merge_synonym_keys!( :c, :b )
       assert_equal( { a: 'a', c: 'b', k: 'k' }, a )

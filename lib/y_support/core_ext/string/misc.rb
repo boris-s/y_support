@@ -77,4 +77,11 @@ class String
     standardize
       .to_sym
   end
+
+  # Capitalizes a string and append an exclamation mark. Also allows optional
+  # argument for string interpolation. Handy for constructing error messages.
+  # 
+  def X! arg=nil
+    arg.nil? ? capitalize + ?! : ( self % arg ).X!
+  end
 end

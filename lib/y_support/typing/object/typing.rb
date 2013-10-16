@@ -1,6 +1,8 @@
 #encoding: utf-8
 
 require 'active_support/core_ext/object/blank'
+require 'y_support/core_ext/object/inspection'
+require 'y_support/core_ext/string/misc'
 
 class Object
   # === Support for typing by declaration
@@ -46,13 +48,12 @@ class Object
   # the receiver (using #instance_exec method). If no block is given, it is
   # checked, whether the object is truey.
   # 
-  def aT what_is_receiver=nil, how_comply=nil, &b
+  def aT what_is_receiver=insp, how_comply=nil, &b
     if block_given? then
-      m = "%s fails #{how_comply ? 'to %s' % how_comply : 'its duck type'}!" %
-        if what_is_receiver then what_is_receiver.to_s.capitalize else
-          "#{self.class} instance #{object_id}"
-        end
-      tap { b.( self ) or fail TypeError, m }
+      if b.( self ) then self else
+        m = "%s fails " + how_comply ? "to #{how_comply}" : "its check"
+        fail TypeError, m.X!( what_is_receiver ) 
+      end
     else self or fail TypeError end
   end
   
@@ -65,107 +66,99 @@ class Object
   # inside the singleton class of the receiver (using #instance_exec method). If
   # no block is given, it is checked, whether the object is falsey.
   # 
-  def aT_not what_is_receiver=nil, how_comply=nil, &b
-    if block_given? then
-      m = how_comply ? "%s must not #{how_comply}!" : "%s fails its duck type!"
-      m %= if what_is_receiver then what_is_receiver.to_s.capitalize else
-             "#{self.class} instance #{object_id}"
-           end
-      tap { fail TypeError, m if b.( self ) }
-    else tap { fail TypeError if self } end
+  def aT_not what_is_receiver=insp, how_comply=nil, &b
+    tap do
+      if block_given? then
+        if b.( self ) then
+          m = how_comply ? "%s must not #{how_comply}" : "%s fails its check"
+          fail TypeError, m.X!( what_is_receiver )
+        end
+      else fail TypeError if self end
+    end
   end
 
   # Fails with TypeError unless the receiver is of the prescribed class. Second
   # optional argument customizes the error message (receiver description).
   # 
-  def aT_kind_of klass, what_is_receiver=nil
-    m = "%s is not a kind of #{klass}!" %
-      if what_is_receiver then what_is_receiver.to_s.capitalize else
-        "#{self.class} instance #{object_id}"
-      end
-    tap { kind_of? klass or fail TypeError, m }
+  def aT_kind_of klass, what_is_receiver=insp
+    tap do
+      is_a? klass or fail TypeError, "%s not a #{klass}".X!( what_is_receiver )
+    end
   end
-  alias :aT_is_a :aT_kind_of
+  alias aT_is_a aT_kind_of
 
   # Fails with TypeError unless the receiver declares compliance with the
   # given class, or is a descendant of that class. Second optional argument
   # customizes the error message (receiver description).
   # 
-  def aT_class_complies klass, what_is_receiver=nil
-    m = "%s does not comply or declare compliance with #{klass}!" %
-      if what_is_receiver then what_is_receiver.to_s.capitalize else
-        "#{self.class} instance #{object_id}"
-      end
-    tap { class_complies? klass or fail TypeError, m }
+  def aT_class_complies klass, what_is_receiver=insp
+    tap do
+      class_complies? klass or
+        fail TypeError, "%s does not comply with #{klass}".X!( what_is_receiver )
+    end
   end
   
   # Fails with TypeError unless the receiver responds to the given
   # method. Second optional argument customizes the error message (receiver
   # description).
   # 
-  def aT_respond_to method_name, what_is_receiver=nil
-    m = "%s does not respond to method '#{method_name}'!" %
-      if what_is_receiver then what_is_receiver.to_s.capitalize else
-        "#{self.class} instance #{object_id}"
+  def aT_respond_to method_name, what_is_receiver=insp
+    tap do
+      unless respond_to? method_name
+        m = "%s does not respond to method '#{method_name}'"
+        fail TypeError, m.X!( what_is_receiver )
       end
-    tap { respond_to? method_name or fail TypeError, m }
+    end
   end
-  alias :aT_responds_to :aT_respond_to
+  alias aT_responds_to aT_respond_to
   
   # Fails with TypeError unless the receiver, according to #== method, is
   # equal to the argument. Two more optional arguments customize the error
   # message (receiver description and the description of the other object).
   # 
-  def aT_equal other, what_is_receiver=nil, what_is_other=nil
-    r = what_is_receiver ? what_is_receiver.to_s.capitalize :
-      "#{self.class} instance #{object_id}"
-    o = what_is_other || "the prescribed value (#{other.class})"
-    m = "%s is not equal (==) to %s!" % [r, o]
-    tap { self == other or fail TypeError, m }
+  def aT_equal other, what_is_receiver=insp, what_is_other=nil
+    tap do
+      unless self == other
+        wo = what_is_other || "the prescribed value (#{other.insp})"
+        fail TypeError, "%s must be equal to %s".X!( [ what_is_receiver, wo ] )
+      end
+    end
   end
 
   # Fails with TypeError unless the receiver, according to #== method, differs
   # from to the argument. Two more optional arguments customize the error
   # message (receiver description and the description of the other object).
   # 
-  def aT_not_equal other, what_is_receiver=nil, what_is_other=nil
-    r = what_is_receiver ? what_is_receiver.to_s.capitalize :
-      "#{self.class} instance #{object_id}"
-    o = what_is_other || "the prescribed value (#{other.class})"
-    m = "%s fails to differ from %s!" % [r, o]
-    tap { fail TypeError, m if self == other }
+  def aT_not_equal other, what_is_receiver=insp, what_is_other=nil
+    tap do
+      if self == other
+        wo = what_is_other || "the prescribed value (#{other.insp})"
+        fail TypeError, "% must not == %s".X!( [ what_is_receiver, wo ] )
+      end
+    end
   end
 
   # Fails with TypeError unless the ActiveSupport method #blank returns true
   # for the receiver.
   # 
-  def aT_blank what_is_receiver=nil
-    r = 
-    m = "#%s fails to be blank!" %
-      if what_is_receiver then what_is_receiver.to_s.capitalize else
-        "#{self.class} instance #{object_id}"
-      end
-    tap { blank? or fail TypeError, m }
+  def aT_blank what_is_receiver=insp
+    tap { blank? or fail TypeError, "%s not blank".X!( what_is_receiver ) }
   end
 
   # Fails with TypeError unless the ActiveSupport method #present returns true
   # for the receiver.
   # 
-  def aT_present what_is_receiver=nil
-    m = "%s fails to be present!" %
-      if what_is_receiver then what_is_receiver.to_s.capitalize else
-        "#{self.class} instance #{object_id}"
-      end
-    tap { present? or fail TypeError, m }
+  def aT_present what_is_receiver=insp
+    tap { present? or fail TypeError, "%s not present".X!( what_is_receiver ) }
   end
 
   private
 
+  # Some objects do not have accessible singleton class. This method returns
+  # the singleton class for those object, which have a singleton class, and
+  # self.class for others.
+  # 
   def singleton_class_or_class
-    begin
-      self.singleton_class
-    rescue TypeError
-      self.class
-    end
+    begin; self.singleton_class; rescue TypeError; self.class end
   end
 end
