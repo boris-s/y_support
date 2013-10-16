@@ -1,76 +1,52 @@
-# -*- coding: utf-8 -*-
+# encoding: utf-8
 
 module NameMagic
   module NamespaceMethods
-    # Presents class-owned namespace. By default, this is the class itself, but
-    # may be overriden to use some other module as a namespace.
-    # 
-    def namespace
-      self
-    end
-
-    # Sets the namespace of the class.
-    # 
-    def namespace= modul
-      modul.extend ::NameMagic::NamespaceMethods unless modul == self
-      tap { define_singleton_method :namespace do modul end }
-    end
-
-    # Makes the class/module its own namespace. This is useful especially to tell
-    # the subclasses of a class using NameMagic to maintain their own namespaces.
-    # 
-    def namespace!
-      nil.tap { self.namespace = self }
-    end
-
-    # Presents the instances registered by the namespace.
+    # Presents the instances registered in this namespace.
     #
-    def instances
+    def instances *args
       const_magic
       __instances__.keys
     end
 
-    # Presents the instance names. Takes one optional argument, same as
-    # #instances method. Unnamed instances are completely disregarded.
+    # Presents the instance names registered in this namespace.
     #
-    def instance_names
+    def instance_names *args
       instances.names( false )
     end
 
-    # Presents namespace-owned @instances hash of pairs <code>{ instance =>
-    # instance_name }</code>. Unnamed instances have nil value. (Also, this
-    # method does not trigger #const_magic.)
+    # Presents namespace-owned +@instances+ hash. The hash consists of pairs
+    # <code>{ instance => instance_name }</code>. Unnamed instances have +nil+
+    # assigned to them as their name. (The method does not trigger
+    # +#const_magic+.)
     #
-    def __instances__
-      namespace.instance_variable_get( :@instances ) ||
-        namespace.instance_variable_set( :@instances, {} )
+    def __instances__ *args
+      @instances ||= {}
     end
 
-    # Presents namespace-owned @avid_instances array of avid instances. "Avid"
-    # means that the instance is able to overwrite a name used by another
-    # registered instance. (Also, this method does not trigger const_magic).
+    # Avid instances registered in this namespace. ("Avid" means that the
+    # instance is able to steal (overwrite) a name from another registered
+    # instance. (The method does not trigger +#const_magic+.)
     #
-    def __avid_instances__
-      namespace.instance_variable_get( :@avid_instances ) ||
-        namespace.instance_variable_set( :@avid_instances, [] )
+    def __avid_instances__ *args
+      @avid_instances ||= []
     end
 
-    # Returns the instance identified by the argument. NameError is raised, if
-    # the argument does not identify an instance. (It can be an instance name
-    # (string/symbol), or an instance itself, in which case, it is just returned
-    # back without changes.)
+    # Returns the instance identified by the argument, which can be typically
+    # a name (string/symbol). If a registered instance is supplied, it will be
+    # returned unchanged.
     #
-    def instance identifier
-      puts "#instance( #{identifier} )" if DEBUG
+    def instance id, *args
+      # puts "#instance( #{identifier} )" if DEBUG
       # In @instances hash, value 'nil' indicates a nameless instance!
-      fail TypeError, "'nil' is not an instance identifier!" if identifier.nil?
+      fail TypeError, "'nil' is not an instance identifier!" if id.nil?
       ii = instances
-      return identifier if ii.include? identifier # return the instance back
+      return id if ii.include? id # return the instance back
       begin # identifier not a registered instace -- treat it as a name
-        ary = [identifier, identifier.to_sym]
-        ii.find do |i| ary.include? i.name end
+        ary = [id, id.to_sym]
+        ii.find { |inst| ary.include? inst.name }
       rescue NoMethodError
-      end or raise NameError, "No instance #{identifier} in #{self}."
+      end or fail NameError, "No instance #{id} in #{self}."
     end
 
     # Searches all the modules in the the object space for constants containing
@@ -78,24 +54,23 @@ module NameMagic
     # number of the remaining nameless instances is returned.
     #
     def const_magic
+      puts "#{self}#const_magic invoked!" if ::NameMagic::DEBUG
       return 0 if nameless_instances.size == 0
       serve_all_modules
       return nameless_instances.size
-    end # def const_magic
-
+    end
+    
     # Returns those instances, which are nameless (whose name is set to nil).
     # 
-    def nameless_instances
+    def nameless_instances *args
       __instances__.select { |key, val| val.nil? }.keys
     end
-    alias unnamed_instances nameless_instances
-    alias anonymous_instances nameless_instances
 
     # Clears namespace-owned references to a specified instance. (This is
     # different from "unnaming" an instance by setting <code>inst.name =
     # nil</code>, which makes the instance anonymous, but still registered.)
     # 
-    def forget( instance_identifier )
+    def forget instance_identifier, *args
       inst = begin
                instance( instance_identifier )
              rescue ArgumentError
@@ -112,7 +87,7 @@ module NameMagic
     # #const_magic first. The argument should be a registered instance. Returns
     # the instance name, or _false_, if there was no such registered instance.
     # 
-    def __forget__( instance )
+    def __forget__( instance, *args )
       return false unless __instances__.keys.include? instance
       namespace.send :remove_const, instance.name if instance.name
       __avid_instances__.delete( instance )
@@ -127,8 +102,6 @@ module NameMagic
         __avid_instances__.delete inst # also from here
       }
     end
-    alias forget_unnamed_instances forget_nameless_instances
-    alias forget_anonymous_instances forget_nameless_instances
 
     # Clears namespace-owned references to all the instances.
     # 
@@ -139,48 +112,50 @@ module NameMagic
       }
     end
 
-    # Registers a hook to execute whenever name magic creates a new instance of
-    # the class including NameMagic. The block should take one argument (the new
-    # instance that was created) and is called in #new method right after
-    # instantiation, but before naming.
+    # Registers a hook to execute upon instantiation. Expects a unary block, whose
+    # argument represents the new instance. It is called right after instantiation,
+    # but before naming the instance.
     # 
-    def new_instance_closure &block
-      namespace.new_instance_closure &block unless namespace == self
-      @new_instance_closure = block if block
-      @new_instance_closure ||= -> instance { instance }
+    def new_instance_hook &block
+      @new_instance_hook = block if block
+      @new_instance_hook ||= -> instance { instance }
     end
-    alias new_instance_hook new_instance_closure
 
-    # Registers a hook to execute whenever name setting is performed on an
-    # instance. The block should take three arguments (instance, name, old_name).
-    # The output value of the block is the name to be actually used – the hook
-    # thus allows to define transformations on the name when naming. It is the
-    # responsibility of the block to output a suitable symbol (capitalized,
-    # usable as a constant name etc.)
+    # Registers a hook to execute upon instance naming. Expects a ternary block,
+    # with arguments instance, name, old_name, representing respectively the
+    # instance to be named, the requested name, and the previous name of that
+    # instance (if any). The output of the block should be the name to actually
+    # be used. In other words, the hook can be used (among other things) to check
+    # and/or modify the requested name when christening the instance. It is the
+    # responsibility of this block to output a symbol that can be used as a Ruby
+    # constant name.
     # 
-    def name_set_closure &block
-      namespace.name_set_closure &block unless namespace == self
-      @name_set_closure = block if block
-      @name_set_closure ||= -> name, instance, old_name=nil { name }
+    def name_set_hook &block
+      @name_set_hook = block if block
+      @name_set_hook ||= -> name, instance, old_name=nil { name }
     end
-    alias name_set_hook name_set_closure
 
-    # Registers a hook to execute whenever the instance is asked about its
-    # name. The name object contained in __instances__[self] is subjected
-    # to the name_get_closure before being returned as instance name.
+    # Registers a hook to execute whenever the instance is asked its name. The
+    # instance names are objects that are kept in a hash referred to by
+    # +@instances+ variable owned by the namespace. Normally, +NameMagic#name+
+    # simply returns the name of the instance, as found in the +@instances+ hash.
+    # When +name_get_hook+ is defined, this name is transformed by it before being
+    # returned.
     # 
-    def name_get_closure &block
-      namespace.name_get_closure &block unless namespace == self
-      @name_get_closure = block if block
-      @name_get_closure ||= -> name { name }
+    def name_get_hook &block
+      @name_get_hook = block if block
+      @name_get_hook ||= -> name { name }
     end
-    alias name_get_hook name_get_closure
 
     private
 
     # Checks all the constants in some module's namespace, recursively.
     # 
     def serve_all_modules
+      if DEBUG then
+        puts "#{self}#serve_all_modules invoked!"
+        if name.nil? then puts "(ancestors: #{ancestors.take( 4 ).join ', '}" end
+      end
       todo = ( nameless_instances + __avid_instances__ ).map( &:object_id ).uniq
       ObjectSpace.each_object Module do |ɱ|
         ɱ.constants( false ).each do |const_ß|
@@ -189,21 +164,19 @@ module NameMagic
           rescue LoadError, StandardError; next end
           next unless todo.include? ◉.object_id
           puts "NameMagic: Anonymous object under #{const_ß}!" if DEBUG
-          if __avid_instances__.map( &:object_id ).include? ◉.object_id # avid
-            puts "NameMagic: It is avid." if DEBUG
-            __avid_instances__       # 1. remove from avid list
-              .delete_if { |inst| inst.object_id == ◉.object_id }
-            ◉.name! const_ß          # 2. name rudely
-          else puts "NameMagic: It is not avid." if DEBUG # not avid
-            ɴ = validate_name( name_set_closure.( const_ß, ◉, nil ) ).to_sym
+          if ◉.avid? then puts "NameMagic: It is avid." if DEBUG
+            ◉.make_not_avid!    # 1. Remove it from the list of avid instances.
+            ◉.name! const_ß     # 2. Name it rudely.
+          else puts "NameMagic: It is not avid." if DEBUG
+            ɴ = validate_name( name_set_hook.( const_ß, ◉, nil ) ).to_sym
             puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
-            conflicter = begin; namespace.const_get( ɴ ); rescue NameError; end
+            conflicter = begin; const_get( ɴ ); rescue NameError; end
             if conflicter then
               msg = "Another #{self}-registered instance named '#{ɴ}' exists!"
               fail NameError, msg unless conflicter == ◉
             else # add the instance to the namespace
               __instances__.update( ◉ => ɴ )
-              namespace.const_set( ɴ, ◉ )
+              const_set( ɴ, ◉ )
             end
           end
           todo.delete ◉.object_id # remove the id from todo list

@@ -71,25 +71,22 @@ require_relative 'name_magic/class_methods'
 module NameMagic
   DEBUG = false
 
-  def self.included modul
-    if modul.is_a? Class then # decorate #new
-      class << modul
-        alias :new_before_name_magic :new
-      end
-      modul.extend NameMagic::NamespaceMethods
-      modul.extend NameMagic::ClassMethods
-      # Attach namespace methods also to the namespace, if given
-      begin
-        if modul.namespace == modul then
-          modul.define_singleton_method :namespace do modul end
-        else
-          modul.namespace.extend NameMagic::NamespaceMethods
+  def self.included target
+    if target.is_a? Class then # decorate #new
+      class << target
+        # Primer that sets the namespace of the class to self if the user has
+        # not defined otherwise when this method is first called.
+        # 
+        def namespace
+          extend ::NameMagic::NamespaceMethods
+          define_singleton_method :namespace do self end # redefines itself
+          namespace
         end
-      rescue NoMethodError
       end
+      target.singleton_class.class_exec { prepend NameMagic::ClassMethods }
     else # it is a Module -- infect it with this #include
-      orig, this = modul.method( :included ), method( :included )
-      modul.define_singleton_method :included do |m| this.( m ); orig.( m ) end
+      orig, this = target.method( :included ), method( :included )
+      target.define_singleton_method :included do |m| this.( m ); orig.( m ) end
     end
   end # self.included
 
@@ -111,24 +108,24 @@ module NameMagic
   # 
   def __name__
     ɴ = self.class.__instances__[ self ]
-    namespace.name_get_closure.( ɴ ) if ɴ
+    namespace.name_get_hook.( ɴ ) if ɴ
   end
 
   # Names an instance, cautiously (ie. no overwriting of existing names).
   # 
   def name=( ɴ )
     old_ɴ = namespace.__instances__[ self ]    # previous name
-    if ɴ then puts "NameMagic: Naming with argument #{ɴ}." if DEBUG
-      ɴ = namespace.send( :validate_name,     # honor the hook
-                          namespace.name_set_closure.( ɴ, self, old_ɴ ) ).to_sym
-      puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
+    if ɴ then # puts "NameMagic: Naming with argument #{ɴ}." if DEBUG
+      ɴ = namespace.send( :validate_name,      # honor the hook
+                          namespace.name_set_hook.( ɴ, self, old_ɴ ) ).to_sym
+      # puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
       return if old_ɴ == ɴ                     # already named as required
       fail NameError, "Name '#{ɴ}' already exists in #{namespace} namespace!" if
         self.class.__instances__.rassoc( ɴ )
       namespace.const_set ɴ, self           # write a constant
       namespace.__instances__[ self ] = ɴ   # write to @instances
       namespace.__forget__ old_ɴ            # forget the old name of self
-    else puts "NameMagic: Unnaming #{old_ɴ || self}" if DEBUG
+    else # puts "NameMagic: Unnaming #{old_ɴ || self}" if DEBUG
       namespace.__instances__.update( self => nil ) # unname in @instances
       namespace.send :remove_const, old_ɴ if old_ɴ  # remove namespace const.
     end
@@ -138,10 +135,10 @@ module NameMagic
   # 
   def name!( ɴ )
     old_ɴ = namespace.__instances__[ self ]   # previous name
-    if ɴ then puts "NameMagic: Rudely naming with #{ɴ}." if DEBUG
+    if ɴ then # puts "NameMagic: Rudely naming with #{ɴ}." if DEBUG
       ɴ = namespace.send( :validate_name,     # honor the hook
-                          namespace.name_set_closure.( ɴ, self, old_ɴ ) ).to_sym
-      puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
+                          namespace.name_set_hook.( ɴ, self, old_ɴ ) ).to_sym
+      # puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
       return false if old_ɴ == ɴ # already named as required
       pair = namespace.__instances__.rassoc( ɴ )
       namespace.__forget__( pair[0] ) if pair # rudely forget the collider
@@ -151,5 +148,17 @@ module NameMagic
     else
       self.name = nil # unnaming, no collider issues
     end
+  end
+
+  # Is the instance avid for a name? (Will it overwrite other instance names?)
+  # 
+  def avid?
+    namespace.__avid_instances__.any? &method( :equal? )
+  end
+
+  # Make the instance not avid.
+  # 
+  def make_not_avid!
+    namespace.__avid_instances__.delete_if { |i| i.object_id == object_id }
   end
 end # module NameMagic
