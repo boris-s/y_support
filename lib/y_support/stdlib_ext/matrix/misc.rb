@@ -6,7 +6,7 @@ class Matrix
   # Pretty inspect
   def pretty_inspect
     return inspect if row_size == 0 or column_size == 0
-    aa = send(:rows).each.with_object [] do |row, memo|
+    aa = send( :rows ).each.with_object [] do |row, memo|
       memo << row.map{ |o|
         os = o.to_s
         case o
@@ -14,9 +14,9 @@ class Matrix
         else o.to_s end
       }
     end
-    width = aa.map{ |row| row.map( &:size ).max }.max + 1
+    width = aa.map { |row| row.map( &:size ).max }.max + 1
     aa.each_with_object "" do |row, memo|
-      row.each{ |e| memo << e << ' ' * ( width - e.size ) }
+      row.each { |e| memo << e << ' ' * ( width - e.size ) }
       memo << "\n"
     end
   end

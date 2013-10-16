@@ -152,10 +152,6 @@ module NameMagic
     # Checks all the constants in some module's namespace, recursively.
     # 
     def serve_all_modules
-      if DEBUG then
-        puts "#{self}#serve_all_modules invoked!"
-        if name.nil? then puts "(ancestors: #{ancestors.take( 4 ).join ', '}" end
-      end
       todo = ( nameless_instances + __avid_instances__ ).map( &:object_id ).uniq
       ObjectSpace.each_object Module do |ɱ|
         ɱ.constants( false ).each do |const_ß|
@@ -163,13 +159,13 @@ module NameMagic
             ◉ = ɱ.const_get( const_ß ) # insurance against const. loading fails
           rescue LoadError, StandardError; next end
           next unless todo.include? ◉.object_id
-          puts "NameMagic: Anonymous object under #{const_ß}!" if DEBUG
-          if ◉.avid? then puts "NameMagic: It is avid." if DEBUG
+          # puts "NameMagic: Anonymous object under #{const_ß}!" if DEBUG
+          if ◉.avid? then # puts "NameMagic: It is avid." if DEBUG
             ◉.make_not_avid!    # 1. Remove it from the list of avid instances.
             ◉.name! const_ß     # 2. Name it rudely.
-          else puts "NameMagic: It is not avid." if DEBUG
+          else # puts "NameMagic: It is not avid." if DEBUG
             ɴ = validate_name( name_set_hook.( const_ß, ◉, nil ) ).to_sym
-            puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
+            # puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
             conflicter = begin; const_get( ɴ ); rescue NameError; end
             if conflicter then
               msg = "Another #{self}-registered instance named '#{ɴ}' exists!"
