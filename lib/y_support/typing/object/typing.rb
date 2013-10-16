@@ -92,10 +92,9 @@ class Object
   # customizes the error message (receiver description).
   # 
   def aT_class_complies klass, what_is_receiver=insp
-    tap do
-      class_complies? klass or
-        fail TypeError, "%s does not comply with #{klass}".X!( what_is_receiver )
-    end
+    if class_complies? klass then
+      fail TypeError, "%s does not comply with #{klass}".X!( what_is_receiver )
+    else self end
   end
   
   # Fails with TypeError unless the receiver responds to the given
@@ -103,11 +102,9 @@ class Object
   # description).
   # 
   def aT_respond_to method_name, what_is_receiver=insp
-    tap do
-      unless respond_to? method_name
-        m = "%s does not respond to method '#{method_name}'"
-        fail TypeError, m.X!( what_is_receiver )
-      end
+    if respond_to? method_name then self else
+      m = "%s does not respond to method '#{method_name}'"
+      fail TypeError, m.X!( what_is_receiver )
     end
   end
   alias aT_responds_to aT_respond_to
@@ -117,11 +114,9 @@ class Object
   # message (receiver description and the description of the other object).
   # 
   def aT_equal other, what_is_receiver=insp, what_is_other=nil
-    tap do
-      unless self == other
-        wo = what_is_other || "the prescribed value (#{other.insp})"
-        fail TypeError, "%s must be equal to %s".X!( [ what_is_receiver, wo ] )
-      end
+    if self == other then self else
+      wo = what_is_other || "the prescribed value (#{other.insp})"
+      fail TypeError, "%s must be equal to %s".X!( [ what_is_receiver, wo ] )
     end
   end
 
@@ -130,12 +125,10 @@ class Object
   # message (receiver description and the description of the other object).
   # 
   def aT_not_equal other, what_is_receiver=insp, what_is_other=nil
-    tap do
-      if self == other
-        wo = what_is_other || "the prescribed value (#{other.insp})"
-        fail TypeError, "% must not == %s".X!( [ what_is_receiver, wo ] )
-      end
-    end
+    if self == other
+      wo = what_is_other || "the prescribed value (#{other.insp})"
+      fail TypeError, "%s must not == %s".X!( [ what_is_receiver, wo ] )
+    else self end
   end
 
   # Fails with TypeError unless the ActiveSupport method #blank returns true
