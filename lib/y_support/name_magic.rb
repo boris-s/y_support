@@ -78,7 +78,7 @@ module NameMagic
         # not defined otherwise when this method is first called.
         # 
         define_method :namespace do
-          extend ::NameMagic::NamespaceMethods
+          target.extend ::NameMagic::NamespaceMethods
           define_singleton_method :namespace do target end # redefines itself
           namespace
         end

@@ -4,8 +4,8 @@ module NameMagic::ClassMethods
   # Presents the instances registered by the namespace. Takes one optional
   # argument. If set to _false_, the method returns all the instances
   # registered by the namespace. If set to _true_ (default), only returns
-  # those instances registered by the namespace, which are of exactly the same
-  # class as the receiver. Example:
+  # those instances registered by the namespace, which are of exactly the
+  # same class as the receiver. Example:
   # 
   # <code>
   # class Animal; include NameMagic end
@@ -67,9 +67,7 @@ module NameMagic::ClassMethods
   # number of the remaining nameless instances is returned.
   #
   def const_magic
-    puts "#{self}#const_magic invoked!" if ::NameMagic::DEBUG
     return super if namespace == self
-    puts "self is not namespace, #const_magic delegated to #{namespace}" if ::NameMagic::DEBUG
     namespace.const_magic
   end
 

@@ -20,7 +20,7 @@ module NameMagic
     # assigned to them as their name. (The method does not trigger
     # +#const_magic+.)
     #
-    def __instances__ *args
+    def __instances__
       @instances ||= {}
     end
 
@@ -28,7 +28,7 @@ module NameMagic
     # instance is able to steal (overwrite) a name from another registered
     # instance. (The method does not trigger +#const_magic+.)
     #
-    def __avid_instances__ *args
+    def __avid_instances__
       @avid_instances ||= []
     end
 
