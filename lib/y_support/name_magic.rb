@@ -73,13 +73,13 @@ module NameMagic
 
   def self.included target
     if target.is_a? Class then # decorate #new
-      class << target
+      target.singleton_class.class_exec do
         # Primer that sets the namespace of the class to self if the user has
         # not defined otherwise when this method is first called.
         # 
-        def namespace
+        define_method :namespace do
           extend ::NameMagic::NamespaceMethods
-          define_singleton_method :namespace do self end # redefines itself
+          define_singleton_method :namespace do target end # redefines itself
           namespace
         end
       end

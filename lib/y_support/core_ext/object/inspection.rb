@@ -4,6 +4,6 @@ class Object
   # Constructs the string "#{self.class}:#{self}". Useful for inspection.
   # 
   def insp
-    "#{self.class}:#{self}"
+    "#{self}:#{self.class}"
   end
 end

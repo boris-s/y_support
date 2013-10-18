@@ -152,3 +152,4 @@ class Hash
     return nil
   end
 end
+
