@@ -51,7 +51,7 @@ class Object
   def aT what_is_receiver=insp, how_comply=nil, &b
     if block_given? then
       if b.( self ) then self else
-        m = "%s fails " + how_comply ? "to #{how_comply}" : "its check"
+        m = "%s fails " + ( how_comply ? "to #{how_comply}" : "its check" )
         fail TypeError, m.X!( what_is_receiver ) 
       end
     else self or fail TypeError end
