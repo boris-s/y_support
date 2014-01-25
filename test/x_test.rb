@@ -8,14 +8,14 @@ require './../lib/y_support/x'
 class XTest < Test::Unit::TestCase
   context "X" do
     setup do
-      YSupport::X.echo_primary_clipboard '"foo"'
-      YSupport::X.echo_secondary_clipboard "bar"
+      YSupport::X.echo_primary_clipboard '"foo & bar"'
+      YSupport::X.echo_secondary_clipboard "baz"
     end
 
     should "have clipboard as expected" do
-      assert_equal '"foo" bar', [`xsel -b`, `xsel -s`].join(' ')
+      assert_equal '"foo & bar" baz', [`xsel -b`, `xsel -s`].join(' ')
     end
-
+    
     should "know #query_box and #message_box methods" do
       assert_respond_to YSupport::X, :query_box
       assert_respond_to YSupport::X, :message_box

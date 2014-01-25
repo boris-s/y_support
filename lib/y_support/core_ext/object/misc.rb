@@ -1,4 +1,4 @@
-# encoding: utf-8
+#encoding: utf-8
 
 require 'y_support/core_ext/class'
 
@@ -43,7 +43,7 @@ class Object
   # class }, and a hash of parameters, with which the class(es) is (are)
   # parametrized. Shadows / overwrites existing methods.
   # 
-  def param_class! hash, with: (fail ArgumentError, "No parameters!")
+  def param_class!( hash, with: {} )
     hash.each { |ß, ç|
       sub = ç.parametrize with
       set_attr_with_readers!( ß => sub )
