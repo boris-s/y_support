@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+# Class methods for the classes that include NameMagic.
+# 
 module NameMagic::ClassMethods
   # Presents the instances registered by the namespace. Takes one optional
   # argument. If set to _false_, the method returns all the instances
@@ -23,10 +25,12 @@ module NameMagic::ClassMethods
     option ? ii.select { |i| i.kind_of? self } : ii
   end
 
-  # Presents the instance names. Takes one optional argument, same as
-  # +#instances+ method.
+  # Deprecated method to get full names of the named instances. Takes one
+  # optional argument, same as +#instances+ method.
   #
   def instance_names option=true
+    warn "Method #instance_names( option ) is deprecated. Use % instead!" %
+      '"instances( option ).names" or "instances( option )._names_"'
     instances( option ).names( false )
   end
 
@@ -150,7 +154,7 @@ module NameMagic::ClassMethods
     namespace.name_get_hook &block
   end
 
-  # Sets the namespace of the class.
+  # Sets the namespace for the class.
   # 
   def namespace= modul
     puts "Assigning #{modul} as the namespace of #{self}." if ::NameMagic::DEBUG 
@@ -174,7 +178,7 @@ module NameMagic::ClassMethods
   def new *args, &block
     oo = if args[-1].is_a? Hash then args.pop else {} end  # extract hash
     nm = oo.delete( :name ) || oo.delete( :ɴ )   # consume :name / :ɴ if given
-    avid = !!oo.delete( :name_avid )
+    avid = oo.delete( :name_avid )
     # Avoid overwriting existing names unless avid:
     fail NameError, "#{self} instance #{nm} already exists!" if
       __instances__.keys.include? nm unless avid
@@ -185,8 +189,8 @@ module NameMagic::ClassMethods
         λ.( inst ) if λ
         if nm then # Name supplied, name the instance.
           avid ? inst.name!( nm ) : inst.name = nm
-        else # Name not supplied, make the instance avid.
-          __avid_instances__ << inst
+        else # Name not given, make the inst. avid unless expressly prohibited.
+          __avid_instances__ << inst unless name_avid == false
         end
       }
     end

@@ -9,7 +9,8 @@ require_relative 'name_magic/namespace_methods'
 require_relative 'name_magic/class_methods'
 
 # This mixin imitates Ruby constant magic and automates the named argument
-# :name (alias :ɴ). One can write:
+# :name, alias :ɴ (Character "ɴ", Unicode small capital N, generally stands
+# for "name" ins YSupport). One can write:
 #
 #   require 'y_support/name_magic'
 #   class Foo; include NameMagic end
@@ -17,7 +18,8 @@ require_relative 'name_magic/class_methods'
 #
 # and the resulting object will know its #name:
 #
-#   Bar.name #=> :Bar
+#   Bar._name_ #=> :Bar
+#   Bar.full_name #=> "Foo::Bar"
 #   Foo::Bar #=> <Foo:0x.....>
 #
 # This is done by searching whole Ruby namespace for constants, triggered by the
@@ -44,8 +46,8 @@ require_relative 'name_magic/class_methods'
 #   Dog.namespace #=> Animal
 #   Cat.namespace #=> Animal
 #   Livia = Cat.new
-#   Cat.instance_names #=> []
-#   Animal.instance_names #=> [:Livia]
+#   Cat.instances._names_ #=> []
+#   Animal.instances._names_ #=> [:Livia]
 #
 # To make the subclasses use each their own namespace, use +#namespace!+ method:
 #
@@ -56,9 +58,8 @@ require_relative 'name_magic/class_methods'
 #
 #   Dog.new name: "Spot"
 #   Dog.new ɴ: :Rover
-#   Dog.instance_names #=> [:Spot, :Rover]
-#   Animal.instance_names #=> []
-#   
+#   Dog.instances._names_ #=> [:Spot, :Rover]
+#   Animal.instances._names_ #=> []
 #
 # Lastly, a name can be assigned by #name= accssor, as in
 #
@@ -83,7 +84,7 @@ module NameMagic
           namespace
         end
       end
-      target.singleton_class.class_exec { prepend NameMagic::ClassMethods }
+      target.singleton_class.class_exec { prepend ::NameMagic::ClassMethods }
     else # it is a Module -- infect it with this #include
       orig, this = target.method( :included ), method( :included )
       target.define_singleton_method :included do |m| this.( m ); orig.( m ) end
@@ -96,14 +97,27 @@ module NameMagic
     self.class.namespace
   end
 
-  # Retrieves an instance name.
+  # Retrieves the instance's name not prefixed by the namespace as a symbol.
+  # Underlines (+#_name_+) distinguish this method from +#name+ method, which
+  # returns full name string for compatibility with vanilla Ruby +Module#name+.
   # 
-  def name
+  def _name_
     self.class.const_magic
     __name__ or ( yield self if block_given? )
   end
-  alias ɴ name
+  alias ɴ _name_
+  # FIXME: Delete the line below! Do it!  Make #name return #full_name, as compatible with Class#name behavior!!!
+  alias name _name_
 
+  # Returns the instance's full name, a string in the style of those returned
+  # by +Module#name+ method, eg. "Namespace::Name".
+  # 
+  def full_name
+    "#{namespace.name || namespace.inspect}::#{namespace.instances[ self ]}"
+  end
+  # FIXME: Uncomment the line below! Do it! Make #name return #full_name, as compatible with Class#name behavior!!!
+  # alias name full_name
+  
   # Retrieves the instance name. Does not trigger #const_magic before doing so.
   # 
   def __name__
