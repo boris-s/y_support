@@ -5,8 +5,6 @@ require 'y_support/core_ext/hash/misc'
 
 require_relative 'name_magic/array'
 require_relative 'name_magic/hash'
-require_relative 'name_magic/namespace_methods'
-require_relative 'name_magic/class_methods'
 
 # This mixin imitates Ruby constant magic and automates the named argument
 # :name, alias :ɴ (Character "ɴ", Unicode small capital N, generally stands
@@ -71,6 +69,9 @@ require_relative 'name_magic/class_methods'
 # 
 module NameMagic
   DEBUG = false
+
+  require_relative 'name_magic/namespace_methods'
+  require_relative 'name_magic/class_methods'
 
   def self.included target
     if target.is_a? Class then # decorate #new
