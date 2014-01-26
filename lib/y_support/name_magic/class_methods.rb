@@ -190,7 +190,7 @@ module NameMagic::ClassMethods
         if nm then # Name supplied, name the instance.
           avid ? inst.name!( nm ) : inst.name = nm
         else # Name not given, make the inst. avid unless expressly prohibited.
-          __avid_instances__ << inst unless name_avid == false
+          __avid_instances__ << inst unless avid == false
         end
       }
     end
