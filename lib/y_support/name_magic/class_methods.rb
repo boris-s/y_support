@@ -209,14 +209,12 @@ module NameMagic::ClassMethods
   # Checks all the constants in some module's namespace, recursively.
   # 
   def serve_all_modules
-    return super if namespace == self
-    namespace.serve_all_modules
+    namespace == self ? super : namespace.serve_all_modules
   end
 
   # Performs general name validation.
   # 
   def validate_name name
-    return super if namespace == self
-    namespace.validate_name name
+    namespace == self ? super : namespace.validate_name name
   end
 end # module NameMagic::ClassMethods
