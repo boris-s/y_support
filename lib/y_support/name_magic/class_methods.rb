@@ -7,7 +7,8 @@ module NameMagic::ClassMethods
   # argument. If set to _false_, the method returns all the instances
   # registered by the namespace. If set to _true_ (default), only returns
   # those instances registered by the namespace, which are of exactly the
-  # same class as the receiver. Example:
+  # same class as the receiver (ie. excluding the instances of the subclasses
+  # of this class). Example:
   # 
   # <code>
   # class Animal; include NameMagic end
@@ -25,12 +26,12 @@ module NameMagic::ClassMethods
     option ? ii.select { |i| i.kind_of? self } : ii
   end
 
-  # Deprecated method to get full names of the named instances. Takes one
-  # optional argument, same as +#instances+ method.
+  # Deprecated method to get full names of the named instances. Use
+  # <code>instances.names</code> instead. Takes one optional argument,
+  # same as +#instances+ method.
   #
   def instance_names option=true
-    warn "Method #instance_names( option ) is deprecated. Use % instead!" %
-      '"instances( option ).names" or "instances( option )._names_"'
+    warn "Method #instance_names is deprecated. Use 'instances._names_' or 'instances.names' instead!"
     instances( option ).names( false )
   end
 
@@ -40,8 +41,7 @@ module NameMagic::ClassMethods
   # +#const_magic+.)
   # 
   def __instances__
-    return super if namespace == self
-    namespace.__instances__
+    namespace == self ? super : namespace.__instances__
   end
 
   # Presents namespace-owned +@avid_instances+ (array of avid instances). "Avid"
@@ -49,8 +49,7 @@ module NameMagic::ClassMethods
   # registered instance. (This method does not trigger +#const_magic+.)
   # 
   def __avid_instances__
-    return super if namespace == self
-    namespace.__avid_instances__
+    namespace == self ? super : namespace.__avid_instances__
   end
 
   # Returns the instance identified by the first argument, which can typically
@@ -58,21 +57,21 @@ module NameMagic::ClassMethods
   # returned without change. The second argument is optional, with the same
   # meaning as in +NameMagic::ClassMethods#instances+ method.
   # 
-  def instance id, option=true
+  def instance instance, option=true
     return super if namespace == self
-    namespace.instance( id ).tap { |inst|
-      fail NameError, "No #{self} instance #{id} registered in " +
-        "#{namespace}!" unless inst.kind_of? self if option
+    return namespace.instance( instance ) unless option
+    namespace.instance( instance ).tap { |instance|
+      fail NameError, "No #{self} instance #{instance} registered in " +
+        "#{namespace}!" unless instance.kind_of? self
     }
   end
 
-  # Searches all the modules in the the object space for constants containing
-  # receiver class objects, and names the found instances accordingly. The
-  # number of the remaining nameless instances is returned.
+  # Searches all the modules in the the object space for constants pointing to
+  # anonymous instances of this class, and names them accordingly. The number
+  # of remaining anonymous instances is returned.
   #
   def const_magic
-    return super if namespace == self
-    namespace.const_magic
+    namespace == self ? super : namespace.const_magic
   end
 
   # Returns the nameless instances. The optional argument has the same meaning
@@ -80,23 +79,23 @@ module NameMagic::ClassMethods
   # 
   def nameless_instances option=true
     return super if namespace == self
-    ii = namespace.nameless_instances
-    option ? ii.select { |i| i.kind_of? self } : ii
+    return namespace.nameless_instances unless option
+    namespace.nameless_instances.select { |i| i.kind_of? self }
   end
 
   # Clears namespace-owned references to a specified instance. (This is
-  # different from "unnaming" an instance by setting <code>inst.name =
+  # different from de-naming an instance by setting <code>inst.name =
   # nil</code>, which makes the instance anonymous, but still registered.)
   # 
-  def forget instance_identifier, option=true
-    if namespace == self || ! option then super else
-      namespace.forget instance( instance_identifier )
-    end
+  def forget instance, option=true
+    namespace == self || ! option ? super : namespace.forget( instance instance )
   end
 
   # Clears namespace-owned references to an instance, without performing
   # #const_magic first. The argument should be a registered instance. Returns
-  # the instance name, or _false_, if there was no such registered instance.
+  # the instance's name for named instances, _nil_ for anonymous instances,
+  # and _false_ if there was no such registered instance. The optional second
+  # argument has the same meaning as in +NameMaic::ClassMethods#instances+.
   # 
   def __forget__( instance, option=true )
     return super if namespace == self
@@ -108,15 +107,13 @@ module NameMagic::ClassMethods
   # Clears namespace-owned references to all the anonymous instances.
   # 
   def forget_nameless_instances
-    return super if namespace == self
-    namespace.forget_nameless_instances
+    namespace == self ? super : namespace.forget_nameless_instances
   end
 
   # Clears namespace-owned references to all the instances.
   # 
   def forget_all_instances
-    return super if namespace == self
-    namespace.forget_all_instances
+    namespace == self ? super : namespace.forget_all_instances
   end
 
   # Registers a hook to execute upon instantiation. Expects a unary block, whose
@@ -124,8 +121,7 @@ module NameMagic::ClassMethods
   # but before naming the instance.
   # 
   def new_instance_hook &block
-    return super if namespace == self
-    namespace.new_instance_hook &block
+    namespace == self ? super : namespace.new_instance_hook( &block )
   end
 
   # Registers a hook to execute upon instance naming. Expects a ternary block,
@@ -138,8 +134,7 @@ module NameMagic::ClassMethods
   # constant name.
   # 
   def name_set_hook &block
-    return super if namespace == self
-    namespace.name_set_hook &block
+    namespace == self ? super : namespace.name_set_hook( &block )
   end
 
   # Registers a hook to execute whenever the instance is asked its name. The
@@ -150,8 +145,7 @@ module NameMagic::ClassMethods
   # returned.
   # 
   def name_get_hook &block
-    return super if namespace == self
-    namespace.name_get_hook &block
+    namespace == self ? super : namespace.name_get_hook( &block )
   end
 
   # Sets the namespace for the class.
@@ -168,12 +162,11 @@ module NameMagic::ClassMethods
     nil.tap { self.namespace = self }
   end
 
-  # In addition the ability to name objects upon constant assignment, as common
-  # with eg. Class instances, NameMagic redefines class method #new so that it
-  # swallows the named argument :name (alias :ɴ), and takes care of naming the
-  # instance accordingly. Also, :name_avid named argument mey be supplied, which
-  # makes the naming avid (able to overwrite the name already in use by
-  # another object) if set to _true_.
+  # In addition the ability to name objects by constant assignment, +NameMagic+
+  # redefines #new method so as to swallow name argument +:name+ (alias :ɴ), and
+  # naming the constructed instance by it. Also, +:name_avid+ option may be
+  # supplied, which, if _true_, makes the instance capable of avid naming:
+  # Overwriting (stealing) a name already given to another instance.
   # 
   def new *args, &block
     oo = if args[-1].is_a? Hash then args.pop else {} end  # extract hash
@@ -199,9 +192,8 @@ module NameMagic::ClassMethods
   # Calls #new in _avid_ _mode_ (<tt>name_avid: true</tt>); see #new method for
   # avid mode explanation.
   # 
-  def avid *args, &block
-    oo = args[-1].is_a?( Hash ) ? args.pop : {} # extract options
-    new *args, oo.update( name_avid: true ), &block
+  def avid *ordered_args, **named_args, &block
+    new *ordered_args, **named_args.update( name_avid: true ), &block
   end
 
   private
@@ -215,6 +207,6 @@ module NameMagic::ClassMethods
   # Performs general name validation.
   # 
   def validate_name name
-    namespace == self ? super : namespace.validate_name name
+    namespace == self ? super : namespace.validate_name( name )
   end
 end # module NameMagic::ClassMethods

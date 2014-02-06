@@ -89,8 +89,7 @@ module NameMagic::NamespaceMethods
   # Deprecated method to get full names of the named instances.
   # 
   def instance_names
-    warn "Method #instance_names is deprecated. Use % instead!" %
-      '"instances._names_" or "instances.names"'
+    warn "Method #instance_names is deprecated. Use 'instances._names_' or 'instances.names' instead!"
     instances.names false
   end
 
