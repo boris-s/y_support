@@ -6,13 +6,13 @@ class Class
   # singleton method(s) named "symbol" be defined on the subclass, returning
   # "value".
   # 
-  def parametrize parameters, &block
+  def parametrize **parameters, &block
     Class.new( self ).tap do |subclass|
       parameters.each_pair { |symbol, value|
         subclass.define_singleton_method symbol do value end
       }
       subclass.define_singleton_method inspect do subclass.superclass.inspect + "<" end
-      subclass.class_exec &block
+      subclass.class_exec &block if block
     end
   end
 end
