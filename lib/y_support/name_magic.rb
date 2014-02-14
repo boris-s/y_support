@@ -177,7 +177,7 @@ module NameMagic
   # Without a block, this method acts as a getter.
   # 
   def name_set_hook &block
-    @name_set_hook = block if block
+    tap { @name_set_hook = block } if block
     @name_set_hook ||= -> name { nil }
   end
 
@@ -190,6 +190,6 @@ module NameMagic
   def honor_name_set_hooks suggested_name, old_name
     ɴ = namespace.name_set_hook.( suggested_name, self, old_name ).to_sym
     # puts "NameMagic: Name adjusted to #{name}." if DEBUG
-    namespace.validate_name( ɴ ).tap { |ɴ| name_set_hook.( ɴ ) }
+    namespace.validate_name( ɴ ).to_sym.tap { |ɴ| name_set_hook.( ɴ ) }
   end
 end # module NameMagic

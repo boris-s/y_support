@@ -196,17 +196,17 @@ module NameMagic::ClassMethods
     new *ordered_args, **named_args.update( name_avid: true ), &block
   end
 
+  # Performs general name validation.
+  # 
+  def validate_name name
+    namespace == self ? super : namespace.validate_name( name )
+  end
+
   private
 
   # Checks all the constants in some module's namespace, recursively.
   # 
   def serve_all_modules
     namespace == self ? super : namespace.serve_all_modules
-  end
-
-  # Performs general name validation.
-  # 
-  def validate_name name
-    namespace == self ? super : namespace.validate_name( name )
   end
 end # module NameMagic::ClassMethods
