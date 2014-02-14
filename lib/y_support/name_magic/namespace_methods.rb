@@ -151,10 +151,8 @@ module NameMagic::NamespaceMethods
   # nil</code>, which makes the instance anonymous, but still registered.)
   # 
   def forget instance_identifier, *args
-    inst = begin
-             instance( instance_identifier )
-           rescue ArgumentError
-             return nil            # nothing to forget
+    inst = begin; instance( instance_identifier ); rescue ArgumentError
+             return nil # nothing to forget
            end
     ɴ = inst.nil? ? nil : inst.name
     namespace.send :remove_const, ɴ if ɴ   # clear constant assignment
@@ -177,24 +175,24 @@ module NameMagic::NamespaceMethods
   # Clears namespace-owned references to all the anonymous instances.
   # 
   def forget_nameless_instances
-    nameless_instances.each { |inst, ɴ|
-      __instances__.delete inst
-      __avid_instances__.delete inst # also from here
+    nameless_instances.each { |inst|
+      __instances__.delete( inst )
+      __avid_instances__.delete( inst ) # also from avid instances
     }
   end
 
   # Clears namespace-owned references to all the instances.
   # 
   def forget_all_instances
-    __instances__.clear           # clears @instances
-    constants( false ).each { |ß| # clear constants in the namespace
-      namespace.send :remove_const, ß if const_get( ß ).is_a? self
+    __instances__.clear
+    constants( false ).each { |sym|
+      namespace.send :remove_const, sym if const_get( sym ).is_a? self
     }
   end
 
   # Registers a hook to execute upon instantiation. Expects a unary block, whose
   # argument represents the new instance. It is called right after instantiation,
-  # but before naming the instance.
+  # but before naming the instance. Without a block, it acts as a getter.
   # 
   def new_instance_hook &block
     @new_instance_hook = block if block
@@ -202,13 +200,13 @@ module NameMagic::NamespaceMethods
   end
 
   # Registers a hook to execute upon instance naming. Expects a ternary block,
-  # with arguments instance, name, old_name, representing respectively the
-  # instance to be named, the requested name, and the previous name of that
+  # with arguments name, instance and old_name, representing respectively the
+  # the requested name, the instance to be named, and the previous name of that
   # instance (if any). The output of the block should be the name to actually
   # be used. In other words, the hook can be used (among other things) to check
   # and/or modify the requested name when christening the instance. It is the
   # responsibility of this block to output a symbol that can be used as a Ruby
-  # constant name.
+  # constant name. Without a block, this method acts as a getter.
   # 
   def name_set_hook &block
     @name_set_hook = block if block
@@ -220,11 +218,20 @@ module NameMagic::NamespaceMethods
   # +@instances+ variable owned by the namespace. Normally, +NameMagic#name+
   # simply returns the name of the instance, as found in the +@instances+ hash.
   # When +name_get_hook+ is defined, this name is transformed by it before being
-  # returned.
+  # returned. Without a block, this method acts as a getter.
   # 
   def name_get_hook &block
     @name_get_hook = block if block
     @name_get_hook ||= -> name { name }
+  end
+
+  # Checks whether a name is acceptable as a constant name.
+  # 
+  def validate_name name
+    name.to_s.tap do |ɴ| # check if the name starts with 'A'..'Z'
+      fail NameError, "#{self}-registered name must start with a capital " +
+        " letter 'A'..'Z' ('#{ɴ}' given)!" unless ( ?A..?Z ) === ɴ[0]
+    end
   end
 
   private
@@ -235,38 +242,19 @@ module NameMagic::NamespaceMethods
     todo = ( nameless_instances + __avid_instances__ ).map( &:object_id ).uniq
     ObjectSpace.each_object Module do |ɱ|
       ɱ.constants( false ).each do |const_ß|
-        begin
-          ◉ = ɱ.const_get( const_ß ) # insurance against const. loading fails
-        rescue LoadError, StandardError; next end
-        next unless todo.include? ◉.object_id
+        begin; instance = ɱ.const_get( const_ß )  # Some constants cause
+        rescue LoadError, StandardError; next end # errors upon loading.
+        next unless todo.include? instance.object_id
         # puts "NameMagic: Anonymous object under #{const_ß}!" if DEBUG
-        if ◉.avid? then # puts "NameMagic: It is avid." if DEBUG
-          ◉.make_not_avid!    # 1. Remove it from the list of avid instances.
-          ◉.name! const_ß     # 2. Name it rudely.
+        if instance.avid? then # puts "NameMagic: It is avid." if DEBUG
+          instance.make_not_avid!                 # Remove from the avid list.
+          instance.name! const_ß                  # Name it rudely.
         else # puts "NameMagic: It is not avid." if DEBUG
-          ɴ = validate_name( name_set_hook.( const_ß, ◉, nil ) ).to_sym
-          # puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
-          conflicter = begin; const_get( ɴ ); rescue NameError; end
-          if conflicter then
-            msg = "Another #{self}-registered instance named '#{ɴ}' exists!"
-            fail NameError, msg unless conflicter == ◉
-          else # add the instance to the namespace
-            __instances__.update( ◉ => ɴ )
-            const_set( ɴ, ◉ )
-          end
+          instance.name = const_ß    # Name it cautiously.
         end
-        todo.delete ◉.object_id # remove the id from todo list
-        break if todo.empty?    # and break the loop if done
-      end # each
-    end # each_object Module
-  end # def search_all_modules
-
-  # Checks whether a name is acceptable as a constant name.
-  # 
-  def validate_name name
-    name.to_s.tap do |ɴ| # check whether the name starts with 'A'..'Z'
-      fail NameError, "#{self}-registered name must start with a capital " +
-        " letter 'A'..'Z' ('#{ɴ}' given)!" unless ( ?A..?Z ) === ɴ[0]
+        todo.delete instance.object_id            # Remove from todo list.
+        break if todo.empty?                      # Abandon the loop if done.
+      end
     end
   end
 end # module NameMagic::NamespaceMethods

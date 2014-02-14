@@ -128,41 +128,34 @@ module NameMagic
 
   # Names an instance, cautiously (ie. no overwriting of existing names).
   # 
-  def name=( ɴ )
-    old_ɴ = namespace.__instances__[ self ]    # previous name
-    if ɴ then # puts "NameMagic: Naming with argument #{ɴ}." if DEBUG
-      ɴ = namespace.send( :validate_name,      # honor the hook
-                          namespace.name_set_hook.( ɴ, self, old_ɴ ) ).to_sym
-      # puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
-      return if old_ɴ == ɴ                     # already named as required
-      fail NameError, "Name '#{ɴ}' already exists in #{namespace} namespace!" if
-        self.class.__instances__.rassoc( ɴ )
-      namespace.const_set ɴ, self           # write a constant
-      namespace.__instances__[ self ] = ɴ   # write to @instances
-      namespace.__forget__ old_ɴ            # forget the old name of self
-    else # puts "NameMagic: Unnaming #{old_ɴ || self}" if DEBUG
+  def name=( name )
+    old_ɴ = namespace.__instances__[ self ]         # previous name
+    if name.nil? then
       namespace.__instances__.update( self => nil ) # unname in @instances
       namespace.send :remove_const, old_ɴ if old_ɴ  # remove namespace const.
+    else
+      ɴ = honor_name_set_hooks( name, old_ɴ )
+      return if old_ɴ == ɴ                  # already named as required
+      fail NameError, "Name '#{ɴ}' already exists in #{namespace} namespace!" if
+        self.class.__instances__.rassoc( ɴ )
+      namespace.__forget__ old_ɴ            # forget the old name of self
+      namespace.const_set ɴ, self           # write a constant
+      namespace.__instances__[ self ] = ɴ   # write to @instances
     end
   end
 
   # Names an instance, aggresively (overwrites existing names).
   # 
-  def name!( ɴ )
+  def name!( name )
     old_ɴ = namespace.__instances__[ self ]   # previous name
-    if ɴ then # puts "NameMagic: Rudely naming with #{ɴ}." if DEBUG
-      ɴ = namespace.send( :validate_name,     # honor the hook
-                          namespace.name_set_hook.( ɴ, self, old_ɴ ) ).to_sym
-      # puts "NameMagic: Name adjusted to #{ɴ}." if DEBUG
-      return false if old_ɴ == ɴ # already named as required
-      pair = namespace.__instances__.rassoc( ɴ )
-      namespace.__forget__( pair[0] ) if pair # rudely forget the collider
-      namespace.const_set ɴ, self             # write a constant
-      namespace.__instances__[ self ] = ɴ     # write to @instances
-      namespace.__forget__ old_ɴ              # forget the old name of self
-    else
-      self.name = nil # unnaming, no collider issues
-    end
+    return self.name = nil if name.nil?       # no collider concerns
+    ɴ = honor_name_set_hooks( name, old_ɴ )
+    return false if old_ɴ == ɴ                # already named as required
+    pair = namespace.__instances__.rassoc( ɴ )
+    namespace.__forget__( pair[0] ) if pair   # rudely forget the collider
+    namespace.__forget__ old_ɴ                # forget the old name of self
+    namespace.const_set ɴ, self               # write a constant
+    namespace.__instances__[ self ] = ɴ       # write to @instances
   end
 
   # Is the instance avid for a name? (Will it overwrite other instance names?)
@@ -175,5 +168,28 @@ module NameMagic
   # 
   def make_not_avid!
     namespace.__avid_instances__.delete_if { |i| i.object_id == object_id }
+  end
+
+  # Registers a hook to execute upon instance naming. Instance's `#name_set_hook`
+  # Behaves analogically as namespace's `#name_set_hook`, and is executed right
+  # after the namespace's hook. Expects a block with a single argument, name of
+  # the instance. The return value of the block is not used and should be _nil_.
+  # Without a block, this method acts as a getter.
+  # 
+  def name_set_hook &block
+    @name_set_hook = block if block
+    @name_set_hook ||= -> name { nil }
+  end
+
+  private
+
+  # Honors name set hooks, first for the namespace, then for the instance.
+  # Takes 2 arguments, name and old name of this instance. Returns the final
+  # name to be used
+  # 
+  def honor_name_set_hooks suggested_name, old_name
+    ɴ = namespace.name_set_hook.( suggested_name, self, old_name ).to_sym
+    # puts "NameMagic: Name adjusted to #{name}." if DEBUG
+    namespace.validate_name( ɴ ).tap { |ɴ| name_set_hook.( ɴ ) }
   end
 end # module NameMagic
