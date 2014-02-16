@@ -4,7 +4,7 @@ require 'active_support/core_ext/hash/reverse_merge'
 
 class Hash
   class << self
-    # This kluge method guards against overwriting of the #slice method by
+    # This kludge method guards against overwriting of the #slice method by
     # ActiveSupport.
     # 
     def method_added( sym )
@@ -26,11 +26,8 @@ class Hash
             # 
             define_method sym do |matcher|
               self.class[ case matcher
-                          when Array then
-                            select { |key, _| matcher.include? key }
-                          else
-                            select { |key, _| matcher === key }
-                          end ]
+                          when Array then select { |k, _| matcher.include? k }
+                          else select { |k, _| matcher === k } end ]
             end
           end
 
@@ -49,8 +46,8 @@ class Hash
   # Applies a block as a mapping on all keys, returning a new hash.
   # 
   def with_keys
-    keys.each_with_object self.class.new do |hash_key, hsh|
-      hsh[ yield hash_key ] = self[ hash_key ]
+    keys.each_with_object self.class.new do |key, hsh|
+      hsh[ yield key ] = self[ key ]
     end
   end
 
@@ -58,8 +55,8 @@ class Hash
   # 2 arguments (key: value pair) and returns the new key.
   # 
   def modify_keys
-    each_with_object self.class.new do |hash_pair, hsh|
-      hsh[ yield( hash_pair ) ] = self[ hash_pair[0] ]
+    each_with_object self.class.new do |pair, hsh|
+      hsh[ yield pair ] = self[ pair[0] ]
     end
   end
 
@@ -79,25 +76,25 @@ class Hash
   # that takes 2 arguments (key: value pair) and returns the new value.
   # 
   def modify_values
-    each_with_object self.class.new do |hash_pair, ꜧ|
-      ꜧ[ hash_pair[0] ] = yield( hash_pair )
+    each_with_object self.class.new do |pair, hsh|
+      hsh[ pair[0] ] = yield pair
     end
   end
 
   # Like #modify_values, but modifies the receiver.
   # 
   def modify_values!
-    each_with_object self do |hash_pair, ꜧ|
-      ꜧ[ hash_pair[0] ] = yield( hash_pair )
+    each_with_object self do |pair, hsh|
+      hsh[ pair[0] ] = yield pair
     end
   end
 
   # Like #map that returns a hash.
   # 
   def modify
-    each_with_object self.class.new do |hash_pair, ꜧ|
-      key, val = yield hash_pair
-      ꜧ[key] = val
+    each_with_object self.class.new do |pair, hsh|
+      key, val = yield pair
+      hsh[key] = val
     end
   end
 
@@ -113,11 +110,8 @@ class Hash
   # 
   def slice matcher
     self.class[ case matcher
-                when Array then
-                  select { |key, _| matcher.include? key }
-                else
-                  select { |key, _| matcher === key }
-                end ]
+                when Array then select { |key, _| matcher.include? key }
+                else select { |key, _| matcher === key } end ]
   end
 
   # Makes hash keys accessible as methods. If the hash keys collide with
@@ -125,31 +119,27 @@ class Hash
   # option == true.
   # 
   def dot! overwrite_methods: false
-    keys.each do |key|
-      msg = "key #{key} of #dot!-ted hash is not convertible to a symbol"
-      fail ArgumentError, msg unless key.respond_to? :to_sym
-      msg = "#dot!-ted hash must not have key names colliding with its methods"
-      fail ArgumentError, msg if methods.include? key.to_sym unless
-        overwrite_methods
+    each_pair do |key, _|
+      fail ArgumentError, "key #{key} of #dot!-ted hash is not convertible " +
+        "to a symbol" unless key.respond_to? :to_sym
+      fail ArgumentError, "#dot!-ted hash must not have keys colliding with " +
+        "its methods" if methods.include? key.to_sym unless overwrite_methods
       define_singleton_method key.to_sym do self[key] end
-      define_singleton_method "#{key}=".to_sym do |value| self[key] = value end
+      define_singleton_method "#{key}=".to_sym do |val| self[key] = val end
     end
-    return self
   end
 
   # Pretty-prints the hash consisting of names as keys, and numeric values.
   # Takes 2 named arguments: +:gap+ and +:precision+.
   # 
   def pretty_print_numeric_values gap: 0, precision: 2
-    key_strings = keys.map &:to_s
+    lmax = keys.map( &:to_s ).map( &:size ).max
     value_strings = values.map { |n| "%.#{precision}f" % n rescue "%s" % n }
-    lmax, rmax = key_strings.map( &:size ).max, value_strings.map( &:size ).max
+    rmax = value_strings.map( &:size ).max
     lgap = gap / 2
     rgap = gap - lgap
-    key_strings.zip( value_strings ).map do |kς, vς|
-      "%- #{lmax+lgap+1}s%#{rmax+rgap+1}.#{precision}f" % [ kς, vς ]
-    end.each { |line| puts line }
-    return nil
+    line = "%- #{lmax+lgap+1}s%#{rmax+rgap+1}.#{precision}f"
+    puts keys.zip( values ).map &line.method( :% )
   end
 end
 
