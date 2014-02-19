@@ -34,7 +34,7 @@ class Object
       singleton_class.class_exec do
         define_method symbol do |*args, &block|
           return instance_variable_get "@#{symbol}" if args.empty? && block.nil?
-          super
+          super *args, &block
         end
       end
     }
