@@ -20,7 +20,7 @@ class Hash
         delete syn
         next true
       else
-        raise TErr, "Value collision between #{key} and its synonym #{syn}!"
+        raise TypeError, "Value collision between #{key} and its synonym #{syn}!"
       end
     end
   end
@@ -43,7 +43,7 @@ class Hash
     !merge_synonym_keys!( key, *options[:syn!] ).nil?
   end
   
-  # This enforcer method (aka. runtime assertion) raises TypeError when:
+  # This runtime assertion raises TypeError when:
   # 1. Neither the required key nor any of its synonyms are present.
   # 2. The supplied criterion block, if any, returns false when applied
   # to the value of the key in question. If the block takes an argument
@@ -52,25 +52,46 @@ class Hash
   # receiver (using #instance_exec method).
   # 
   def aT_has key, options={}, &b
-    raise TErr, "Key '#{key}' absent!" unless has? key, options
-    # Now validate self[key] using the supplied block
-    if block_given?
-      m = "Value for #{key} fails its duck type!"
-      raise TErr, m unless ( b.arity == 0 ? self[key].instance_exec( &b ) :
-                               b.( self[key] ) )
+    fail TypeError, "Key '#{key}' absent!" unless has? key, options
+    self[key].tap do |val|
+      fail TypeError, "Value for #{key} of wrong type!" unless
+        ( b.arity == 0 ? val.instance_exec( &b ) : b.( val ) ) if b
     end
-    return self[key]
   end
   alias :must_have :aT_has
 
   # This method behaves exactly like #aT_has, but with the difference, that
   # it raises ArgumentError instead of TypeError
   # 
-  def aE_has key, options={}, &b
-    begin
-      options.empty? ? aT_has( key, &b ) : aT_has( key, options, &b )
-    rescue TypeError => e
-      raise AErr, e.message
+  def aA_has key, options={}, &b
+    fail ArgumentError, "Key '#{key}' absent!" unless has? key, options
+    self[key].tap do |val|
+      fail ArgumentError, "Value for #{key} of wrong type!" unless
+        ( b.arity == 0 ? val.instance_exec( &b ) : b.( val ) ) if b
     end
+  end
+
+  # Fails with TypeError unless the receiver's `#empty?` returns _true_.
+  # 
+  def aT_empty what_is_receiver="hash"
+    tap { empty? or fail TypeError, "%s not empty".X!( what_is_receiver ) }
+  end
+
+  # Fails with TypeError unless the receiver's `#empty?` returns _false_.
+  # 
+  def aT_not_empty what_is_receiver="hash"
+    tap { empty? and fail TypeError, "%s empty".X!( what_is_receiver ) }
+  end
+
+  # Fails with ArgumentError unless the receiver's `#empty?` returns _true_.
+  # 
+  def aA_empty what_is_receiver="hash"
+    tap { empty? or fail ArgumentError, "%s not empty".X!( what_is_receiver ) }
+  end
+
+  # Fails with ArgumentError unless the receiver's `#empty?` returns _false_.
+  # 
+  def aA_not_empty what_is_receiver="hash"
+    tap { empty? and fail ArgumentError, "%s empty".X!( what_is_receiver ) }
   end
 end

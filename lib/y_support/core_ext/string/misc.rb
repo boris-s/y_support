@@ -32,7 +32,7 @@ class String
       .gsub("\n", "")
       .strip
   end
-  
+
   # Joins a paragraph of possibly indented, newline separated lines into a
   # single contiguous string.
   # 
@@ -43,19 +43,19 @@ class String
       .delete_if( &:blank? )         # delete blank lines
       .join " "                      # and join with whitspace
   end
-  
+
   # If the string is empty, it gets replace with the string given as argument.
   # 
   def default! default_string
     strip.empty? ? clear << default_string.to_s : self
   end
-  
+
   # As it says – replaces spaces with underscores.
   # 
   def underscore_spaces
     gsub ' ', '_'
   end
-  
+
   # Converts a string into a standard symbol. While Symbol class objects can
   # be created from any string, it is good practice to keep symbols free of
   # whitespaces and weird characters, so that the are typed easily, usable as
@@ -70,7 +70,7 @@ class String
       .squeeze(" ")
       .underscore_spaces
   end
-  
+
   # Applies #standardize to the receiver and converts the result to a symbol.
   # 
   def to_standardized_sym
@@ -78,7 +78,7 @@ class String
       .to_sym
   end
 
-  # Capitalizes a string and append an exclamation mark. Also allows optional
+  # Capitalizes a string and appends an exclamation mark. Also allows optional
   # argument for string interpolation. Handy for constructing error messages.
   # 
   def X! arg=nil
