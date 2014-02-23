@@ -68,12 +68,15 @@ class TypingTest < Test::Unit::TestCase
     end
     
     should "have #aT_complies" do
-      Koko = Class.new; Pipi = Class.new
-      koko = Koko.new; pipi = Pipi.new
-      pipi.declare_class_compliance! koko.class
-      assert_raise TypeError do koko.aT_class_complies pipi.class end
+      Koko, Pipi = Class.new, Class.new
+      koko, pipi = Koko.new, Pipi.new
+      assert Koko.compliance.include? Object
+      assert Koko.complies? Object
+      assert koko.class_complies? Object
       assert_nothing_raised do koko.aT_class_complies koko.class end
       assert_nothing_raised do pipi.aT_class_complies pipi.class end
+      assert_raise TypeError do koko.aT_class_complies pipi.class end
+      pipi.declare_class_compliance! koko.class
       assert_nothing_raised do pipi.aT_class_complies koko.class end
       assert_raise TypeError do koko.aT_class_complies Pipi end
       assert_nothing_raised do pipi.aT_class_complies Pipi end

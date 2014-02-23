@@ -6,8 +6,7 @@ class Module
   # Compliance inquirer (declared compliance + ancestors).
   # 
   def complies?( other_module )
-    other_module.aT_kind_of Module, "other module"
-    compliance.include? other_module
+    compliance.include? other_module.aT_kind_of( Module, "other module" )
   end
 
   # Declared complience inquirer.
