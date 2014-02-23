@@ -39,7 +39,7 @@ class Array
   # fails to include the specified element. An optional argument customizes the
   # error message (element description).
   # 
-  def aT_includes element, what_is_self="array", what_is_element=nil
+  def aA_includes element, what_is_self="array", what_is_element=nil
     m = "%s is absent from #{what_is_self}!" %
       if what_is_element then what_is_element.to_s.capitalize else
         "Element (#{element.class} instance)"
