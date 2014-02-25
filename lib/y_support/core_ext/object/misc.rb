@@ -48,7 +48,7 @@ class Object
   # 
   def param_class( hash, with: {} )
     hash.each { |ß, ç|
-      sub = ç.parametrize( **with )
+      sub = ç.parametrize( with )
       set_attr_with_readers( ß => sub )
     }
     return nil
@@ -60,7 +60,7 @@ class Object
   # 
   def param_class!( hash, with: {} )
     hash.each { |ß, ç|
-      sub = ç.parametrize( **with )
+      sub = ç.parametrize( with )
       set_attr_with_readers!( ß => sub )
     }
     return nil

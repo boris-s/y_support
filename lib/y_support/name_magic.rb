@@ -181,6 +181,18 @@ module NameMagic
     @name_set_hook ||= -> name { nil }
   end
 
+  # Default +#to_s+ method for +NameMagic+ includers, returning the name.
+  # 
+  def to_s
+    name ? name.to_s : super
+  end
+
+  # Default +#inspect+ method for +NameMagic+ includers.
+  # 
+  def inspect
+    to_s
+  end
+
   private
 
   # Honors name set hooks, first for the namespace, then for the instance.
