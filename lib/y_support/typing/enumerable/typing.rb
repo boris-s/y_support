@@ -14,7 +14,7 @@ module Enumerable
     e = what_is_collection_element || "collection element"
     if block_given?
       m = "Each #{e} must %s!" %
-        ( how_comply ? how_comply : "comply with the given duck type" )
+        ( how_comply ? how_comply : "comply with the specification" )
       raise TErr, m unless ( b.arity == 0 ?
                              all? { |e| e.instance_exec( &b ) } :
                              all? { |e| b.( e ) } )
