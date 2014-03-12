@@ -16,9 +16,10 @@ class Module
 
   # Defines a set of methods by applying the block on the return value of
   # another set of methods. Accepts a hash of pairs { mapped_method_symbol =>
-  # original_method_symbol } and a block with which to perform mapping.
+  # original_method_symbol } and a block which to chain to the original
+  # method result.
   # 
-  def map! **hash, &block
+  def chain **hash, &block
     hash.each_pair { |mapped_method_symbol, original_method_symbol|
       define_method mapped_method_symbol do |*args, &b|
         block.( send original_method_symbol, *args, &b )
