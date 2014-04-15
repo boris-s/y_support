@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# encoding: utf-8
+
 class Symbol
   # This method applies String#default! method to the receiver converted to
   # a string. Of course, symbols are immutable, so in spite of the exclamation
