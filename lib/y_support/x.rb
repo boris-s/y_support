@@ -1,5 +1,3 @@
-puts "hello from y_support/x!"
-
 # Assets related to X windows control.
 # 
 module YSupport::X
