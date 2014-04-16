@@ -1,1 +1,1 @@
-puts "Hello from #{File.basename(__FILE__)}"
+require 'y_support/core_ext/object/typing'
