@@ -5,7 +5,7 @@ require 'minitest/autorun'
 
 describe Object do
   before do
-    require 'y_support/core_ext/object'
+    require './../lib/y_support/core_ext/object'
   end
 
   it "should have #param_class" do
@@ -20,7 +20,7 @@ end
 
 describe Module do
   before do
-    require 'y_support/core_ext/module'
+    require './../lib/y_support/core_ext/module'
   end
 
   it "has #const_set_if_not_defined and #const_reset!" do
@@ -40,7 +40,7 @@ end
 
 describe Class do
   before do
-    require 'y_support/core_ext/class'
+    require './../lib/y_support/core_ext/class'
   end
 
   it "has #parametrize method" do
@@ -54,7 +54,7 @@ end
 
 describe Enumerable do
   before do
-    require 'y_support/core_ext/enumerable'
+    require './../lib/y_support/core_ext/enumerable'
   end
 
   it "should introduce #all_kind_of? collection qualifier" do
@@ -78,7 +78,7 @@ end
 
 describe Array do
   before do
-    require 'y_support/core_ext/array'
+    require './../lib/y_support/core_ext/array'
   end
 
   it "has #arrays_to_hash" do
@@ -140,7 +140,7 @@ end
 
 describe Hash do
   before do
-    require 'y_support/core_ext/hash'
+    require './../lib/y_support/core_ext/hash'
   end
 
   it "should have #default! custom defaulter" do
@@ -211,7 +211,7 @@ end
 describe "Matrix" do
   before do
     require 'matrix'
-    require 'y_support/stdlib_ext/matrix'
+    require './../lib/y_support/stdlib_ext/matrix'
   end
 
   it "should have #pp method" do
@@ -261,7 +261,7 @@ end
 
 describe String do
   before do
-    require 'y_support/core_ext/string'
+    require './../lib/y_support/core_ext/string'
   end
 
   it "should have #can_be_integer? returning the integer or false if not convertible" do
@@ -317,7 +317,7 @@ end
 
 describe Symbol do
   before do
-    require 'y_support/core_ext/symbol'
+    require './../lib/y_support/core_ext/symbol'
   end
 
   it "should have #default! defaulter going through String#default!" do
@@ -336,7 +336,7 @@ end
 
 describe Numeric do
   before do
-    require 'y_support/core_ext/numeric'
+    require './../lib/y_support/core_ext/numeric'
   end
 
   it "should have #zero public class methods" do

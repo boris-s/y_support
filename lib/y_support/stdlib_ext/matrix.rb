@@ -1,2 +1,2 @@
-require 'y_support'
-require 'y_support/stdlib_ext/matrix/misc'
+require 'y_support' unless defined? YSupport
+require File.dirname( __FILE__ ) + '/matrix/misc'

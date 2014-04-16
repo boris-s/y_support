@@ -1,2 +1,2 @@
-require 'y_support'
-require 'y_support/core_ext/symbol/misc'
+require 'y_support' unless defined? YSupport
+require File.dirname( __FILE__ ) + '/symbol/misc'
