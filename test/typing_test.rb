@@ -1,23 +1,20 @@
-#! /Usr/Bin/ruby
-#encoding: utf-8
+#! /usr/bin/ruby
+# encoding: utf-8
 
-require 'test/unit'
-require 'shoulda'
-require 'y_support/typing'
+require 'minitest/autorun'
 
-class TypingTest < Test::Unit::TestCase
-  P = Class.new
-  K = Class.new
-  L = Module.new
+describe "y_support/typing" do
+  before do
+    require './../lib/y_support/typing'
+    P, K, L = Class.new, Class.new, Module.new
+  end
 
-  context "with some classes" do
-    setup do
-      @p = P.new
-      @k = K.new
-      @l = L
+  describe "with some classes" do
+    before do
+      @p, @k, @l = P.new, K.new, L
     end
 
-    should "have working class compliance methods" do
+    it "should have working class compliance methods" do
       assert @p.class_complies?( @p.class )
       assert ! @p.class_complies?( @k.class )
       @p.declare_class_compliance! @k.class
@@ -32,12 +29,8 @@ class TypingTest < Test::Unit::TestCase
     end
   end
 
-  context "general" do
-    should "have AErr alias for ArgumentError" do
-      assert_equal ::ArgumentError, ::AErr
-    end
-    
-    should "have #aT raising TypeError if block falsey" do
+  describe "in general" do
+    it "should have #aT raising TypeError if block falsey" do
       assert_raise TypeError do 0.aT "yada yada" do |rcvr| rcvr == 1 end end
       assert_nothing_raised do 0.aT "yada yada" do |rcvr| rcvr == 0 end end
       assert_equal( "hello",
@@ -48,8 +41,8 @@ class TypingTest < Test::Unit::TestCase
       assert_raise TypeError do 3.aT &:even? end
       assert_raise TypeError do nil.aT end
     end
-    
-    should "have #aT_not raising TypeError if block truey" do
+
+    it "should have #aT_not raising TypeError if block truey" do
       assert_raise TypeError do 0.aT_not { |rcvr| rcvr < 1 } end
       assert_nothing_raised do 1.aT_not { |rcvr| rcvr == 2 } end
       assert_equal( "hello", "hello".aT_not( "have x" ) { |rcvr| rcvr.include? 'x' } )
@@ -58,7 +51,7 @@ class TypingTest < Test::Unit::TestCase
       assert_raise TypeError do "".aT_not end
     end
     
-    should "have #aT_kind_of, alias #aT_is_a TypeError enforcers" do
+    it "should have #aT_kind_of, alias #aT_is_a TypeError enforcers" do
       assert_raise TypeError do :o.aT_kind_of Numeric end
       assert_nothing_raised do 0.aT_kind_of Numeric end
       assert_equal( "hello", "hello".aT_kind_of( String ) )
@@ -67,7 +60,7 @@ class TypingTest < Test::Unit::TestCase
       assert_equal( "hello", "hello".aT_is_a( String ) )
     end
     
-    should "have #aT_complies" do
+    it "should have #aT_complies" do
       Koko, Pipi = Class.new, Class.new
       koko, pipi = Koko.new, Pipi.new
       assert Koko.compliance.include? Object
@@ -84,75 +77,74 @@ class TypingTest < Test::Unit::TestCase
       assert_equal koko, koko.aT_class_complies( Koko )
     end
     
-    should "have #aT_respond_to assertion" do
+    it "should have #aT_respond_to assertion" do
       assert_raise TypeError do :o.aT_respond_to :each end
       assert_nothing_raised do {}.aT_respond_to :each end
       assert_equal( [:hello], [:hello].aT_respond_to( :each ) )
     end
     
-    should "have #aT_equal enforcer" do
+    it "should have #aT_equal enforcer" do
       assert_raise TypeError do 0.aT_equal 1 end
       assert_nothing_raised do 1.aT_equal 2.0/2.0 end
       assert_equal( "hello", "hello".aT_equal( " hello ".strip ) )
     end
     
-    should "have #aT_not_equal enforcer" do
+    it "should have #aT_not_equal enforcer" do
       assert_raise TypeError do 1.aT_not_equal 1.0 end
       assert_nothing_raised do 7.aT_not_equal 42 end
       assert_equal( "hello", "hello".aT_not_equal( "goodbye" ) )
     end
     
-    should "have #aT_blank enforcer" do
+    it "should have #aT_blank enforcer" do
       assert_raise TypeError do "x".aT_blank end
       assert_nothing_raised do ["", []].each{|e| e.aT_blank } end
       assert_equal( {}, {}.aT_blank )
     end
     
-    should "have #aT_present enforcer" do
+    it "should have #aT_present enforcer" do
       assert_raise TypeError do nil.aT_present end
       assert_nothing_raised do 0.aT_present end
       assert_equal( "hello", "hello".aT_present )
     end
   end
+
+  describe "Enumerable" do
+    it "should have #aT_all enforcer" do
+      -> { [1, 2, 7].aT_all { |e| e < 5 } }.must_raise TypeError
+      assert [1, 2, 4].aT_all { |e| e < 5 }
+    end
+
+    it "should have #aT_all_kind_of enforcer" do
+      -> { [1.0, 2.0, :a].aT_all_kind_of Numeric }.must_raise TypeError
+      assert [1.0, 2.0, 3].aT_all_kind_of Numeric
+    end
+
+    it "should have #aT_all_comply class compliance enforcer" do
+      -> { [1.0, 2.0, :a].aT_all_comply Numeric }.must_raise TypeError
+      assert [1.0, 2.0, 3].aT_all_comply Numeric
+    end
+
+    it "should have #aT_all_numeric enforcer" do
+      -> { [:a].aT_all_numeric }.must_raise TypeError
+      assert [1, 2.0].aT_all_numeric
+    end
     
-  context "Enumerable" do
-    should "have #aT_all enforcer" do
-      assert_raise TypeError do [1, 2, 7].aT_all { |e| e < 5 } end
-      assert_nothing_raised do [1, 2, 4].aT_all { |e| e < 5 } end
+    it "should have #aT_subset_of enforcer" do
+      -> { [6].aT_subset_of [*0..5] }.must_raise TypeError
+      assert [1,2].aT_subset_of [*0..5]
     end
+  end # describe "Enumerable"
 
-    should "have #aT_all_kind_of enforcer" do
-      assert_raise TypeError do [1.0, 2.0, :a].aT_all_kind_of Numeric end
-      assert_nothing_raised do [1.0, 2.0, 3].aT_all_kind_of Numeric end
-    end
-
-    should "have #aT_all_comply class compliance enforcer" do
-      assert_raise TypeError do [1.0, 2.0, :a].aT_all_comply Numeric end
-      assert_nothing_raised do [1.0, 2.0, 3].aT_all_comply Numeric end
-    end
-
-    should "have #aT_all_numeric enforcer" do
-      assert_raise TypeError do [:a].aT_all_numeric end
-      assert_nothing_raised do [1, 2.0].aT_all_numeric end
-    end
-    
-    should "have #aT_subset_of enforcer" do
-      assert_raise TypeError do [6].aT_subset_of [*0..5] end
-      assert_nothing_raised do [1,2].aT_subset_of [*0..5] end
-    end
-  end # context Enumerable
-
-  context "Array" do
-    should "have #aT_includes (alias #aT_include) enforcer" do
-      assert_raise TypeError do [1, 2, 4].aT_includes 3 end
-      assert_nothing_raised do [1, 2, 4].aT_includes( 4 ).aT_include( 4 ) end
-      assert_equal [6, 7], [6, 7].aT_includes( 6 )
+  describe "Array" do
+    it "should have #aT_includes (alias #aT_include) enforcer" do
+      -> { [1, 2, 4].aT_include 3 }.must_raise TypeError
+      assert [1, 2, 4].aT_include( 4 )
       assert_equal [6, 7], [6, 7].aT_include( 6 )
     end
-  end # context Array
+  end # describe Array
 
-  context "Hash" do
-    should "have #merge_synonym_keys! method" do
+  describe "Hash" do
+    it "should have #merge_synonym_keys! method" do
       a = { a: 'a', b: 'b', k: 'k', o: 'k', t: 'k' }
       old = a.dup
       assert_respond_to a, :merge_synonym_keys!
@@ -163,18 +155,18 @@ class TypingTest < Test::Unit::TestCase
       assert_equal true, a.merge_synonym_keys!( :k, :o, :t )
       assert_equal( { a: 'a', b: 'b', k: 'k' }, a )
       old = a.dup
-      assert_raise TypeError do a.merge_synonym_keys!( :a, :b ) end
+      -> { a.merge_synonym_keys!( :a, :b ) }.must_raise TypeError
       assert_equal old, a
       assert_equal true, a.merge_synonym_keys!( :c, :b )
       assert_equal( { a: 'a', c: 'b', k: 'k' }, a )
     end
     
-    should "have #may_have synonym key merger" do
+    it "should have #may_have synonym key merger" do
       a = { a: 'a', b: 'b', k: 'k', o: 'k', t: 'k' }
       assert_respond_to a, :may_have
       old = a.dup
-      assert_nothing_raised do a.may_have :z end
-      assert_nothing_raised do a.has? :z end
+      assert ! a.may_have( :z )
+      assert ! a.has?( :z )
       assert_raises TypeError do a.may_have( :a, syn!: :b ) end
       assert_raises TypeError do a.has?( :a, syn!: :b ) end
       assert_equal false, a.has?( :z )
@@ -191,26 +183,26 @@ class TypingTest < Test::Unit::TestCase
       assert_equal( { a: 'a', c: 'b', k: 'k' }, a )
     end
     
-    should "have #aT_has synonymizing enforcer" do
+    it "should have #aT_has synonymizing enforcer" do
       a = { infile: 'a', csv_out_file: 'b', k: 'k', o: 'k', t: 'k' }
       assert_respond_to a, :aT_has
       old = a.dup
       assert_raises TypeError do a.aT_has :z end
-      assert_nothing_raised do a.aT_has :infile end
-      assert_nothing_raised do a.aT_has :csv_out_file end
+      assert a.aT_has :infile
+      assert a.aT_has :csv_out_file
       class TestClass; def initialize( args )
                          args.aT_has :infile
                          args.aT_has :csv_out_file
                          args.aT_has :k
                        end end
-      assert_nothing_raised do TestClass.new a end
+      assert TestClass.new a
       assert_raises TypeError do a.aT_has( :a, syn!: :b ) end
       assert_equal "a", a.aT_has( :infile )
       assert_equal "k", a.aT_has( :k, syn!: [:o, :t] )
       assert_equal "b", a.aT_has( :c, syn!: :csv_out_file )
       assert_equal( { infile: 'a', c: 'b', k: 'k' }, a )
       assert_raises TypeError do a.aT_has(:c) {|val| val == 'c'} end
-      assert_nothing_raised do a.aT_has(:c) {|val| val == 'b'} end
+      assert a.aT_has(:c) {|val| val == 'b'}
     end
-  end # context Hash
-end # class ScruplesTest
+  end # describe Hash
+end

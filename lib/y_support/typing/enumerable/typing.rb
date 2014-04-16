@@ -13,12 +13,12 @@ module Enumerable
     if block_given?
       m = "Each #{e} must %s!" %
         ( how_comply ? how_comply : "comply with the specification" )
-      raise TypeError, m unless ( b.arity == 0 ?
-                                  all? { |e| e.instance_exec( &b ) } :n
-                                  all? { |e| b.( e ) } )
+      fail TypeError, m unless ( b.arity == 0 ?
+                                 all? { |e| e.instance_exec( &b ) } :
+                                 all? { |e| b.( e ) } )
     else
       m = "No #{e} must be nil or false!"
-      raise TypeError, m unless all? { |e| e }
+      fail TypeError, m unless all? { |e| e }
     end
     return self
   end
@@ -30,7 +30,7 @@ module Enumerable
   def aT_all_kind_of klass, what_is_collection_element=nil
     e = what_is_collection_element || "collection element"
     m = "Each #{e} must be kind of #{klass}!"
-    raise TypeError, m unless all? { |e| e.kind_of? klass }
+    fail TypeError, m unless all? { |e| e.kind_of? klass }
     return self
   end
 
@@ -41,7 +41,7 @@ module Enumerable
   def aT_all_comply klass, what_is_collection_element=nil
     e = what_is_collection_element || "collection element"
     m = "Each #{e} must declare compliance to #{klass}!"
-    raise TypeError, m unless all? { |e| e.class_complies? klass }
+    fail TypeError, m unless all? { |e| e.class_complies? klass }
     return self
   end
   
@@ -52,7 +52,7 @@ module Enumerable
   def aT_all_numeric what_is_collection_element=nil
     e = what_is_collection_element || "collection element"
     m = "Each #{e} must declare compliance with Numeric!"
-    raise TypeError, m unless all? { |e| e.class_complies? Numeric }
+    fail TypeError, m unless all? { |e| e.class_complies? Numeric }
     return self
   end
   
@@ -67,7 +67,7 @@ module Enumerable
     oc = what_is_other_collection ? what_is_other_collection.to_s.capitalize :
       "the specified collection"
     m = "The #{rc} must be a subset of #{oc}"
-    raise TypeError, m unless all? { |e| other_collection.include? e }
+    fail TypeError, m unless all? { |e| other_collection.include? e }
     return self
   end
 end
