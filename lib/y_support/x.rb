@@ -1,3 +1,5 @@
+require 'y_support'
+
 # Assets related to X windows control.
 # 
 module YSupport::X
@@ -8,7 +10,6 @@ module YSupport::X
     system s
   end
 
-  
   # Echo a string to the secondary X clip; `xsel -b -i`.
   # 
   def echo_secondary_clipboard string
