@@ -1,1 +1,3 @@
-puts "Hello from #{File.basename(__FILE__)}"
+Dir["#{File.dirname( __FILE__ )}/core_ext/*.rb"].sort.each do |path|
+  require "y_support/core_ext/#{File.basename( path, '.rb' )}"
+end
