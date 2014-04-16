@@ -1,5 +1,4 @@
 # encoding: utf-8
-puts "Hello from #{File.basename(__FILE__)}"
 
 require 'y_support'
 
