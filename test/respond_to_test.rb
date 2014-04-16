@@ -14,7 +14,7 @@ describe "y_support/typing" do
     end
   end
 
-  describe RespondTo do
+  describe "RespondTo" do
     it "should work" do
       assert_respond_to( RespondTo.new(:hello), :=== )
       assert RespondTo.new(:each_char) === "arbitrary string"

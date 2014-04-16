@@ -2,7 +2,7 @@
 #encoding: utf-8
 
 require 'minitest/autorun'
-require 'y_support/name_magic'
+require './../lib/y_support/name_magic'
 
 describe NameMagic do
   before do
