@@ -31,33 +31,33 @@ describe "y_support/typing" do
 
   describe "in general" do
     it "should have #aT raising TypeError if block falsey" do
-      assert_raise TypeError do 0.aT "yada yada" do |rcvr| rcvr == 1 end end
-      assert_nothing_raised do 0.aT "yada yada" do |rcvr| rcvr == 0 end end
+      -> { 0.aT "yada yada" do |rcvr| rcvr == 1 end }.must_raise TypeError
+      assert 0.aT "yada yada" do |rcvr| rcvr == 0 end
       assert_equal( "hello",
                     "hello".aT( "have 4 unique letters" ) { |str|
                       str.each_char.map { |e| e }.uniq.join.size == 4
                     } )
-      assert_nothing_raised do 2.aT &:even? end
-      assert_raise TypeError do 3.aT &:even? end
-      assert_raise TypeError do nil.aT end
+      assert 2.aT &:even?
+      -> { 3.aT &:even? }.must_raise TypeError
+      -> { nil.aT }.must_raise TypeError
     end
 
     it "should have #aT_not raising TypeError if block truey" do
-      assert_raise TypeError do 0.aT_not { |rcvr| rcvr < 1 } end
-      assert_nothing_raised do 1.aT_not { |rcvr| rcvr == 2 } end
+      -> { 0.aT_not { |rcvr| rcvr < 1 } }.must_raise TypeError
+      assert 1.aT_not { |rcvr| rcvr == 2 }
       assert_equal( "hello", "hello".aT_not( "have x" ) { |rcvr| rcvr.include? 'x' } )
-      assert_nothing_raised do 3.aT_not &:even? end
-      assert_raise TypeError do 2.aT_not &:even? end
-      assert_raise TypeError do "".aT_not end
+      assert 3.aT_not &:even?
+      -> { 2.aT_not &:even? }.must_raise TypeError
+      -> { "".aT_not }.must_raise TypeError
     end
     
     it "should have #aT_kind_of, alias #aT_is_a TypeError enforcers" do
-      assert_raise TypeError do :o.aT_kind_of Numeric end
-      assert_nothing_raised do 0.aT_kind_of Numeric end
-      assert_equal( "hello", "hello".aT_kind_of( String ) )
-      assert_raise TypeError do :o.aT_is_a Numeric end
-      assert_nothing_raised do 0.aT_is_a Numeric end
-      assert_equal( "hello", "hello".aT_is_a( String ) )
+      -> { :o.aT_kind_of Numeric }.must_raise TypeError
+      assert 0.aT_kind_of Numeric
+      assert_equal "hello", "hello".aT_kind_of( String )
+      -> { :o.aT_is_a Numeric }.must_raise TypeError
+      assert 0.aT_is_a Numeric
+      assert_equal "hello", "hello".aT_is_a( String )
     end
     
     it "should have #aT_complies" do
@@ -66,44 +66,44 @@ describe "y_support/typing" do
       assert Koko.compliance.include? Object
       assert Koko.complies? Object
       assert koko.class_complies? Object
-      assert_nothing_raised do koko.aT_class_complies koko.class end
-      assert_nothing_raised do pipi.aT_class_complies pipi.class end
-      assert_raise TypeError do koko.aT_class_complies pipi.class end
+      assert koko.aT_class_complies koko.class
+      assert pipi.aT_class_complies pipi.class
+      -> { koko.aT_class_complies pipi.class }.must_raise TypeError
       pipi.declare_class_compliance! koko.class
-      assert_nothing_raised do pipi.aT_class_complies koko.class end
-      assert_raise TypeError do koko.aT_class_complies Pipi end
-      assert_nothing_raised do pipi.aT_class_complies Pipi end
-      assert_nothing_raised do pipi.aT_class_complies Koko end
+      assert pipi.aT_class_complies koko.class
+      -> { koko.aT_class_complies Pipi }.must_raise TypeError
+      assert pipi.aT_class_complies Pipi
+      assert pipi.aT_class_complies Koko
       assert_equal koko, koko.aT_class_complies( Koko )
     end
     
     it "should have #aT_respond_to assertion" do
-      assert_raise TypeError do :o.aT_respond_to :each end
-      assert_nothing_raised do {}.aT_respond_to :each end
-      assert_equal( [:hello], [:hello].aT_respond_to( :each ) )
+      -> { :o.aT_respond_to :each }.must_raise TypeError
+      assert( {}.aT_respond_to :each )
+      assert_equal [:hello], [:hello].aT_respond_to( :each )
     end
     
     it "should have #aT_equal enforcer" do
-      assert_raise TypeError do 0.aT_equal 1 end
-      assert_nothing_raised do 1.aT_equal 2.0/2.0 end
+      -> { 0.aT_equal 1 }.must_raise TypeError
+      assert 1.aT_equal 2.0/2.0
       assert_equal( "hello", "hello".aT_equal( " hello ".strip ) )
     end
     
     it "should have #aT_not_equal enforcer" do
-      assert_raise TypeError do 1.aT_not_equal 1.0 end
-      assert_nothing_raised do 7.aT_not_equal 42 end
+      -> { 1.aT_not_equal 1.0 }.must_raise TypeError
+      assert 7.aT_not_equal 42
       assert_equal( "hello", "hello".aT_not_equal( "goodbye" ) )
     end
     
     it "should have #aT_blank enforcer" do
-      assert_raise TypeError do "x".aT_blank end
-      assert_nothing_raised do ["", []].each{|e| e.aT_blank } end
+      -> { "x".aT_blank }.must_raise TypeError
+      assert ["", []].each{|e| e.aT_blank }
       assert_equal( {}, {}.aT_blank )
     end
     
     it "should have #aT_present enforcer" do
-      assert_raise TypeError do nil.aT_present end
-      assert_nothing_raised do 0.aT_present end
+      -> { nil.aT_present }.must_raise TypeError
+      assert 0.aT_present
       assert_equal( "hello", "hello".aT_present )
     end
   end
