@@ -1,3 +1,4 @@
 module YSupport
-  VERSION = "0.0.1"
+  VERSION = "2.1.12"
+  DEBUG = false
 end
