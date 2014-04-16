@@ -1,41 +1,38 @@
 #! /usr/bin/ruby
 #encoding: utf-8
 
-require 'test/unit'
-require 'shoulda'
+require 'minitest/autorun'
 
-# This whole test is one big FIXME
-
-class AbstractAlgebraTest < Test::Unit::TestCase
-  context "Algebra" do
-    setup do
-      require 'y_support/abstract_algebra'
-      # Define the stupidest monoid:
-      @monoid = Class.new { include Algebra::Monoid } # make some class
-      zero = @monoid.new         # call arbitrary instance zero
-      @monoid.class_exec {
-        # Define the stupidest #add method.
-        define_method :add do |other|
-          if self == zero then other
-          elsif other == zero then self
-          else self.class.addition_table[[self, other]] end
-        end
-        # Define the stupidest addition table.
-        instance_variable_set :@addition_table,                      
-                              Hash.new { |ꜧ, k|
-                                ꜧ[k] = if k[0].object_id <= k[1].object_id
-                                         new # just make up an instance
-                                       else
-                                         ꜧ[k[1], k[0]] # swap operands
-                                       end
-                              }
+describe "Algebra" do
+  before do
+    require './../lib/y_support/abstract_algebra'
+    # Define the stupidest monoid:
+    @monoid = Class.new { include Algebra::Monoid } # make some class
+    zero = @monoid.new         # call arbitrary instance zero
+    @monoid.class_exec {
+      # Define the stupidest #add method.
+      define_method :add do |other|
+        if self == zero then other
+        elsif other == zero then self
+        else self.class.addition_table[[self, other]] end
+      end
+      # Define the stupidest addition table.
+      instance_variable_set :@addition_table,                      
+      Hash.new { |ꜧ, k|
+        ꜧ[k] = if k[0].object_id <= k[1].object_id
+                 new # just make up an instance
+               else
+                 ꜧ[k[1], k[0]] # swap operands
+               end
       }
-      # And refine the @monoid's singleton class.
-      @monoid.singleton_class.class_exec { attr_reader :addition_table }
-      @monoid.define_singleton_method :additive_identity do zero end
-    end
+    }
+    # And refine the @monoid's singleton class.
+    @monoid.singleton_class.class_exec { attr_reader :addition_table }
+    @monoid.define_singleton_method :additive_identity do zero end
+  end
 
-    should "have working Monoid" do
+  describe "Algebra" do
+    it "should have working Monoid" do
       m = @monoid.random                  # choose an instance
 
       # #== method
@@ -53,7 +50,7 @@ class AbstractAlgebraTest < Test::Unit::TestCase
       assert @monoid.zero + m == m
     end
 
-    should "have working Group" do
+    it "should have working Group" do
       g = @group.random
 
       # (monoid properties not tested)
@@ -63,7 +60,7 @@ class AbstractAlgebraTest < Test::Unit::TestCase
       assert (-g) + g == @group.zero
     end
 
-    should "define AbelianGroup" do
+    it "should define AbelianGroup" do
       ag = @abelian_group.random
 
       # (group properties not tested)
@@ -73,7 +70,7 @@ class AbstractAlgebraTest < Test::Unit::TestCase
       assert ag + bh == bh + ag
     end
 
-    should "define Ring" do
+    it "should define Ring" do
       r = @ring.random
 
       # (abelian group properties with respect to addition not tested)
@@ -93,7 +90,7 @@ class AbstractAlgebraTest < Test::Unit::TestCase
       assert r * ( s + t ) == ( r * s ) + ( s * t )
     end
 
-    should "define Field" do
+    it "should define Field" do
       f = @field.random
 
       # (ring properties not tested)
@@ -105,43 +102,35 @@ class AbstractAlgebraTest < Test::Unit::TestCase
     end
   end
 
-  context "numerics" do
-    setup do
-      require 'y_support/abstract_algebra'
-    end
-
-    should "have patched Integer" do
+  describe "numerics" do
+    it "should have patched Integer" do
       assert Integer.zero.equal? 0
     end
 
-    should "have patched Float" do
+    it "should have patched Float" do
       assert Float.zero.equal? 0.0
     end
 
-    should "have patched Rational" do
+    it "should have patched Rational" do
       assert Rational.zero.equal? Rational( 0, 0 )
     end
 
-    should "have patched Complex" do
+    it "should have patched Complex" do
       assert Complex.zero.equal? Complex( 0, 0 )
     end
   end
 
-  context "Matrix" do
-    setup do
-      require 'y_support/abstract_algebra'
-    end
-
-    should "have Matrix.wildcard_zero public instance method" do
+  describe "Matrix" do
+    it "should have Matrix.wildcard_zero public instance method" do
       # FIXME
     end
 
-    should "be able to perform #* with nonnumerics in the matrix" do
+    it "should be able to perform #* with nonnumerics in the matrix" do
       # FIXME
     end
 
-    should "numeric matrix multiplication still be working normally" do
+    it "should numeric matrix multiplication still be working normally" do
       # FIXME
     end
   end # context Matrix
-end # class AbstractAlgebraTest
+end

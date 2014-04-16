@@ -1,37 +1,32 @@
 #! /usr/bin/ruby
 #encoding: utf-8
 
-require 'test/unit'
-require 'shoulda'
+require 'minitest/autorun'
 
-class LocalObjectTest < Test::Unit::TestCase
-  context "Object" do
-    setup do
-      require 'y_support/local_object'
-    end
+describe "LocalObject" do
+  before do
+    require './../lib/y_support/local_object'
+  end
 
-    should "have constructor #LocalObject, alias #L!" do
+  describe "Object" do
+    it "should have constructor #LocalObject, alias #L!" do
       assert_equal LocalObject, LocalObject().class
       assert_equal LocalObject, L!.class
     end
 
-    should "have #local_object?, alias #ℓ?" do
+    it "should have #local_object?, alias #ℓ?" do
       assert_equal false, Object.new.local_object?
       assert_equal false, Object.new.ℓ?
     end
-  end # context Object
+  end
   
-  context "LocalObject" do
-    setup do
-      require 'y_support/local_object'
-    end
-
-    should "exist and comply" do
+  describe "LocalObject" do
+    it "should exist and comply" do
       n = LocalObject.new 'whatever'
       assert ! n.ℓ?
       assert n.ℓ? 'whatever'
       assert_equal 'whatever', n.signature
       assert_equal 'whatever', n.σ
     end
-  end # context LocalObject
-end # class LocalObjectTest
+  end
+end
