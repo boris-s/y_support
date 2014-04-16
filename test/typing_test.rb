@@ -6,7 +6,9 @@ require 'minitest/autorun'
 describe "y_support/typing" do
   before do
     require './../lib/y_support/typing'
-    P, K, L = Class.new, Class.new, Module.new
+    P = Class.new unless defined? P
+    K = Class.new unless defined? K
+    L = Module.new unless defined? L
   end
 
   describe "with some classes" do

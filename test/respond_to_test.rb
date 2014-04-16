@@ -1,22 +1,21 @@
 #! /usr/bin/ruby
 #encoding: utf-8
 
-require 'test/unit'
-require 'shoulda'
+require 'minitest/autorun'
 
-class RespondToTest < Test::Unit::TestCase
-  context "Object" do
-    setup do
-      require 'y_support/respond_to'
-    end
+describe "y_support/typing" do
+  before do
+    require './../lib/y_support/respond_to'
+  end
 
-    should "have RespondTo() constructor" do
+  describe Object do
+    it "should have RespondTo() constructor" do
       assert_equal RespondTo, RespondTo( :inspect ).class
     end
-  end # context Object
+  end
 
-  context "RespondTo" do
-    should "work" do
+  describe RespondTo do
+    it "should work" do
       assert_respond_to( RespondTo.new(:hello), :=== )
       assert RespondTo.new(:each_char) === "arbitrary string"
       assert ! ( RespondTo.new(:each_char) === Object.new )
@@ -29,10 +28,10 @@ class RespondToTest < Test::Unit::TestCase
                when RespondTo.new(:improbab_method_name) then 1
                else false end
     end
-  end # context RespondTo
+  end
 
-  context "Symbol" do
-    should "have Symbol#~@ for .respond_to? case statements" do
+  describe Symbol do
+    it "should have Symbol#~@ for .respond_to? case statements" do
       assert_kind_of RespondTo, ~:hello
       assert RespondTo(:<<) === "testing"
       assert case ?x
@@ -42,5 +41,5 @@ class RespondToTest < Test::Unit::TestCase
                when ~:improbab_method_name then 1
                else false end
     end
-  end # context Symbol
-end # class RespondToTest
+  end
+end
