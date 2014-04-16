@@ -1,1 +1,1 @@
-require 'y_support/core_ext/enumerable/typing'
+require File.dirname( __FILE__ ) + '/enumerable/typing'

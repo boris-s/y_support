@@ -13,4 +13,4 @@ class Class
       subclass.class_exec &block if block
     end
   end
-en
+end

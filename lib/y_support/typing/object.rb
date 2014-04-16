@@ -1,1 +1,1 @@
-require 'y_support/core_ext/object/typing'
+require File.dirname( __FILE__ ) + '/object/typing'

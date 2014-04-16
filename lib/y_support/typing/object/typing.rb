@@ -1,6 +1,6 @@
 require 'active_support/core_ext/object/blank'
-require 'y_support/core_ext/object/inspection'
-require 'y_support/core_ext/string/misc'
+require File.dirname( __FILE__ ) + '/../../core_ext/object/inspection'
+require File.dirname( __FILE__ ) + '/../../core_ext/string/misc'
 
 class Object
   # === Typing by declaration

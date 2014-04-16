@@ -1,1 +1,1 @@
-require 'y_support/core_ext/array/typing'
+require File.dirname( __FILE__ ) + '/array/typing'

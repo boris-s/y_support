@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'y_support/core_ext/class'
+require File.dirname( __FILE__ ) + '/../class'
 
 class Object
   # Assigns prescribed atrributes to the object and makes them accessible with

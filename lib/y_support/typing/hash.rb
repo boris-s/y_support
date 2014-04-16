@@ -1,1 +1,1 @@
-require 'y_support/core_ext/hash/typing'
+require File.dirname( __FILE__ ) + '/hash/typing'
