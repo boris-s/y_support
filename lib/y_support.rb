@@ -1,5 +1,5 @@
-require "y_support/version"
+# encoding: utf-8
 
-module YSupport
-  # Your code goes here...
-end
+# YSupport is a collection of methods used  in Y gems.
+# 
+require "y_support/version"
