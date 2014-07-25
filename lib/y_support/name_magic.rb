@@ -11,29 +11,32 @@ require_relative 'name_magic/hash'
 # for "name" ins YSupport). One can write:
 #
 #   require 'y_support/name_magic'
-#   class Foo; include NameMagic end
+#   class Foo;
+#     include NameMagic
+#   end
 #   Bar = Foo.new
 #
-# and the resulting object will know its #name:
+# The resulting object will know its +#name+:
 #
-#   Bar._name_ #=> :Bar
-#   Bar.full_name #=> "Foo::Bar"
-#   Foo::Bar #=> <Foo:0x.....>
+#   Bar.name #=> "Bar"
 #
-# This is done by searching whole Ruby namespace for constants, triggered by the
-# method #const_magic defined in the namespace mixin. (Once the object is named,
-# subsequent constant assignments have no effects.) By default, the namespace
-# is the class, in which NameMagic is included, but it is possible to prescribe
-# another module as a namespace:
+# This is done by searching whole Ruby namespace for constants, via #const_magic
+# defined in the namespace mixin. (Once the object is named, its assignments to
+# other constants have no further effects.) By default, the class, in which
+# NameMagic is included acts as a namespace: holds a list of instances and their
+# names, which is often useful.
+#
+#   Foo.instances #=> [Bar]
+#
+# It is possible to set another module as namespace:
 #
 #   Quux = Module.new
 #   class FooBar
 #     include NameMagic
-#     self.namespace = Quux
 #   end
+#   FooBar.namespace = Quux
 #   FooBar.new name: "Baz"
-#   FooBar::Baz #=> NameError
-#   Quux::Baz #=> <FooBar:0x.....>
+#   Quux.instances #=> [Baz]
 #
 # When subclassing the classes with NameMagic included, namespace setting does
 # not change:
@@ -205,4 +208,3 @@ module NameMagic
     namespace.validate_name( ɴ ).to_sym.tap { |ɴ| name_set_hook.( ɴ ) }
   end
 end # module NameMagic
-
