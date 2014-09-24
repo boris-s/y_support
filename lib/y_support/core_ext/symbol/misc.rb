@@ -1,3 +1,5 @@
+require 'y_support/core_ext/string'
+
 class Symbol
   # This method applies +String#default!+ method to the receiver converted to
   # a string. Of course, symbols are immutable, so in spite of the exclamation

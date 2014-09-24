@@ -1,6 +1,8 @@
 #! /usr/bin/ruby
 #encoding: utf-8
 
+fail NotImplementedError # TODO: This part doesn't work yet
+
 require 'minitest/autorun'
 
 describe "Algebra" do
