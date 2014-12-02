@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["boris"]
   spec.email         = ["\"boris@iis.sinica.edu.tw\""]
   spec.summary       = %q{Support library used by Y gems.}
-  spec.description   = %q{LocalObject, RespondTo, InertRecorder, NullObject, NameMagic, core extensions, typing etc.}
+  spec.description   = %q{Methods and assets of general utility. LocalObject, RespondTo, InertRecorder, NullObject, NameMagic, core extensions, typing etc.}
   spec.homepage      = ""
   spec.license       = "GPLv3"
 
