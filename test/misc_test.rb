@@ -25,6 +25,14 @@ describe Module do
 
   it "has #const_set_if_not_defined and #const_reset!" do
     m = Module.new
+    hm = m.heir_module( p1: 1, p2: 2 )
+    hm.ancestors[1].must_equal m
+    hm.p1.must_equal 1
+    hm.p2.must_equal 2
+    hc = m.heir_class( Array, q1: 1, q2: 2 )
+    hc.new.class.ancestors[1].must_equal m
+    hc.q1.must_equal 1
+    hc.q2.must_equal 2
     m.const_set_if_not_defined :Foo, 42
     m::Foo.must_equal 42
     m.const_reset! :Foo, 43
