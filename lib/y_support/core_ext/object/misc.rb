@@ -29,27 +29,35 @@ class Object
   #   returned.
   # 
   def set_attr_with_readers! hash
-    hash.each_pair { |symbol, value|
-      instance_variable_set "@#{symbol}", value
+    hash.each_pair { |ß, value|
+      instance_variable_set "@#{ß}", value
       singleton_class.class_exec do
-        define_method symbol do |*args, &block|
-          return instance_variable_get "@#{symbol}" if args.empty? && block.nil?
+        define_method ß do |*args, &block|
+          return instance_variable_get "@#{ß}" if args.empty? && block.nil?
           super *args, &block
         end
       end
     }
   end
 
-  # Constructs parametrized subclasses of the supplied classes and makes them
-  # available under specified getters. Expects a hash of pairs { symbol: class },
-  # and a hash of parameters with which to parametrize the class(es). Guards
-  # against collisions in the subclass getter symbols, rasing NameError should
-  # these shadow or overwrite existing methods.
+  # Constructs heir classes (parametrized subclasses) of the supplied modules
+  # (classes) and makes them available under specified getters. Expects a hash of
+  # pairs { symbol: class }, and a hash of parameters with which to parametrize
+  # the modules (classes). The methods guards against collisions in the subclass
+  # getter symbols, rasing +NameError+ should these shadow or overwrite existing
+  # methods.
   # 
   def param_class( hash, with: {} )
-    hash.each { |ß, ç|
-      sub = ç.parametrize( with )
-      set_attr_with_readers( ß => sub )
+    hash.each { |ß, m|
+      case m
+      when Class then
+        parametrized_subclass = m.parametrize( with )
+        set_attr_with_readers( ß => parametrized_subclass )
+      when Module then
+        heir_class = m.heir_class( with )
+        set_attr_with_readers( ß => heir_class )
+      else fail TypeError, "#{m} must be a module or a class!"
+      end
     }
     return nil
   end
