@@ -1,3 +1,5 @@
+require File.dirname( __FILE__ ) + '/../module'
+
 class Class
   # Creates a subclass of the current class parametrized with a given set of
   # parameters. The parameters have form { symbol: value } and they cause

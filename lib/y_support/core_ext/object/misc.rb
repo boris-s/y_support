@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+require File.dirname( __FILE__ ) + '/../module'
 require File.dirname( __FILE__ ) + '/../class'
 
 class Object
@@ -67,9 +68,16 @@ class Object
   # for full explanation of the shadowing / overwriting behavior.
   # 
   def param_class!( hash, with: {} )
-    hash.each { |ß, ç|
-      sub = ç.parametrize( with )
-      set_attr_with_readers!( ß => sub )
+    hash.each { |ß, m|
+      case m
+      when Class then
+        parametrized_subclass = m.parametrize( with )
+        set_attr_with_readers!( ß => parametrized_subclass )
+      when Module then
+        heir_class = m.heir_class( with )
+        set_attr_with_readers!( ß => heir_class )
+      else fail TypeError, "#{m} must be a module or a class!"
+      end
     }
     return nil
   end

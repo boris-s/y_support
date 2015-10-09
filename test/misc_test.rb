@@ -18,6 +18,17 @@ describe Object do
     o.bar.ancestors[1].must_equal( m )
     o.bar.mother.must_equal( o )
   end
+
+  it "should have #param_class!" do
+    o = Object.new
+    m = Module.new
+    o.param_class!( { Array: Array, foo: Hash, bar: m }, with: { mother: o } )
+    assert o.Array < Array
+    o.Array.mother.must_equal( o )
+    o.foo.mother.must_equal( o )
+    o.bar.ancestors[1].must_equal( m )
+    o.bar.mother.must_equal( o )
+  end
 end
 
 
