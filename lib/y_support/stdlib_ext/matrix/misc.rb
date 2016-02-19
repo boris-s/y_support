@@ -5,7 +5,7 @@ class Matrix
   def pretty_inspect
     return inspect if row_size == 0 or column_size == 0
     aa = send( :rows ).each.with_object [] do |row, memo|
-      memo << row.map{ |o|
+      memo << row.map { |o|
         os = o.to_s
         case o
         when Numeric then os[0] == '-' ? os : ' ' + os
@@ -18,7 +18,7 @@ class Matrix
       memo << "\n"
     end
   end
-  
+
   # Pretty print
   def pretty_print
     print pretty_inspect

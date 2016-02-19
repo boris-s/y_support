@@ -52,7 +52,8 @@ describe Module do
     m.const_reset! :Foo, 43
     m::Foo.must_equal 43
     m.module_exec do
-      def a; 42 end
+      selector :a
+      def initialize; @a = 42 end
       chain b: :a, &:to_s
     end
     Class.new do include m end.new.b.must_equal "42"

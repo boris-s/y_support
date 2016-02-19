@@ -1,4 +1,13 @@
 class Module
+  # Hopefully not too ridiculous attempt to call a spade a spade. In the
+  # 1964 landmark paper "The mechanical evaluation of expressions", Peter
+  # Landin has defined an abstract language which is a basic for
+  # expression-oriented high-level languages popular today, such as Ruby.
+  # While Ruby's instance variables can be called "attributes", attribute
+  # readers seem to be called "selectors" in Landin's paper.
+  # 
+  alias selector attr_reader
+
   # Creates a module that inherits from the receiver and is parametrized
   # with the given set of parameters. The parameters have form { symbol:
   # value } and they cause singleton method(s) named "symbol" be defined

@@ -1,4 +1,5 @@
 require 'y_support'
+require 'gtk2'
 
 # Assets related to X windows control.
 # 
