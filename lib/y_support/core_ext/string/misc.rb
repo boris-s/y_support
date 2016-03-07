@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'active_support/core_ext/object/blank'
+require 'active_support/multibyte/chars'
 
 class String
   # Integer() style conversion, or false if conversion impossible.
@@ -56,15 +57,15 @@ class String
     gsub ' ', '_'
   end
 
-  # Converts a string into a standard symbol. While Symbol class objects can
-  # be created from any string, it is good practice to keep symbols free of
-  # whitespaces and weird characters, so that the are typed easily, usable as
-  # variable names etc. This method thus removes punctuation, removes
+  # Converts a string into a string suitable as a symbol. While Symbol class
+  # objects can be created from any string, it is good practice to keep symbols
+  # free of whitespaces and weird characters, so that the are typed easily,
+  # usable as variable names etc. This method thus removes punctuation, removes
   # superfluous spaces, and underscores the remaining ones, before returning
   # the string.
   # 
   def standardize
-    ς = self.dup
+    ς = self.dup.normalize( :kd )
     ",.;".each_char { |c| ς.gsub! c, " " }
     ς.stripn
       .squeeze(" ")
