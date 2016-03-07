@@ -57,12 +57,10 @@ class String
     gsub ' ', '_'
   end
 
-  # Converts a string into a string suitable as a symbol. While Symbol class
-  # objects can be created from any string, it is good practice to keep symbols
-  # free of whitespaces and weird characters, so that the are typed easily,
-  # usable as variable names etc. This method thus removes punctuation, removes
-  # superfluous spaces, and underscores the remaining ones, before returning
-  # the string.
+  # Converts a string into a string suitable as a symbol. Although symbols can
+  # be created from any strings, sometimes it is good to have symbols without
+  # accented characters, punctuation and whitespaces. This method returns a
+  # string of these characteristics.
   # 
   def standardize
     ς = self.dup.normalize( :kd )
