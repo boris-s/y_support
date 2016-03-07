@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 require 'active_support/core_ext/object/blank'
-require 'active_support/multibyte/chars'
 
 class String
   # Integer() style conversion, or false if conversion impossible.
@@ -63,18 +62,17 @@ class String
   # string of these characteristics.
   # 
   def standardize
-    ς = self.dup.normalize( :kd )
+    ς = ς.tr( "ÀÁÂÃÄÅàáâãäåĀāĂăĄąÇçĆćĈĉĊċČčÐðĎďĐđÈÉÊËèéêëĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħÌÍÎÏìíîïĨĩĪīĬĭĮįİıĴĵĶķĸĹĺĻļĽľĿŀŁłÑñŃńŅņŇňŉŊŋÒÓÔÕÖØòóôõöøŌōŎŏŐőŔŕŖŗŘřŚśŜŝŞşŠšſŢţŤťŦŧÙÚÛÜùúûüŨũŪūŬŭŮůŰűŲųŴŵÝýÿŶŷŸŹźŻżŽž",
+               "AAAAAAaaaaaaAaAaAaCcCcCcCcCcDdDdDdEEEEeeeeEeEeEeEeEeGgGgGgGgHhHhIIIIiiiiIiIiIiIiIiJjKkkLlLlLlLlLlNnNnNnNnnNnOOOOOOooooooOoOoOoRrRrRrSsSsSsSssTtTtTtUUUUuuuuUuUuUuUuUuUuWwYyyYyYZzZzZz"
+             )
     ",.;".each_char { |c| ς.gsub! c, " " }
-    ς.stripn
-      .squeeze(" ")
-      .underscore_spaces
+    ς.stripn.squeeze(" ").underscore_spaces
   end
 
   # Applies #standardize to the receiver and converts the result to a symbol.
   # 
   def to_standardized_sym
-    standardize
-      .to_sym
+    standardize.to_sym
   end
 
   # Capitalizes a string and appends an exclamation mark. Also allows optional
