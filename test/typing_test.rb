@@ -103,7 +103,7 @@ describe "y_support/typing" do
       assert_equal( {}, {}.aT_blank )
     end
     
-    it "should have #aT_present enforcer" do
+    it "should have #aT_present validator" do
       -> { nil.aT_present }.must_raise TypeError
       assert 0.aT_present
       assert_equal( "hello", "hello".aT_present )
@@ -116,29 +116,29 @@ describe "y_support/typing" do
       assert [1, 2, 4].aT_all { |e| e < 5 }
     end
 
-    it "should have #aT_all_kind_of enforcer" do
+    it "should have #aT_all_kind_of validator" do
       -> { [1.0, 2.0, :a].aT_all_kind_of Numeric }.must_raise TypeError
       assert [1.0, 2.0, 3].aT_all_kind_of Numeric
     end
 
-    it "should have #aT_all_comply class compliance enforcer" do
+    it "should have #aT_all_comply class compliance validator" do
       -> { [1.0, 2.0, :a].aT_all_comply Numeric }.must_raise TypeError
       assert [1.0, 2.0, 3].aT_all_comply Numeric
     end
 
-    it "should have #aT_all_numeric enforcer" do
+    it "should have #aT_all_numeric validator" do
       -> { [:a].aT_all_numeric }.must_raise TypeError
       assert [1, 2.0].aT_all_numeric
     end
     
-    it "should have #aT_subset_of enforcer" do
+    it "should have #aT_subset_of validator" do
       -> { [6].aT_subset_of [*0..5] }.must_raise TypeError
       assert [1,2].aT_subset_of [*0..5]
     end
   end # describe "Enumerable"
 
   describe "Array" do
-    it "should have #aT_includes (alias #aT_include) enforcer" do
+    it "should have #aT_includes (alias #aT_include) validator" do
       -> { [1, 2, 4].aT_include 3 }.must_raise TypeError
       assert [1, 2, 4].aT_include( 4 )
       assert_equal [6, 7], [6, 7].aT_include( 6 )
@@ -185,7 +185,7 @@ describe "y_support/typing" do
       assert_equal( { a: 'a', c: 'b', k: 'k' }, a )
     end
     
-    it "should have #aT_has synonymizing enforcer" do
+    it "should have #aT_has synonymizing validator" do
       a = { infile: 'a', csv_out_file: 'b', k: 'k', o: 'k', t: 'k' }
       assert_respond_to a, :aT_has
       old = a.dup
