@@ -66,6 +66,14 @@ describe Class do
     require './../lib/y_support/core_ext/class'
   end
 
+  it "has #selector alias for #attr_reader method" do
+    o = Class.new do
+      selector :a
+      def initialize a; @a = a end
+    end.new( 42 )
+    o.a.must_equal( 42 )
+  end
+
   it "has #parametrize method" do
     a = Class.new
     -> { a.foo }.must_raise NoMethodError
