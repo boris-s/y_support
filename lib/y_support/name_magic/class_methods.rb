@@ -6,9 +6,8 @@ module NameMagic::ClassMethods
   # Presents the instances registered by the namespace. Takes one optional
   # argument. If set to _false_, the method returns all the instances
   # registered by the namespace. If set to _true_ (default), only returns
-  # those instances registered by the namespace, which are of exactly the
-  # same class as the receiver (ie. excluding the instances of the subclasses
-  # of this class). Example:
+  # those instances registered by the namespace, which are a subclass of
+  # the receiver. Example:
   # 
   # <code>
   # class Animal; include NameMagic end
@@ -21,19 +20,24 @@ module NameMagic::ClassMethods
   # </code>
   #
   def instances option=true
+    # TODO: Consider whether instances( false ) is useful at all,
+    # ie. whether there is any time at all we want to get cat instances
+    # when asking Dog class about instances. There is certain logic to
+    # it -- that of #instances method lookup -- but I still think
+    # instance( false ) should not be available.
     return super if namespace == self
     ii = namespace.instances
     option ? ii.select { |i| i.kind_of? self } : ii
   end
 
-  # Deprecated method to get full names of the named instances. Use
-  # <code>instances.names</code> instead. Takes one optional argument,
-  # same as +#instances+ method.
-  #
-  def instance_names option=true
-    warn "Method #instance_names is deprecated. Use 'instances._names_' or 'instances.names' instead!"
-    instances( option ).names( false )
-  end
+  # # Deprecated method to get full names of the named instances. Use
+  # # <code>instances.names</code> instead. Takes one optional argument,
+  # # same as +#instances+ method.
+  # #
+  # def instance_names option=true
+  #   warn "Method #instance_names is deprecated. Use 'instances._names_' or 'instances.names' instead!"
+  #   instances( option ).names( false )
+  # end
 
   # Presents namespace-owned +@instances+ hash. The hash consists of pairs
   # <code>{ instance => instance_name }</code>. Unnamed instances have +nil+

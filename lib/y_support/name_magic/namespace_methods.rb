@@ -242,8 +242,9 @@ module NameMagic::NamespaceMethods
     todo = ( nameless_instances + __avid_instances__ ).map( &:object_id ).uniq
     ObjectSpace.each_object Module do |ɱ|
       ɱ.constants( false ).each do |const_ß|
-        begin; instance = ɱ.const_get( const_ß )  # Some constants cause
-        rescue LoadError, StandardError; next end # errors upon loading.
+        next if ɱ == Object && const_ß == :Config # Some constants cause
+        begin; instance = ɱ.const_get( const_ß )  # problems upon loading.
+        rescue LoadError, StandardError; next end
         next unless todo.include? instance.object_id
         # puts "NameMagic: Anonymous object under #{const_ß}!" if DEBUG
         if instance.avid? then # puts "NameMagic: It is avid." if DEBUG
