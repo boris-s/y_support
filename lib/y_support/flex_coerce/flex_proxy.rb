@@ -36,8 +36,8 @@ class FlexCoerce::FlexProxy
   def method_missing ß, arg
     table_entry = host_class.coercion_table[ ß ]
     response = table_entry.find { |type, closure| type === operand }
-    fail TypeError arg, "#{operand.class} not compatible with " +
-                        "#{arg.class} and ##{ß} method!" unless response
+    fail TypeError, "#{operand.class} not compatible with " +
+                    "#{arg.class} and ##{ß} method!" unless response
     response[ 1 ].call( operand, arg )
   end
 
