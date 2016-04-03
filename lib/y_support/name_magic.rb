@@ -1,8 +1,7 @@
 # encoding: utf-8
 
-require 'y_support'
-require 'y_support/core_ext/hash/misc'
-
+require_relative '../y_support'
+require_relative '../y_support/core_ext/hash/misc'
 require_relative 'name_magic/array'
 require_relative 'name_magic/hash'
 

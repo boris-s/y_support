@@ -1,1 +1,1 @@
-require File.dirname( __FILE__ ) + '/array/typing'
+require_relative 'array/typing'

@@ -1,6 +1,8 @@
 require 'active_support/core_ext/object/blank'
-require File.dirname( __FILE__ ) + '/../../core_ext/object/inspection'
-require File.dirname( __FILE__ ) + '/../../core_ext/string/misc'
+# require File.dirname( __FILE__ ) + '/../../core_ext/object/inspection'
+# require File.dirname( __FILE__ ) + '/../../core_ext/string/misc'
+require_relative '../../core_ext/object/inspection'
+require_relative '../../core_ext/string/misc'
 
 class Object
   # === Typing by declaration
@@ -46,7 +48,7 @@ class Object
   # the receiver (using +#instance_exec+ method). If no block is given, it is
   # checked, whether the object is truey.
   # 
-  def aT what_is_receiver=insp, how_comply=nil, &b
+  def aT what_is_receiver=y_inspect, how_comply=nil, &b
     return tap { fail TypeError unless self } unless b
     return self if b.( self )
     m = "%s fails " + ( how_comply ? "to #{how_comply}" : "its check" )
@@ -62,7 +64,7 @@ class Object
   # inside the singleton class of the receiver (using #instance_exec method). If
   # no block is given, it is checked, whether the object is falsey.
   # 
-  def aT_not what_is_receiver=insp, how_comply=nil, &b
+  def aT_not what_is_receiver=y_inspect, how_comply=nil, &b
     return tap { fail TypeError if self } unless b
     return self unless b.( self )
     m = how_comply ? "%s must not #{how_comply}" : "%s fails its check"
@@ -72,7 +74,7 @@ class Object
   # Fails with +TypeError+ unless the receiver is of the prescribed class. Second
   # optional argument customizes the error message (receiver description).
   # 
-  def aT_kind_of klass, what_is_receiver=insp
+  def aT_kind_of klass, what_is_receiver=y_inspect
     return self if is_a? klass
     fail TypeError, "%s not a #{klass}".X!( what_is_receiver )
   end
@@ -82,7 +84,7 @@ class Object
   # given class, or is a descendant of that class. Second optional argument
   # customizes the error message (receiver description).
   # 
-  def aT_complies klass, what_is_receiver=insp
+  def aT_complies klass, what_is_receiver=y_inspect
     return self if class_complies? klass
     fail TypeError, "%s does not comply with #{klass}".X!( what_is_receiver )
   end
@@ -91,7 +93,7 @@ class Object
   # Fails with +TypeError+ unless the receiver responds to the given method.
   # Second optional argument customizes the error message (receiver description).
   # 
-  def aT_respond_to method_name, what_is_receiver=insp
+  def aT_respond_to method_name, what_is_receiver=y_inspect
     return self if respond_to? method_name
     fail TypeError,
          "%s does not respond to '#{method_name}'".X!( what_is_receiver )
@@ -102,9 +104,9 @@ class Object
   # equal to the argument. Two more optional arguments customize the error
   # message (receiver description and the description of the other object).
   # 
-  def aT_equal other, what_is_receiver=insp, what_is_other=nil
+  def aT_equal other, what_is_receiver=y_inspect, what_is_other=nil
     return self if self == other
-    wo = what_is_other || "the prescribed value (#{other.insp})"
+    wo = what_is_other || "the prescribed value (#{other.y_inspect})"
     fail TypeError, "%s must be equal to %s".X!( [ what_is_receiver, wo ] )
   end
 
@@ -112,37 +114,37 @@ class Object
   # differs from to the argument. Two more optional arguments customize the error
   # message (receiver description and the description of the other object).
   # 
-  def aT_not_equal other, what_is_receiver=insp, what_is_other=nil
+  def aT_not_equal other, what_is_receiver=y_inspect, what_is_other=nil
     return self unless self == other
-    wo = what_is_other || "the prescribed value (#{other.insp})"
+    wo = what_is_other || "the prescribed value (#{other.y_inspect})"
     fail TypeError, "%s must not == %s".X!( [ what_is_receiver, wo ] )
   end
 
   # Fails with +TypeError+ unless activesupport's +#blank+ returns true for
   # the receiver.
   # 
-  def aT_blank what_is_receiver=insp
+  def aT_blank what_is_receiver=y_inspect
     tap { blank? or fail TypeError, "%s not blank".X!( what_is_receiver ) }
   end
 
   # Fails with +TypeError+ unless activesupport's +#present+ returns true for
   # the receiver.
   # 
-  def aT_present what_is_receiver=insp
+  def aT_present what_is_receiver=y_inspect
     tap { present? or fail TypeError, "%s not present".X!( what_is_receiver ) }
   end
 
   # Fails with +ArgumentError+ unless the +ActiveSupport+ method +#blank+ returns
   # true for the receiver.
   # 
-  def aA_blank what_is_receiver=insp
+  def aA_blank what_is_receiver=y_inspect
     tap { blank? or fail ArgumentError, "%s not blank".X!( what_is_receiver ) }
   end
 
   # Fails with +ArgumentError+ unless the +ActiveSupport+ method #present returns
   # true for the receiver.
   # 
-  def aA_present what_is_receiver=insp
+  def aA_present what_is_receiver=y_inspect
     tap {
       present? or fail ArgumentError, "%s not present".X!( what_is_receiver )
     }

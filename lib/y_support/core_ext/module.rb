@@ -1,2 +1,2 @@
-require 'y_support' unless defined? YSupport
-require File.dirname( __FILE__ ) + '/module/misc'
+require_relative '../../y_support'
+require_relative 'module/misc'

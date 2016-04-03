@@ -1,7 +1,7 @@
 # encoding: utf-8
 
-require 'y_support'
-require 'y_support/core_ext/array/misc'
+require_relative '../y_support'
+require_relative '../y_support/core_ext/array/misc'
 
 # Provides +Try+ class, and +Object#try+ method that constructs and calls a
 # +Consciously::Try+ instance. This +#try+ method has nothing to do with the

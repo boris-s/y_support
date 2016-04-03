@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'y_support'
+require_relative '../y_support'
 
 # +y_support/unicode+ defines a small number of Unicode 1-character aliases to
 # make code more concise.

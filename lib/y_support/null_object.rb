@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'y_support'
+require_relative '../y_support'
 
 # Null object pattern implementation in +YSupport+. apart from the expected null
 # object behavior (such as returning self in response to almost all messages),

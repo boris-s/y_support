@@ -1,3 +1,3 @@
-require 'y_support' unless defined? YSupport
-require File.dirname( __FILE__ ) + '/object/misc'
-require File.dirname( __FILE__ ) + '/object/inspection'
+require_relative '../../y_support'
+require_relative 'object/misc'
+require_relative 'object/inspection'

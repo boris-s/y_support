@@ -1,5 +1,5 @@
-require 'y_support'
 require 'gtk2'
+require_relative '../y_support'
 
 # Assets related to X windows control.
 # 

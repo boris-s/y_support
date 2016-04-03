@@ -1,2 +1,2 @@
-require 'y_support' unless defined? YSupport
-require File.dirname( __FILE__ ) + '/matrix/misc'
+require_relative '../../y_support'
+require_relative 'matrix/misc'

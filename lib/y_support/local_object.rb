@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'y_support'
+require_relative '../y_support'
 
 # Object, whose business is to stay local to methods. Optional signature
 # provides additional level of safety in ensuring object locality. (Signature

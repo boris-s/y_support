@@ -1,1 +1,1 @@
-require File.dirname( __FILE__ ) + '/object/typing'
+require_relative 'object/typing'

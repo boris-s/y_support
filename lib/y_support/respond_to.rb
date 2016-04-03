@@ -1,4 +1,4 @@
-require 'y_support'
+require_relative '../y_support'
 
 # RespondTo class for easy use of respond_to? in case statements.
 # 

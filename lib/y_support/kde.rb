@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'y_support'
+require_relative '../y_support'
 
 module YSupport::KDE
   class << self
