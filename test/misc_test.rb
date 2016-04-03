@@ -29,6 +29,13 @@ describe Object do
     o.bar.ancestors[1].must_equal( m )
     o.bar.mother.must_equal( o )
   end
+
+  it "should have #insp method to facilitate inspection" do
+    module Quux; class Foo; def to_s; "bar" end end end
+    Quux::Foo.new.y_inspect.must_equal "Quux::Foo:bar"
+    Quux::Foo.new.y_inspect( :full ).must_equal "#<Quux::Foo:bar>"
+    Quux::Foo.new.y_inspect( :short ).must_equal "Foo:bar"
+  end
 end
 
 
