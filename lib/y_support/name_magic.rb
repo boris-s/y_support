@@ -2,14 +2,13 @@
 
 require_relative '../y_support'
 require_relative '../y_support/core_ext/hash/misc'
-require_relative 'name_magic/array'
-require_relative 'name_magic/hash'
 
-# Module NameMagic imitates Ruby constant magic and automates the named argument
-# :name, alias :ɴ (Character "ɴ", Unicode small capital N). At the same time,
-# NameMagic provides the registry of instances of the user class. In Ruby, we
-# frequently want to keep a list of instances of some classes, and NameMagic
-# also helps with this task. Simple example:
+# Module NameMagic imitates Ruby constant magic and automates the
+# named argument :name, alias :ɴ (Character "ɴ", Unicode small
+# capital N). At the same time, NameMagic provides the registry of
+# instances of the user class. In Ruby, we frequently want to keep
+# a list of instances of some classes, and NameMagic also helps
+# with this task. Simple example:
 #
 #   require 'y_support/name_magic'
 #   class Foo
@@ -25,24 +24,28 @@ require_relative 'name_magic/hash'
 #
 #   Foo.instances #=> [Bar]
 #
-# Additionally, NameMagic provides two hooks: Instantiation hook activates
-# when a new instance is created, and naming hook activates when the created
-# instance is baptized. Let us set the first hook, for example, as follows:
+# Additionally, NameMagic provides two hooks: Instantiation hook
+# activates when a new instance is created, and naming hook
+# activates when the created instance is baptized. Let us set the
+# first hook, for example, as follows:
 #
 #   Foo.instantiation_hook do |instance|
-#     puts "New instance of Foo with object id #{instance.object_id} created!"
+#     puts "New instance of Foo with object id " +
+#           "#{instance.object_id} created!"
 #   end
 #
 # Now let us set the second hook as follows:
 #
 #   Foo.naming_hook do |name, instance|
-#     puts "Instance with object id #{instance.object_id} is baptized #{name}!"
+#     puts "Instance with object id #{instance.object_id} " +
+#          "is baptized #{name}!"
 #     name
 #   end
 #
-# Note that the naming hook must always return name. (This can be used to
-# censor the name on the fly, but that's beyond this basic intro.) Now that
-# we set the hooks, let us observe when do they activate:
+# Note that the naming hook must always return name. (This can be
+# used to censor the name on the fly, but that's beyond this basic
+# intro.) Now that we set the hooks, let us observe when do they
+# activate:
 #
 #   i = Foo.new
 #   New instance of Foo with object id 73054440 created!
@@ -50,46 +53,51 @@ require_relative 'name_magic/hash'
 #   Baz = i
 #   Instance with object id 73054440 is baptized Baz!
 #  
-# We can see that the registry of instances now registers two instances:
+# We can see that the registry of instances now registers two
+# instances:
 #
 #   Foo.instances #=> [Bar, Baz]
 #
-# NameMagic has been programmed to be simple and intuitive to use, so with this
-# little demonstration, you can start using it without fear. You can find the
-# rest of the methods provided by NameMagic in the documentation.
+# NameMagic has been programmed to be simple and intuitive to use,
+# so with this little demonstration, you can start using it without
+# fear. You can find the rest of the methods provided by NameMagic
+# in the documentation.
 # 
-# However, behind the scenes, inner workings of NameMagic require understanding.
-# The key part of NameMagic is the code that searches Ruby namespace for
-# constants. This search is done automatically when necessary. It can be also
-# explicitly initiated by calling .const_magic class method, but this is
-# rarely needed. When you write "include NameMagic" in some class, three
+# However, behind the scenes, inner workings of NameMagic require
+# understanding.  The key part of NameMagic is the code that
+# searches Ruby namespace for constants. This search is done
+# automatically when necessary. It can be also explicitly initiated
+# by calling .const_magic class method, but this is rarely
+# needed. When you write "include NameMagic" in some class, three
 # things happen:
 #
-# 1. module NameMagic is included in that class, as expected.
-# 2. The user class is extended with module NameMagic::ClassMethods.
-# 3. The namespace is extended with module NameMagic::NamespaceMethods.
+# 1. Module NameMagic is included in that class, as expected.
+# 2. Class is extended with NameMagic::ClassMethods.
+# 3. Namespace is extended with NameMagic::NamespaceMethods.
 #
-# Namespace (in the NameMagic sense) is a module that holds the list of
-# instances and their names. Typically, the user class acts as its own
-# namespace. Note that the meaning of the word 'namespace' is somewhat
-# different from its meaning in general Ruby. NameMagic actually provides
-# class method .namespace that returns the namespace of the class. Consider
-# this example:
+# Namespace (in the NameMagic sense) is a module that holds the
+# list of instances and their names. Typically, the user class acts
+# as its own namespace. Note that the meaning of the word
+# 'namespace' is somewhat different from its meaning in general
+# Ruby. NameMagic actually provides class method .namespace that
+# returns the namespace of the class. Consider this example:
 #
 #   require 'y_support/name_magic'
-#   class Animal; include NameMagic end
+#   class Animal
+#     include NameMagic
+#   end
 #   Animal.namespace #=> Animal
 # 
-# We can see that the namespace of Animal class is again Animal class. But
-# when we subclass it:
+# We can see that the namespace of Animal class is again Animal
+# class. But when we subclass it:
 #
 #   class Dog < Animal; end
 #   class Cat < Animal; end
 #   Dog.namespace #=> Animal
 #   Cat.namespace #=> Animal
 #
-# The subclasses retain Animal as their namespace. Let us continue with the
-# example:
+# The subclasses retain Animal as their namespace. Let us continue
+# with the example:
 #
 #   Livia = Cat.new
 #   Cat.instances #=> [Livia]
@@ -104,53 +112,70 @@ require_relative 'name_magic/hash'
 #   Dog.instances #=> [Spot, Rover]
 #   Animal.instances #=> [Livia, Spot, Rover]
 #
-# To make the subclasses use each their own namespace, use +#namespace!+ method:
+# Make the subclasses be their own namespaces with +#namespace!:
 #
 #   Dog.namespace!
 #   
-# NameMagic also provides an alternative way to create named objects by taking
-# care of :name (alias :ɴ) named argument of the constructor:
+# NameMagic also provides another way of naming objects by taking
+# care of :name (alias :ɴ) parameter of #new constructor:
 #
 #   Dog.new name: "Spot"
 #   Dog.new.name = :Rover
 #   Dog.instances._names_ #=> [:Spot, :Rover]
 #   Animal.instances._names_ #=> []
 #
-# Note that the Dog instances above did not disappear even though we did not
-# assign them to any variables or constants. This is because the instances of
-# the classes using NameMagic, whether named or not, are since their creation
-# referred to from the instance registry, which prevents them from being
-# garbage collected. To get rid of Spot and Rover, we would have to delete
+# Note that the Dog instances above did not disappear even though
+# we did not assign them to any variables or constants. This is
+# because the instances of the classes using NameMagic, whether
+# named or not, are since their creation referred to from the
+# instance registry, which prevents them from being garbage
+# collected. To get rid of Spot and Rover, we would have to delete
 # them from the instance registry:
 #
 #   Dog.forget "Spot"
 #   Dog.forget "Rover"
 #
-# Spot and Rover show their inspect string for the last time and are garbage
-# collected. 
+# Spot and Rover show their inspect string for the last time and
+# are garbage collected.
 # 
 module NameMagic
-  DEBUG = false
+  require_relative 'name_magic/array_methods'
+  require_relative 'name_magic/hash_methods'
 
-  require_relative 'name_magic/namespace_methods'
+  Array.class_exec { include ArrayMethods }
+  Hash.class_exec { include HashMethods }
+
+  require_relative 'name_magic/namespace'
   require_relative 'name_magic/class_methods'
 
   def self.included target
-    if target.is_a? Class then # decorate #new
+    if target.is_a? Class then
+      # Define target.namespace method.
       target.singleton_class.class_exec do
-        # Primer that sets the namespace of the class to self if the user has
-        # not defined otherwise when this method is first called.
+        # Primer that sets the namespace of the class to self if
+        # the user has not defined otherwise when this method is
+        # first called.
         # 
         define_method :namespace do
-          target.extend ::NameMagic::NamespaceMethods
-          define_singleton_method :namespace do target end # redefines itself
+          # The method first extends target with Namespace methods.
+          target.extend NameMagic::Namespace
+          # The method then redefines itself.
+          define_singleton_method :namespace do target end
+          # And finally calls the redefined version of itself.
           namespace
         end
       end
-      target.singleton_class.class_exec { prepend ::NameMagic::ClassMethods }
-    else # it is a Module -- infect it with this #include
-      orig, this = target.method( :included ), method( :included )
-      target.define_singleton_method :included do |m| this.( m ); orig.( m ) end
+      # Prepend NameMagic::ClassMethod to class << target.
+      target.singleton_class.class_exec do
+        prepend NameMagic::ClassMethods
+      end
+    else # Target is a Module, infect it with this #include
+      original_included_method = target.method :included
+      this_method = method :included
+      target.define_singleton_method :included do |target|
+        this_method.( target )
+        original_included_method.( target )
+      end
     end
   end # self.included
 
@@ -160,67 +185,101 @@ module NameMagic
     self.class.namespace
   end
 
-  # Retrieves the instance's name not prefixed by the namespace as a symbol.
-  # Underlines (+#_name_+) distinguish this method from +#name+ method, which
-  # returns full name string for compatibility with vanilla Ruby +Module#name+.
+  # Retrieves the instance's name not prefixed by the namespace as
+  # a symbol.  Underlines (+#_name_+) distinguish this method from
+  # +#name+ method, which returns full name string for
+  # compatibility with vanilla Ruby +Module#name+.
   # 
   def _name_
     self.class.const_magic
     __name__ or ( yield self if block_given? )
   end
   alias ɴ _name_
-  # FIXME: Delete the line below! Do it!  Make #name return #full_name, as compatible with Class#name behavior!!!
+  # FIXME: Delete the line below! Do it!  Make #name return
+  # #full_name, as compatible with Class#name behavior!!!
   alias name _name_
 
-  # Returns the instance's full name, a string in the style of those returned
-  # by +Module#name+ method, eg. "Namespace::Name".
+  # Returns the instance's full name, a string in the style of
+  # those returned by +Module#name+ method, eg. "Namespace::Name".
   # 
   def full_name
-    "#{namespace.name || namespace.inspect}::#{namespace.instances[ self ]}"
+    # FIXME: The code below does not even look correct.
+    [ namespace.name || namespace.inspect,
+      namespace.instances[ self ]
+    ].join "::"
   end
-  # FIXME: Uncomment the line below! Do it! Make #name return #full_name, as compatible with Class#name behavior!!!
-  # alias name full_name
+  # FIXME: Uncomment the line below! Do it! Make #name return
+  # #full_name, as compatible with Class#name behavior!!!  alias
+  # name full_name
   
-  # Retrieves the instance name. Does not trigger #const_magic before doing so.
+  # Retrieves the instance name. Does not trigger #const_magic
+  # before doing so.
   # 
   def __name__
-    ɴ = self.class.__instances__[ self ]
-    namespace.name_get_hook.( ɴ ) if ɴ
+    self.class.__instances__[ self ]
   end
 
-  # Names an instance, cautiously (ie. no overwriting of existing names).
+  # Names an instance politely. (Avoids redefining already used
+  # names.) Can be used to unname the instance, if the supplied
+  # argument is nil.
   # 
   def name=( name )
-    old_ɴ = namespace.__instances__[ self ]         # previous name
+    # Get the previous name of the instance, if any.
+    old_ɴ = namespace.__instances__[ self ]
+    # Next action depends on the value of name.
     if name.nil? then
-      namespace.__instances__.update( self => nil ) # unname in @instances
-      namespace.send :remove_const, old_ɴ if old_ɴ  # remove namespace const.
+      # Unname the instance.
+      namespace.__instances__.update( self => nil )
+      # # Remove the constant from the namespace.
+      # namespace.send :remove_const, old_ɴ if old_ɴ
     else
-      ɴ = honor_name_set_hooks( name, old_ɴ )
-      return if old_ɴ == ɴ                  # already named as required
-      fail NameError, "Name '#{ɴ}' already exists in #{namespace} namespace!" if
-        self.class.__instances__.rassoc( ɴ )
-      namespace.__forget__ old_ɴ            # forget the old name of self
-      namespace.const_set ɴ, self           # write a constant
-      namespace.__instances__[ self ] = ɴ   # write to @instances
+      # Name the instance.
+      ɴ = honor_naming_hooks( name, old_ɴ )
+      # Quit if the instance is already named as required.
+      return if old_ɴ == ɴ
+      # Raise error if the required name is already taken.
+      if self.class.__instances__.rassoc( ɴ ) then
+        fail NameError, "Name '#{ɴ}' already exists in " +
+                        "#{namespace} namespace!"
+      end
+      # Forget the old name of self.
+      namespace.__forget__ self
+      # # Create a constant in the namespace.
+      # namespace.const_set ɴ, self
+      # Create an entry in to @instances.
+      namespace.__instances__.update self => ɴ
     end
   end
 
   # Names an instance, aggresively (overwrites existing names).
   # 
   def name!( name )
-    old_ɴ = namespace.__instances__[ self ]   # previous name
-    return self.name = nil if name.nil?       # no collider concerns
-    ɴ = honor_name_set_hooks( name, old_ɴ )
-    return false if old_ɴ == ɴ                # already named as required
+    # Get the previous name of the instance, if any.
+    old_ɴ = namespace.__instances__[ self ]
+    # Unname the instance if nil is supplied as argument.
+    return self.name = nil if name.nil?
+    # Proceed to name the instance without collision concerns.
+    ɴ = honor_naming_hooks( name, old_ɴ )
+    # Quit if the instance is already named as required.
+    return false if old_ɴ == ɴ
+    # Search for the collider.
     pair = namespace.__instances__.rassoc( ɴ )
-    namespace.__forget__( pair[0] ) if pair   # rudely forget the collider
-    namespace.__forget__ old_ɴ                # forget the old name of self
-    namespace.const_set ɴ, self               # write a constant
-    namespace.__instances__[ self ] = ɴ       # write to @instances
+    # Rudely de-register the collider if it is present.
+    if pair then
+      collider = pair.first
+      namespace.__forget__( collider )
+    end
+    # Forget the old name of self.
+    namespace.__forget__ self
+    # # Create a constant in the namespace.
+    # namespace.const_set ɴ, self
+    # Create an entry in to @instances.
+    namespace.__instances__.update self => ɴ
   end
 
-  # Is the instance avid for a name? (Will it overwrite other instance names?)
+  # Is the instance avid? ("Avid" means that the instance is so
+  # eager to get a name that it will use name even if this is
+  # already in use by another instance.)
   # 
   def avid?
     namespace.__avid_instances__.any? &method( :equal? )
@@ -229,21 +288,24 @@ module NameMagic
   # Make the instance not avid.
   # 
   def make_not_avid!
-    namespace.__avid_instances__.delete_if { |i| i.object_id == object_id }
+    namespace.__avid_instances__.delete_if { |i| equal? i }
   end
 
-  # Registers a hook to execute upon instance naming. Instance's `#name_set_hook`
-  # Behaves analogically as namespace's `#name_set_hook`, and is executed right
-  # after the namespace's hook. Expects a block with a single argument, name of
-  # the instance. The return value of the block is not used and should be _nil_.
-  # Without a block, this method acts as a getter.
+  # Registers a hook to execute upon instance naming. Instance's
+  # `#name_set_hook` Behaves analogically as namespace's
+  # `#name_set_hook`, and is executed right after the namespace's
+  # hook. Expects a block with a single argument, name of the
+  # instance. The return value of the block is not used and should
+  # be _nil_.  Without a block, this method acts as a getter.
   # 
-  def name_set_hook &block
-    tap { @name_set_hook = block } if block
-    @name_set_hook ||= -> name { nil }
+  def exec_when_named &block
+    tap { @block_to_exec_when_named = block } if block
+    @block_to_exec_when_named ||= -> name { nil }
   end
+  # alias name_set_hook exec_when_named
 
-  # Default +#to_s+ method for +NameMagic+ includers, returning the name.
+  # +NameMagic+ redefines #to_s method to show names.
+  # name.
   # 
   def to_s
     name ? name.to_s : super
@@ -252,18 +314,25 @@ module NameMagic
   # Default +#inspect+ method for +NameMagic+ includers.
   # 
   def inspect
+    # FIXME: Is this method really necessary?
     to_s
   end
 
   private
 
-  # Honors name set hooks, first for the namespace, then for the instance.
-  # Takes 2 arguments, name and old name of this instance. Returns the final
-  # name to be used
+  # Honors naming hooks, first for the namespace, then for the
+  # instance. Takes 2 arguments, name and old name of this
+  # instance. Returns the final name to be used
   # 
-  def honor_name_set_hooks suggested_name, old_name
-    ɴ = namespace.name_set_hook.( suggested_name, self, old_name ).to_sym
-    # puts "NameMagic: Name adjusted to #{name}." if DEBUG
-    namespace.validate_name( ɴ ).to_sym.tap { |ɴ| name_set_hook.( ɴ ) }
+  def honor_naming_hooks suggested_name, old_name
+    # First, honor namespace.exec_when_naming (baptism hook).
+    name = namespace
+      .exec_when_naming.( suggested_name.to_s, self, old_name )
+      .to_sym
+    # Then, validate the name with namespace.validate_name.
+    name = namespace.validate_name( name ).to_sym
+    # Finally, respect NameMagic#exec_when_named hook.
+    exec_when_named.( name )
+    return name
   end
 end # module NameMagic
