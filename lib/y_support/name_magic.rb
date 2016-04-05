@@ -5,12 +5,14 @@ require_relative '../y_support/core_ext/hash/misc'
 require_relative 'name_magic/array'
 require_relative 'name_magic/hash'
 
-# This mixin imitates Ruby constant magic and automates the named argument
-# :name, alias :ɴ (Character "ɴ", Unicode small capital N, generally stands
-# for "name" ins YSupport). One can write:
+# Module NameMagic imitates Ruby constant magic and automates the named argument
+# :name, alias :ɴ (Character "ɴ", Unicode small capital N). At the same time,
+# NameMagic provides the registry of instances of the user class. In Ruby, we
+# frequently want to keep a list of instances of some classes, and NameMagic
+# also helps with this task. Simple example:
 #
 #   require 'y_support/name_magic'
-#   class Foo;
+#   class Foo
 #     include NameMagic
 #   end
 #   Bar = Foo.new
@@ -19,35 +21,88 @@ require_relative 'name_magic/hash'
 #
 #   Bar.name #=> "Bar"
 #
-# This is done by searching whole Ruby namespace for constants, via #const_magic
-# defined in the namespace mixin. (Once the object is named, its assignments to
-# other constants have no further effects.) By default, the class, in which
-# NameMagic is included acts as a namespace: holds a list of instances and their
-# names, which is often useful.
+# We can get the list of instances by:
 #
 #   Foo.instances #=> [Bar]
 #
-# It is possible to set another module as namespace:
+# Additionally, NameMagic provides two hooks: Instantiation hook activates
+# when a new instance is created, and naming hook activates when the created
+# instance is baptized. Let us set the first hook, for example, as follows:
 #
-#   Quux = Module.new
-#   class FooBar
-#     include NameMagic
+#   Foo.instantiation_hook do |instance|
+#     puts "New instance of Foo with object id #{instance.object_id} created!"
 #   end
-#   FooBar.namespace = Quux
-#   FooBar.new name: "Baz"
-#   Quux.instances #=> [Baz]
 #
-# When subclassing the classes with NameMagic included, namespace setting does
-# not change:
+# Now let us set the second hook as follows:
 #
+#   Foo.naming_hook do |name, instance|
+#     puts "Instance with object id #{instance.object_id} is baptized #{name}!"
+#     name
+#   end
+#
+# Note that the naming hook must always return name. (This can be used to
+# censor the name on the fly, but that's beyond this basic intro.) Now that
+# we set the hooks, let us observe when do they activate:
+#
+#   i = Foo.new
+#   New instance of Foo with object id 73054440 created!
+#
+#   Baz = i
+#   Instance with object id 73054440 is baptized Baz!
+#  
+# We can see that the registry of instances now registers two instances:
+#
+#   Foo.instances #=> [Bar, Baz]
+#
+# NameMagic has been programmed to be simple and intuitive to use, so with this
+# little demonstration, you can start using it without fear. You can find the
+# rest of the methods provided by NameMagic in the documentation.
+# 
+# However, behind the scenes, inner workings of NameMagic require understanding.
+# The key part of NameMagic is the code that searches Ruby namespace for
+# constants. This search is done automatically when necessary. It can be also
+# explicitly initiated by calling .const_magic class method, but this is
+# rarely needed. When you write "include NameMagic" in some class, three
+# things happen:
+#
+# 1. module NameMagic is included in that class, as expected.
+# 2. The user class is extended with module NameMagic::ClassMethods.
+# 3. The namespace is extended with module NameMagic::NamespaceMethods.
+#
+# Namespace (in the NameMagic sense) is a module that holds the list of
+# instances and their names. Typically, the user class acts as its own
+# namespace. Note that the meaning of the word 'namespace' is somewhat
+# different from its meaning in general Ruby. NameMagic actually provides
+# class method .namespace that returns the namespace of the class. Consider
+# this example:
+#
+#   require 'y_support/name_magic'
 #   class Animal; include NameMagic end
+#   Animal.namespace #=> Animal
+# 
+# We can see that the namespace of Animal class is again Animal class. But
+# when we subclass it:
+#
 #   class Dog < Animal; end
 #   class Cat < Animal; end
 #   Dog.namespace #=> Animal
 #   Cat.namespace #=> Animal
+#
+# The subclasses retain Animal as their namespace. Let us continue with the
+# example:
+#
 #   Livia = Cat.new
-#   Cat.instances._names_ #=> []
-#   Animal.instances._names_ #=> [:Livia]
+#   Cat.instances #=> [Livia]
+#   Dog.instances #=> []
+#   Animal.instances #=> [Livia]
+#
+# Let us demonstrate alternative ways of creating named objects:
+#
+#   Dog.new name: :Spot
+#   Dog.new ɴ: "Rover"
+#   Cat.instances #=> [Livia]
+#   Dog.instances #=> [Spot, Rover]
+#   Animal.instances #=> [Livia, Spot, Rover]
 #
 # To make the subclasses use each their own namespace, use +#namespace!+ method:
 #
@@ -57,17 +112,22 @@ require_relative 'name_magic/hash'
 # care of :name (alias :ɴ) named argument of the constructor:
 #
 #   Dog.new name: "Spot"
-#   Dog.new ɴ: :Rover
+#   Dog.new.name = :Rover
 #   Dog.instances._names_ #=> [:Spot, :Rover]
 #   Animal.instances._names_ #=> []
 #
-# Lastly, a name can be assigned by #name= accssor, as in
+# Note that the Dog instances above did not disappear even though we did not
+# assign them to any variables or constants. This is because the instances of
+# the classes using NameMagic, whether named or not, are since their creation
+# referred to from the instance registry, which prevents them from being
+# garbage collected. To get rid of Spot and Rover, we would have to delete
+# them from the instance registry:
 #
-# <tt>o = SomeClass.new</tt>
-# <tt>o.name = "SomeName"</tt>
+#   Dog.forget "Spot"
+#   Dog.forget "Rover"
 #
-# Hook is provided for when the name magic is performed, as well as when the
-# name is retrieved.
+# Spot and Rover show their inspect string for the last time and are garbage
+# collected. 
 # 
 module NameMagic
   DEBUG = false
