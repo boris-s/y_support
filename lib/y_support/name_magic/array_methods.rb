@@ -44,5 +44,5 @@ module NameMagic::ArrayMethods
     return map( &:_name_ ).compact if option == false
     fail ArgumentError, "Unknown option: #{option}"
   end
-  alias ɴs _names_
+  alias ɴ _names_
 end

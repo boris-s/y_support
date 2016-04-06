@@ -532,20 +532,40 @@ describe NameMagic do
   describe NameMagic::ArrayMethods do
     before do
       c = @c.call
-      @i, @j = c.new( name: :Fred ), c.new( name: :Joe )
+      @e1 = c.new name: :Fred
+      @e2 = c.new name: :Joe
+      @e3 = c.new
+      @e4 = c.new name: :Julia
+      @a = @e1, @e2, @e3, @e4
     end
 
     describe "Array#names" do
-      it "should work as expected" do
-        skip
-        flunk "Test not written!"
+      it "maps unnamed objects into nil by default" do
+        @a.names.must_equal [ :Fred, :Joe, nil, :Julia ]
+        @a.names( nil ).must_equal [ :Fred, :Joe, nil, :Julia ]
+      end
+
+      it "maps unnamed objects into themselves if option=true" do
+        @a.names( true ).must_equal [ :Fred, :Joe, @e3, :Julia ]
+      end
+
+      it "omits the unnamed instances if option=false" do
+        @a.names( false ).must_equal [ :Fred, :Joe, :Julia ]
       end
     end
 
     describe "Array#_names_" do
-      it "should work as expected" do
-        skip
-        flunk "Test not written!"
+      it "maps unnamed objects into nil by default" do
+        @a._names_.must_equal [ :Fred, :Joe, nil, :Julia ]
+        @a._names_( nil ).must_equal [ :Fred, :Joe, nil, :Julia ]
+      end
+
+      it "maps unnamed objects into themselves if option=true" do
+        @a._names_( true ).must_equal [ :Fred, :Joe, @e3, :Julia ]
+      end
+
+      it "omits the unnamed instances if option=false" do
+        @a._names_( false ).must_equal [ :Fred, :Joe, :Julia ]
       end
     end
   end
@@ -592,7 +612,52 @@ describe NameMagic do
     end
   end
 
-  describe "how naming collisions and renaming are solved" do
+  describe "renaming" do
+    before do
+      @human = @c.call
+      @city = Module.new
+      @human.namespace = @city
+    end
+
+    it "is possible without restrictions" do
+      a = @human.new name: :Fred
+      a.name.must_equal :Fred
+      # Fred can be renamed to Joe without problems.
+      a.name = :Joe
+      a.name.must_equal :Joe
+    end
+
+    it "can be prohibited eg. by naming hook" do
+      @city.exec_when_naming do |name, instance, old_name|
+        fail NameError, "Renaming is now prohibited!" if old_name
+        name
+      end
+      a = @human.new name: :Fred
+      -> { a.name = :Joe }.must_raise NameError
+    end
+  end
+
+  describe "name collisions" do
+    before do
+      @human = @c.call
+      @city = Module.new
+      @human.namespace = @city
+      @a = @human.new name: :Fred
+    end
+
+    it "cannot construct another Fred by #new method" do
+      -> { @human.new name: :Fred }.must_raise NameError
+    end
+
+    it "cannot construct another Fred by #name= method" do
+      b = @human.new
+      -> { b.name = :Fred }.must_raise NameError
+    end
+
+    it "can, however, steal name Fred by constant assignment" do
+      m = Module.new
+      m::Fred = @human.new
+    end
   end
 
   describe "how avid instances work" do
@@ -602,88 +667,3 @@ describe NameMagic do
     # This mainly tests NameMagic.included hook.
   end
 end # describe NameMagic
-
-# mod = Module.new do include NameMagic end
-# @namespace = Class.new do include mod end
-# @uc1 = Class.new @namespace
-# @uc2 = Class.new @namespace
-# class << @reporter = Object.new
-#   attr_reader :report, :naming
-# end
-
-
-#       end
-
-
-#       end
-#     end # describe "basic features"
-#   end
-    
-#   it "should work" do
-#     skip
-#     @ç.instances.must_be_empty
-#     @ç.nameless_instances.must_be_empty
-#     @reporter.report.must_equal nil
-#   end
-
-#   it "..." do
-#     skip
-#     @ç.namespace.instantiation_hook do |instance|
-#       @reporter.define_singleton_method :report do "Instance reported" end
-#     end
-#     @ç.namespace.name_set_hook do |name, instance, old_name|
-#       @reporter.define_singleton_method :name_set do
-#         "Name of the new instance was #{name}"
-#       end
-#       name
-#     end
-#     @ç.name_get_hook do |name_object|
-#       @reporter.define_singleton_method :name_get do
-#         "Name get hook called on #{name_object}"
-#       end
-#       name_object
-#     end
-#   end
-  
- 
-
-#  it "should work" do
-#    skip
-#     x = @ç.new( name: "Boris" )
-#     @reporter.report.must_equal "Instance reported"
-#     @reporter.name_set.must_equal "Name of the new instance was Boris"
-#     x.name.must_equal :Boris
-#     @reporter.name_get.must_equal "Name get hook called on Boris"
-#     ufo = @ç.new
-#     @ç.nameless_instances.must_equal [ufo]
-#     UFO = @ç.new
-#     @reporter.report.must_equal "Instance reported"
-#     @reporter.name_set.must_equal "Name of the new instance was Boris"
-#     UFO.name
-#     @reporter.name_set.must_equal "Name of the new instance was UFO"
-#     @reporter.name_get.must_equal "Name get hook called on UFO"
-#     Elaine = @ç.new
-#     Elaine.name.must_equal :Elaine
-#     m = Module.new
-#     XXX = m
-#     @ç.namespace = XXX
-#     @ç.namespace.must_equal m
-#     @ç.singleton_class.must_include ::NameMagic::ClassMethods
-#     m.singleton_class.must_include ::NameMagic::NamespaceMethods
-#     Rover = @ç.new
-#     @ç.namespace.must_equal XXX
-#     @ç.nameless_instances.must_equal [ Rover ]
-#     @ç.const_magic
-#     Rover.name.must_equal :Rover
-#     XXX::Rover.must_be_kind_of @ç
-#     @ç.namespace!
-#     Spot = @ç.new
-#     @ç.const_magic
-#     Spot.name.must_equal :Spot
-#     -> { XXX::Spot }.must_raise NameError
-#     @ç.const_get( :Spot ).must_be_kind_of @ç
-#     # Array
-#     [ Spot ].names.must_equal [ :Spot ]
-#     { Spot => 42 }.keys_to_names.must_equal( { Spot: 42 } )
-#   end
-# end    

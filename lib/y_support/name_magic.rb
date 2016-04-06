@@ -325,14 +325,21 @@ module NameMagic
   # instance. Returns the final name to be used
   # 
   def honor_naming_hooks suggested_name, old_name
-    # First, honor namespace.exec_when_naming (baptism hook).
-    name = namespace
-      .exec_when_naming.( suggested_name.to_s, self, old_name )
-      .to_sym
-    # Then, validate the name with namespace.validate_name.
+    # There are two hooks to honor
+    namespace_hook = namespace.exec_when_naming
+    instance_hook = exec_when_named
+    # First, honor the namespace hook.
+    instance = self
+    name = suggested_name.to_s
+    # TODO: Consider how to execute the hook to have all the
+    # namespace methods available inside it.
+    name = namespace_hook.( name, instance, old_name ).to_sym
+    # Apply namespace.validate_name to name.
     name = namespace.validate_name( name ).to_sym
-    # Finally, respect NameMagic#exec_when_named hook.
-    exec_when_named.( name )
+    # Finally, honor the instance baptism hook.
+    # TODO: Consider how to execute the hook to have all the
+    # instance methods provided by NameMagic available inside.
+    instance_hook.( name )
     return name
   end
 end # module NameMagic
