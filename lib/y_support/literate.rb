@@ -53,7 +53,7 @@ module Literate
   # 
   class Attempt < BasicObject
     # String construction closures are defined below.
-    DECORATE = -> string, prefix: '', postfix: '' do
+    CONSTRUCT = -> string, prefix: '', postfix: '' do
       s = string.to_s
       if s.empty? then '' else prefix + s + postfix end
     end
@@ -152,21 +152,21 @@ module Literate
       # Get the description of the main subject.
       subject, statements = __describe__( __subject__ )
       # Write the 2nd part of the error message.
-      part2 = DECORATE.( subject, prefix: ' ' )
+      part2 = CONSTRUCT.( subject, prefix: ' ' )
       # Construct the descriptive string of the main subject.
       subject_description = statements.map { |verb, object|
         # Generate the statement string.
         STATE[ verb ] % object
       }.join ', ' # join the statement strings with commas
       # Write the third part of the error message.
-      part3 = DECORATE.( subject_description,
+      part3 = CONSTRUCT.( subject_description,
                          prefix: ' (', postfix: ')' )
       # Write the fourth part of the error message.
-      part4 = DECORATE.( __circumstances__, prefix: ', ' )
+      part4 = CONSTRUCT.( __circumstances__, prefix: ', ' )
       # Write the fifth part of the error message.
-      part5 = DECORATE.( "#{error.class} occurred: #{error}", 
-                          prefix: ', ' )
-      return part1 + part2 + part3 + part4 + part5
+      part5 = ": #{error}"
+      part6 = ['.', '!', '?'].include?( part5[-1] ) ? '' : '!'
+      return [ part1, part2, part3, part4, part5, part6 ].join
     end
 
     # Inside the block, +#try method is delegated to the subject
@@ -222,7 +222,7 @@ module Literate
           TRANSITIVE[ verb ] % object
         }.join( ', ' )
         # Create the fact string.
-        subject + DECORATE.( statements, prefix: ' ' )
+        subject + CONSTRUCT.( statements, prefix: ' ' )
       }
       # Concatenate the fact strings and return the result.
       return fact_strings.join( ', ' )

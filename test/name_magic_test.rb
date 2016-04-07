@@ -57,7 +57,7 @@ describe NameMagic do
     describe ".validate_name" do
       it "must validate suitable capitalized names" do
         c = @c.call
-        c.validate_name( :Fred ).must_equal "Fred"
+        c.validate_name( :Fred ).must_equal :Fred
         c.validate_name( "Fred" ).must_equal "Fred"
         -> { c.validate_name "fred" }.must_raise NameError
         -> { c.validate_name "Name With Spaces" }
@@ -440,7 +440,7 @@ describe NameMagic do
 
     describe "Namespace#validate_name" do
       it "should work as expected" do
-        @ns.validate_name( :Dave ).must_equal "Dave"
+        @ns.validate_name( :Dave ).must_equal :Dave
       end
     end
   end # describe NameMagic::Namespace
@@ -513,36 +513,36 @@ describe NameMagic do
         # to NameMagic, it only confuses the users.
         skip
         flunk "Tests not written!"
-      end
+        end
     end
 
     describe "NameMagic#exec_when_named hook" do
-      it "is executed just before instance naming" do
+      it "is executed just after instance naming" do
         i = @human.new
-        counter = 0
-        i.exec_when_named do counter += 1 end
-        counter.must_equal 0
+        names = []
+        i.exec_when_named do names << name end
+        names.must_equal []
         i.name = :Fred
-        counter.must_equal 1
+        names.must_equal [:Fred]
         j = @human.new
-        counter.must_equal 1
+        names.must_equal [:Fred]
         j.name = :Joe
-        counter.must_equal 1
+        names.must_equal [:Fred]
         # Finally, one more way how to use this hook.
         @human.instantiation_exec do |instance|
-          instance.exec_when_named do |name| counter += 1 end
+          instance.exec_when_named do names << name end
         end
-        @human.new name: "Dave"
-        counter.must_equal 2
+        @human.new name: :Dave
+        names.must_equal [:Fred, :Dave]
         @human.new name: :St_IGNUcius
-        counter.must_equal 3
+        names.must_equal [:Fred, :Dave, :St_IGNUcius]
       end
 
       it "is executed in the context of the instance" do
         i = @human.new
         i.define_singleton_method :hello do "hello" end
         result = nil
-        i.exec_when_named do |name| result = hello, name end
+        i.exec_when_named do result = hello, name end
         i.name = :Dave
         result.join( ' ' ).must_equal "hello Dave"
         # Explanation: If the block was not executed in the
@@ -619,9 +619,7 @@ describe NameMagic do
     end
 
     describe "Hash#keys_to_names!" do
-      # FIXME: Change this method to keys_to_full_names!.
       it "must work as expected" do
-        skip
         h = { @i => 1, @j => 2 }
         h.keys_to_names!
         h.must_equal( { Fred: 1, Joe: 2 } )

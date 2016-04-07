@@ -124,6 +124,37 @@ describe Literate::Attempt do
   end
 end
 
+describe "usecase 1: name validator" do
+  before do
+    @name_validator = Object.new
+    @name_validator.define_singleton_method :validate do |name|
+      name.to_s.try "to validate the requested name" do
+        note "rejecting non-capitalized names"
+        fail NameError unless ( ?A..?Z ) === self[0]
+        note "rejecting names with spaces"
+        fail NameError unless split( ' ' ).size == 1
+      end
+      return name
+    end
+  end
+
+  it "should validate good names" do
+    @name_validator.validate( :Fred ).must_equal :Fred
+    @name_validator.validate( "Su_san" ).must_equal "Su_san"
+  end
+
+  it "should reject bad names with a good error message" do
+    expected_message =
+      "When trying to validate the requested name, rejecting " +
+      "non-capitalized names: NameError!"
+    begin
+      @name_validator.validate( :fred )
+    rescue => error
+      error.message.must_equal expected_message
+    end
+  end
+end
+
 # describe 'case 1' do
 #   it "should work" do
 #     # begin

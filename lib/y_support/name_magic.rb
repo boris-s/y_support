@@ -1,7 +1,8 @@
 # encoding: utf-8
 
 require_relative '../y_support'
-require_relative '../y_support/core_ext/hash/misc'
+require_relative 'core_ext/hash/misc'
+require_relative 'literate'
 
 # Module NameMagic imitates Ruby constant magic and automates the
 # named argument :name, alias :ɴ (Character "ɴ", Unicode small
@@ -232,18 +233,18 @@ module NameMagic
   # 
   def name=( name )
     # Get the previous name of the instance, if any.
-    old_ɴ = namespace.__instances__[ self ]
+    old_name = namespace.__instances__[ self ]
     # Next action depends on the value of name.
     if name.nil? then
       # Unname the instance.
       namespace.__instances__.update( self => nil )
       # # Remove the constant from the namespace.
       # namespace.send :remove_const, old_ɴ if old_ɴ
-    else
-      # Name the instance.
-      ɴ = honor_naming_hooks( name, old_ɴ )
+    else # Name the instance.
+      # Honor the namespace naming hook.
+      ɴ = honor_exec_when_naming( name, old_name )
       # Quit if the instance is already named as required.
-      return if old_ɴ == ɴ
+      return if old_name == ɴ
       # Raise error if the required name is already taken.
       if self.class.__instances__.rassoc( ɴ ) then
         fail NameError, "Name '#{ɴ}' already exists in " +
@@ -255,6 +256,8 @@ module NameMagic
       # namespace.const_set ɴ, self
       # Create an entry in to @instances.
       namespace.__instances__.update self => ɴ
+      # Honor the second (instance's) hook when already named.
+      honor_exec_when_named
     end
   end
 
@@ -262,13 +265,14 @@ module NameMagic
   # 
   def name!( name )
     # Get the previous name of the instance, if any.
-    old_ɴ = namespace.__instances__[ self ]
+    old_name = namespace.__instances__[ self ]
     # Unname the instance if nil is supplied as argument.
     return self.name = nil if name.nil?
     # Proceed to name the instance without collision concerns.
-    ɴ = honor_naming_hooks( name, old_ɴ )
+    # Start by honoring the first (namespace's) naming hook.
+    ɴ = honor_exec_when_naming( name, old_name )
     # Quit if the instance is already named as required.
-    return false if old_ɴ == ɴ
+    return false if old_name == ɴ
     # Search for the collider.
     pair = namespace.__instances__.rassoc( ɴ )
     # Rudely de-register the collider if it is present.
@@ -282,6 +286,8 @@ module NameMagic
     # namespace.const_set ɴ, self
     # Create an entry in to @instances.
     namespace.__instances__.update self => ɴ
+    # Honor the second (instance's) naming hook when already named.
+    honor_exec_when_named
   end
 
   # Is the instance avid? ("Avid" means that the instance is so
@@ -307,7 +313,7 @@ module NameMagic
   # 
   def exec_when_named &block
     tap { @block_to_exec_when_named = block } if block
-    @block_to_exec_when_named ||= -> name { nil }
+    @block_to_exec_when_named ||= -> { }
   end
   # alias name_set_hook exec_when_named
 
@@ -326,39 +332,40 @@ module NameMagic
 
   private
 
-  # Honors naming hooks, first for the namespace, then for the
-  # instance. Takes 2 arguments, name and old name of this
-  # instance. Returns the final name to be used
+  # Honors namespace hook Namespace#exec_when_naming. Takes 2
+  # arguments, name and old name of this instance. Also calls
+  # Namespace#validate_name method. Returns the final name to be
+  # used.
   # 
-  def honor_naming_hooks suggested_name, old_name
-    # There are two hooks to honor
-    namespace_hook = namespace.exec_when_naming
-    instance_hook = exec_when_named
-    # First, honor the namespace hook.
+  def honor_exec_when_naming( suggested_name, old_name )
     instance = self
     suggested_name = suggested_name.to_s
+    # Method Namespace#exec_when_naming, when called withou a
+    # block, returns the block defined earlier.
+    block = namespace.exec_when_naming
     # Execute the namespace hook in the context of the user class.
-    name = self.class.instance_exec( suggested_name,
-                                     instance,
-                                     old_name,
-                                     &namespace_hook )
-    # The hook was supposed to return the name to be actually used.
-    # But if the coder used the block for other purposes and did
-    # not bother to return the original name, we should assume
-    # it by default. I am hesitating whether this is making
-    # the hook too smart, or not...
-    name = begin
-             name.to_sym
-           rescue NoMethodError
+    name = self.class.instance_exec( suggested_name, instance,
+                                     old_name, &block )
+    # The hook is supposed to return the name to be actually used.
+    # But if the user used the block for other purposes and did
+    # not bother to return a string or symbol (or anything that
+    # can be converted to a symbol), we will assume that the user
+    # meant to leave the suggested name without intervention.
+    # I wonder whether this behavior is too smart.
+    name = begin; name.to_sym; rescue NoMethodError
              suggested_name
            end
-    # Apply validate_name method.
-    name = self.class.validate_name( name ).to_sym
-    # Finally, honor the instance baptism hook.
-    # TODO: Consider how to execute the hook to have all the
-    # instance methods provided by NameMagic available inside.
-    instance_exec name, &instance_hook
-    # instance_hook.( name )
-    return name
+    # Finally, apply validate_name method.
+    return self.class.validate_name( name ).to_sym
+  end
+
+  # Honors instance's hook exec_when_named.
+  # 
+  def honor_exec_when_named
+    # Method #exec_when_named, when called withou a block, returns
+    # the block defined earlier.
+    block = exec_when_named
+    # Block is executed within the context of this instance.
+    instance_exec &block
   end
 end # module NameMagic
