@@ -376,7 +376,23 @@ module NameMagic::Namespace
           instance.make_not_avid!
         else
           # Avid flag is not set, name the instance politely.
-          instance.name = const_ß
+          # 
+          # Note that instances of NameMagic user classes are
+          # created avid. So if the anonymous instance is not
+          # avid at this point, it means it must have lost its
+          # avidity either being a previously named and now
+          # unnamed instance, or by the user explicitly invoking
+          # its #make_not_avid! method. In the first case, we do
+          # not want to see NameErrors raised ad infinitum just
+          # because there is some now-unnamed instance assigned
+          # to some forgotten constant in the deep namespace.
+          # In the second case, we must assume that the user
+          # takes the responsibility. So we will swallow NameError
+          # here:
+          begin
+            instance.name = const_ß
+          rescue NameError
+          end
         end
         # Remove the instance object id from todo list.
         todo.delete instance.object_id

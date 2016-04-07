@@ -507,15 +507,6 @@ describe NameMagic do
       end
     end
 
-    describe "#make_not_avid!" do
-      it "removes the avid state of the instance" do
-        # FIXME: Consider making all of this avid stuff private
-        # to NameMagic, it only confuses the users.
-        skip
-        flunk "Tests not written!"
-        end
-    end
-
     describe "NameMagic#exec_when_named hook" do
       it "is executed just after instance naming" do
         i = @human.new
@@ -611,7 +602,7 @@ describe NameMagic do
     end
 
     describe "Hash#keys_to_names" do
-      # FIXME: Change this method to keys_to_full_names.
+      # TODO: Consider method to keys_to_full_names.
       it "must work as expected" do
         { @i => 1, @j => 2 }.keys_to_names
           .must_equal( { Fred: 1, Joe: 2 } )
@@ -691,6 +682,47 @@ describe NameMagic do
   end
 
   describe "how avid instances work" do
+    describe "why avidity is needed" do
+      # In NameMagic, names are unique. At the same time, naming
+      # can be performed by constant assignment. If all instances
+      # were always avid, fights over a name would ensue if two
+      # constant assignments leading to the same naming were
+      # present in the namespace. We could get rid of avidity
+      # only if the naming was done using constant names with
+      # full Ruby namespace path. The question is, should we do
+      # this? It would surely break some dependencies. I am not
+      # gonna do it until YPetri paper is out.
+    end
+
+    describe "new instance" do
+      it "is created avid" do
+        skip
+        flunk "Test not written!"
+      end
+
+      it "can lose its avidity using #make_not_avid! method" do
+        skip
+        flunk "Test not written!"
+      end
+
+      it "also loses avidity by naming" do
+        skip
+        flunk "Test not written!"
+      end
+    end
+
+    describe "unnamed instance" do
+      it "does not regain avidity it lost upon naming" do
+        skip
+        flunk "Test not written!"
+      end
+
+      it "does not raise repeated NameError if it is assigned" +
+         "to some forgotten constant in the namespace" do
+        skip
+        flunk "Test not written!"
+      end
+    end
   end
 
   describe "how NameMagic can be included modules and classes" do
