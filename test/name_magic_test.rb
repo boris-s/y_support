@@ -691,7 +691,11 @@ describe NameMagic do
       # only if the naming was done using constant names with
       # full Ruby namespace path. The question is, should we do
       # this? It would surely break some dependencies. I am not
-      # gonna do it until YPetri paper is out.
+      # gonna do it until YPetri paper is out. However, I feel
+      # that naming by full namespace path of the constant will
+      # be a must if I try to make use of the Ruby's native
+      # namespace mechanism for YPetri / YNelson nets and for
+      # YChem / YCell modules.
     end
 
     describe "new instance" do
