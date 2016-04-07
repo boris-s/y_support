@@ -190,32 +190,38 @@ describe Hash do
     test = { a: 11, b: 22 }
     assert_equal( { a: 11, b: 22 }, test.default!( defaults ) )
     test = { a: 11, c: 22 }
-    assert_equal( { a: 11, b: nil, c: 22 }, test.default!( defaults ) )
+    { a: 11, b: nil, c: 22 }.must_equal test.default! defaults
   end
 
-  it "should have #with_keys and #modify_keys" do
-    assert_equal( {"a" => :b, "c" => :d}, {a: :b, c: :d}.with_keys( &:to_s ) )
-    assert_equal( {"a1" => 1, "c2" => 2}, {a: 1, c: 2}.modify_keys { |k, v|
-                    k.to_s + v.to_s } )
-    assert_equal( {"a1" => 1, "c2" => 2}, {a: 1, c: 2}.modify_keys {|p|
-                    p[0].to_s + p[1].to_s } )
-    assert_equal( {2 => 1, 4 => 2}, {1 => 1, 2 => 2}.modify_keys { |k, v|
-                    k + v } )
-    assert_equal( {2 => 1, 4 => 2}, {1 => 1, 2 => 2}.modify_keys { |p|
-                    p[0] + p[1] } )
+  it "should have #with_keys and #with_keys!" do
+    test = { "a" => :b, "c" => :d }
+    test.with_keys( &:to_sym ).must_equal( { a: :b, c: :d } )
+    test.must_equal( { "a" => :b, "c" => :d } )
+    test.with_keys! &:to_sym
+    test.must_equal( { a: :b, c: :d } )
   end
 
-  it "should have #with_values and #modify_values" do
-    assert_equal( { a: "b", c: "d" }, {a: :b, c: :d}.with_values( &:to_s ) )
-    assert_equal( {a: "ab", c: "cd"}, {a: :b, c: :d}.modify_values { |k, v|
-                    k.to_s + v.to_s } )
-    assert_equal( {a: "ab", c: "cd"}, {a: :b, c: :d}.modify_values { |p|
-                    p[0].to_s + p[1].to_s } )
-    hh = { a: 1, b: 2 }
-    hh.with_values! &:to_s
-    assert_equal ["1", "2"], hh.values
-    hh.modify_values! &:join
-    assert_equal ["a1", "b2"], hh.values
+  it "should have #change_keys" do
+    test = { a: 1, c: 2 }
+    test.change_keys { |k, v| k.to_s + v.to_s }
+      .must_equal( { "a1" => 1, "c2" => 2 } )
+  end
+
+  it "should have #with_values and #with_values!" do
+    test = { a: :b, c: :d }
+    test.with_values( &:to_s ).must_equal( { a: "b", c: "d" } )
+    test.must_equal( { a: :b, c: :d } )
+    test.with_values!( &:to_s )
+    test.must_equal( { a: "b", c: "d" } )
+  end
+
+  it "should have #change_values and #change_values!" do
+    test = { a: :b, c: :d }
+    test.modify_values do |k, v| k.to_s + v.to_s end
+      .must_equal( {a: "ab", c: "cd"} )
+    test.must_equal( { a: :b, c: :d } )
+    test.modify_values! { |k, v| k.to_s + v.to_s }
+    test.must_equal( {a: "ab", c: "cd"} )
   end
 
   it "should have #modify" do

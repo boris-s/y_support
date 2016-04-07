@@ -185,9 +185,10 @@ module NameMagic
     self.class.namespace
   end
 
-  # Retrieves the instance's name not prefixed by the namespace as
-  # a symbol.  Underlines (+#_name_+) distinguish this method from
-  # +#name+ method, which returns full name string for
+  # Retrieves the demodulized instance's name as a symbol.
+  # "Demodulized" means that if the full name is "Foo::Bar", only
+  # :Bar is returned. Underlines (+#_name_+) distinguish this
+  # method from +#name+ method, which returns full name string for
   # compatibility with vanilla Ruby +Module#name+.
   # 
   def _name_
@@ -203,7 +204,13 @@ module NameMagic
   # those returned by +Module#name+ method, eg. "Namespace::Name".
   # 
   def full_name
-    # FIXME: The code below does not even look correct.
+    # FIXME: This method cannot work until Namespace#const_magic
+    # starts noticing not just constant names, as it does now,
+    # but also names of the modules those constants are in. This
+    # is no simple task.
+    #
+    # The code below is the closest approximation, yet still
+    # patently wrong.
     [ namespace.name || namespace.inspect,
       namespace.instances[ self ]
     ].join "::"
@@ -314,7 +321,6 @@ module NameMagic
   # Default +#inspect+ method for +NameMagic+ includers.
   # 
   def inspect
-    # FIXME: Is this method really necessary?
     to_s
   end
 
@@ -330,16 +336,29 @@ module NameMagic
     instance_hook = exec_when_named
     # First, honor the namespace hook.
     instance = self
-    name = suggested_name.to_s
-    # TODO: Consider how to execute the hook to have all the
-    # namespace methods available inside it.
-    name = namespace_hook.( name, instance, old_name ).to_sym
-    # Apply namespace.validate_name to name.
-    name = namespace.validate_name( name ).to_sym
+    suggested_name = suggested_name.to_s
+    # Execute the namespace hook in the context of the user class.
+    name = self.class.instance_exec( suggested_name,
+                                     instance,
+                                     old_name,
+                                     &namespace_hook )
+    # The hook was supposed to return the name to be actually used.
+    # But if the coder used the block for other purposes and did
+    # not bother to return the original name, we should assume
+    # it by default. I am hesitating whether this is making
+    # the hook too smart, or not...
+    name = begin
+             name.to_sym
+           rescue NoMethodError
+             suggested_name
+           end
+    # Apply validate_name method.
+    name = self.class.validate_name( name ).to_sym
     # Finally, honor the instance baptism hook.
     # TODO: Consider how to execute the hook to have all the
     # instance methods provided by NameMagic available inside.
-    instance_hook.( name )
+    instance_exec name, &instance_hook
+    # instance_hook.( name )
     return name
   end
 end # module NameMagic

@@ -49,16 +49,26 @@ class Hash
     end
   end
 
-  # The difference from #with_keys is that modify_keys expects block that takes
-  # 2 arguments (key: value pair) and returns the new key.
+  # Like #with_keys, but modifies the receiver.
   # 
-  def modify_keys
+  def with_keys!
+    keys.each_with_object self do |key, hsh|
+      hsh[ yield key ] = delete key
+    end
+  end
+
+  # The difference from #with_keys is that modify_keys expects
+  # block that takes 2 arguments (key: value pair) and returns the
+  # new key.
+  # 
+  def change_keys
     each_with_object self.class.new do |pair, hsh|
       hsh[ yield pair ] = self[ pair[0] ]
     end
   end
 
-  # Applies a block as a mapping on all values, returning a new hash.
+  # Applies a block as a mapping on all values, returning a new
+  # hash.
   # 
   def with_values
     each_with_object self.class.new do |(k, v), hsh| hsh[ k ] = yield v end
@@ -70,8 +80,9 @@ class Hash
     each_with_object self do |(k, v), hsh| hsh[ k ] = yield v end
   end
 
-  # The difference from #do_with_values is that modify_values expects block
-  # that takes 2 arguments (key: value pair) and returns the new value.
+  # The difference from #with_values is that modify_values expects
+  # block that takes 2 arguments [ key, value ] and returns the
+  # new value.
   # 
   def modify_values
     each_with_object self.class.new do |pair, hsh|
@@ -96,15 +107,17 @@ class Hash
     end
   end
 
-  # Checking mainly against the collision with ActiveSupport's Hash#slice.
+  # Checking mainly against the collision with ActiveSupport's
+  # Hash#slice.
   if Hash.instance_methods.include? :slice then
     warn "Collision: Method #slice already defined on Hash! (%s)" %
       Hash.instance_method( :slice ).source_location
   end
 
-  # A bit like Array#slice, but only takes 1 argument, which is either a Range,
-  # or an Array, and returns the selection of the hash for the keys that match
-  # the range or are present in the array.
+  # A bit like Array#slice, but only takes 1 argument, which is
+  # either a Range, or an Array, and returns the selection of the
+  # hash for the keys that match the range or are present in the
+  # array.
   # 
   def slice matcher
     self.class[ case matcher

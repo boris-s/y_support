@@ -163,15 +163,15 @@ module NameMagic::ClassMethods
       #  Register the instance as unnamed
       __instances__.update( instance => nil )
       # Honor the instantiation hook
-      namespace.new_instance_hook.tap do |hook_block|
-        hook_block.( instance ) if hook_block
-        if nm then
-          # If name has been supplied, name the instance.
-          avid ? instance.name!( nm ) : instance.name = nm
-        else # Name has not been given.
-          # Make the instance avid unless expressly prohibited.
-          __avid_instances__ << instance unless avid == false
-        end
+      hook = namespace.instantiation_exec
+      instance_exec instance, &hook if hook
+      # Name the instance if name has been given.
+      if nm then
+        # If name has been supplied, name the instance.
+        avid ? instance.name!( nm ) : instance.name = nm
+      else # Name has not been given.
+        # Make the instance avid unless expressly prohibited.
+        __avid_instances__ << instance unless avid == false
       end
     end
   end

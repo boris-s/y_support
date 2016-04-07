@@ -240,10 +240,21 @@ describe NameMagic do
       object_ids.size.must_equal 2
       object_ids.must_equal [ i1.object_id, i2.object_id ]
     end
+
+    it "must run in the context of the instance's class" do
+      c = @c.call
+      c.instantiation_exec do foobar() end
+      flag = false
+      -> { c.new }.must_raise NoMethodError
+      flag.must_equal false
+      c.define_singleton_method :foobar do flag = true end
+      c.new
+      flag.must_equal true
+    end
   end
 
   describe ".exec_when_naming hook" do
-    it "must execute at baptism and allow name censorship" do
+    it "must execute just before naming and allow censorship" do
       c = @c.call
       baptised_instances = []
       discarded_names = []
@@ -262,6 +273,15 @@ describe NameMagic do
       baptised_instances.names
         .must_equal [ :Joe, :St_IGNUcius, :St_IGNUcius ]
       discarded_names.must_equal [ :Dave ]
+    end
+
+    it "must execute in the context of the instance's class" do
+      c = @c.call
+      i = c.new
+      c.define_singleton_method :foobar do "Foobar" end
+      c.exec_when_naming do foobar end
+      i.name = :Dave
+      i.name.must_equal :Foobar
     end
   end
 
@@ -426,38 +446,54 @@ describe NameMagic do
   end # describe NameMagic::Namespace
 
   describe "instance methods" do
+    before do
+      @human = @c.call
+      @anon = @human.new
+      @m = Module.new
+      @m::Foo = Module.new
+      @m::Foo::Frank = @human.new
+    end
+
     describe "#_name_" do
       it "should return demodulized name of the instance" do
-        skip
-        flunk "Tests not written!"
+        @m::Foo::Frank._name_.must_equal :Frank
+        @anon._name_.must_equal nil
       end
     end
 
     describe "#full_name" do
       it "should return full name of the instance" do
         skip
-        flunk "Tests not written!"
+        # FIXME: The test below is purposely wrong.
+        @m::Foo::Frank.full_name.must_equal "@m::Foo::Frank"
       end
     end
 
     describe "#__name__" do
       it "returns full name without triggering #const_magic" do
-        skip
-        flunk "Tests not written!"
+        @m::Foo::Frank.__name__.must_equal nil
+        # Now trigger #const_magic manually.
+        @human.const_magic
+        @m::Foo::Frank.__name__.must_equal :Frank
       end
     end
 
     describe "#name=" do
       it "names the instance" do
-        skip
-        flunk "Tests not written!"
+        @m::Foo::Frank.name.must_equal :Frank
+        @m::Foo::Frank.name = :Joe
+        @m::Foo::Frank.name.must_equal :Joe
       end
     end
 
     describe "#name!" do
       it "names the instance aggresively" do
-        skip
-        flunk "Tests not written!"
+        @m::Foo::Frank.name.must_equal :Frank
+        i = @human.new
+        -> { i.name = :Frank }.must_raise NameError
+        i.name! :Frank
+        i.name.must_equal :Frank
+        @m::Foo::Frank.name.must_equal nil
       end
     end
 
@@ -481,50 +517,48 @@ describe NameMagic do
     end
 
     describe "NameMagic#exec_when_named hook" do
-      it "is called upon instance naming" do
-        c = @c.call
-        i = c.new
+      it "is executed just before instance naming" do
+        i = @human.new
         counter = 0
         i.exec_when_named do counter += 1 end
         counter.must_equal 0
         i.name = :Fred
         counter.must_equal 1
-        j = c.new
+        j = @human.new
         counter.must_equal 1
-        c.class_exec do
-          define_method :exec_when_named do
-            -> name { counter += 1 } 
-          end
-        end
         j.name = :Joe
-        counter.must_equal 2
-        c.new name: "Dave"
-        counter.must_equal 3
-        # Finally, one more way how to use this hook.
-        x = @c.call
-        counter = 0
-        x.instantiation_exec do |instance|
-          instance.exec_when_named do |name|
-            counter += 1
-          end
-        end
-        x.new name: :St_IGNUcius
         counter.must_equal 1
+        # Finally, one more way how to use this hook.
+        @human.instantiation_exec do |instance|
+          instance.exec_when_named do |name| counter += 1 end
+        end
+        @human.new name: "Dave"
+        counter.must_equal 2
+        @human.new name: :St_IGNUcius
+        counter.must_equal 3
       end
 
-      describe "NameMagic#to_s" do
-        it "is defined to show names of named instances" do
-          skip
-          flunk "Tests not written!"
-        end
+      it "is executed in the context of the instance" do
+        i = @human.new
+        i.define_singleton_method :hello do "hello" end
+        result = nil
+        i.exec_when_named do |name| result = hello, name end
+        i.name = :Dave
+        result.join( ' ' ).must_equal "hello Dave"
+        # Explanation: If the block was not executed in the
+        # context of instance i, method hello wouldn't work.
       end
+    end
 
-      describe "NameMagic#inspect" do
-        it "..." do
-          # FIXME: It is not even clear it is needed.
-          skip
-          flunk "Tests not written!"
-        end
+    describe "NameMagic#to_s" do
+      it "is defined to show names of named instances" do
+        @m::Foo::Frank.to_s.must_equal "Frank"
+      end
+    end
+
+    describe "NameMagic#inspect" do
+      it "must show name for named instances" do
+        @m::Foo::Frank.inspect.must_equal "Frank"
       end
     end
   end # describe "NameMagic instance methods"
@@ -596,7 +630,6 @@ describe NameMagic do
 
     describe "Hash#keys_to_ɴ" do
       it "must work as expected" do
-        skip
         { @i => 1, @j => 2 }.keys_to_ɴ
           .must_equal( { Fred: 1, Joe: 2 } )
       end
@@ -604,7 +637,6 @@ describe NameMagic do
 
     describe "Hash#keys_to_ɴ!" do
       it "must work as expected" do
-        skip
         h = { @i => 1, @j => 2 }
         h.keys_to_ɴ!
         h.must_equal( { Fred: 1, Joe: 2 } )
