@@ -729,6 +729,20 @@ describe NameMagic do
     end
   end
 
+  describe "how unnaming works" do
+    it "should treat unnaming as kind of naming" do
+      flunk "Unnaming should be better cared for in NameMagic." +
+            "Firstly, many user classes will want no unnaming" +
+            "at all to ever occur. Those should have something " +
+            "like #no_renaming! or #names_are_forever! switch " +
+            "available. Secondly, I have a choice of making " +
+            "unnaming (ie. setting the instance name to nil) " +
+            "behave exactly as naming, that is, honoring all " +
+            "naming hooks, or I can make it behave differenty. " +
+            "I might eg. introduce unnaming hook..."
+    end
+  end
+
   describe "how NameMagic can be included modules and classes" do
     # This mainly tests NameMagic.included hook.
   end
