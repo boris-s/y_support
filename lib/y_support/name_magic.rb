@@ -227,67 +227,97 @@ module NameMagic
     self.class.__instances__[ self ]
   end
 
-  # Names an instance politely. (Avoids redefining already used
-  # names.) Can be used to unname the instance, if the supplied
-  # argument is nil.
+  # Names the receiver, while rejecting names already in use by
+  # another instance. If nil is supplied as an argument, unnames
+  # the instance. (This method does not trigger const_magic.)
   # 
   def name=( name )
-    # Get the previous name of the instance, if any.
-    old_name = namespace.__instances__[ self ]
-    # Next action depends on the value of name.
-    if name.nil? then
-      # Unname the instance.
-      namespace.__instances__.update( self => nil )
-      # # Remove the constant from the namespace.
-      # namespace.send :remove_const, old_ɴ if old_ɴ
-    else # Name the instance.
-      # Honor the namespace naming hook.
-      ɴ = honor_exec_when_naming( name, old_name )
-      # Quit if the instance is already named as required.
-      return if old_name == ɴ
-      # Raise error if the required name is already taken.
-      if self.class.__instances__.rassoc( ɴ ) then
-        fail NameError, "Name '#{ɴ}' already exists in " +
-                        "#{namespace} namespace!"
-      end
-      # Forget the old name of self.
-      namespace.__forget__ self
-      # # Create a constant in the namespace.
-      # namespace.const_set ɴ, self
-      # Create an entry in to @instances.
-      namespace.__instances__.update self => ɴ
-      # Honor the second (instance's) hook when already named.
-      honor_exec_when_named
-    end
+    # If the argument is nil, the method performs unnaming.
+    return unname! if name.nil?
+    # Otherwise, the method performs naming the instance, while
+    # avoiding stealing names already in use by another instance.
+    # Let us look at the current name of the instance first.
+    previous_name = namespace.__instances__[ self ]
+    # Honor class'es #exec_when_naming hook.
+    requested_new_name = honor_exec_when_naming( name )
+    # Return if the instance is already named as requested.
+    return if previous_name == requested_new_name
+    # Raise error if the requested name is already taken.
+    self.class.__instances__.rassoc( requested_new_name ) and
+      fail NameError, "Name '#{requested_new_name}' already " +
+                      "exists in #{namespace} namespace!"
+    # Now it is sure that the instance will be named, so it does
+    # not need to be avid.
+    make_not_avid!
+    # Rename self by modifying the registry.
+    namespace.__instances__.update self => requested_new_name
+    # Honor instance's #exec_when_named hook.
+    honor_exec_when_named
   end
 
-  # Names an instance, aggresively (overwrites existing names).
+  # Names the receiver aggresively. "Aggresively" means that in
+  # case the requested new name of the instance is already in use
+  # by another instance, the other instance is unnamed. In other
+  # words, in case of conflict of a name, the name is stolen from
+  # the conflicting instance, which becomes unnamed as a result.
+  # (The method does not trigger const_magic.)
   # 
   def name!( name )
-    # Get the previous name of the instance, if any.
-    old_name = namespace.__instances__[ self ]
-    # Unname the instance if nil is supplied as argument.
-    return self.name = nil if name.nil?
-    # Proceed to name the instance without collision concerns.
-    # Start by honoring the first (namespace's) naming hook.
-    ɴ = honor_exec_when_naming( name, old_name )
-    # Quit if the instance is already named as required.
-    return false if old_name == ɴ
-    # Search for the collider.
-    pair = namespace.__instances__.rassoc( ɴ )
-    # Rudely de-register the collider if it is present.
-    if pair then
-      collider = pair.first
-      namespace.__forget__( collider )
+    # If the argument is nil, the method performs unnaming.
+    return unname! if name.nil?
+    # Otherwise, the method performs aggresive naming the instance,
+    # where "aggresive" means that in case of conflict over a name,
+    # the name is stolen from the conflicting instance.
+    # Let us look at the current name of the instance first.
+    previous_name = namespace.__instances__[ self ]
+    # Honor class'es #exec_when_naming hook.
+    requested_new_name = honor_exec_when_naming( name )
+    # Return if the instance is already named as requested.
+    return if previous_name == requested_new_name
+    # See if the requested name is already taken.
+    colliding_entry =
+      namespace.__instances__.rassoc( requested_new_name )
+    # Unname the colliding instance, if any.
+    begin
+      colliding_entry.first.unname! if colliding_entry
+    ensure
+      # Unnaming the colliding instance may fail. But whether it
+      # fails or succeeds, self must quit being avid. If the
+      # unnaming succeeded, self is getting a new name and thus
+      # no longer needs to be avid. However, if the unnaming
+      # raises an error, we want to avoid seeing the same error
+      # over and over again just because avid self assigned to
+      # a constant with conflicting name tries over and over again
+      # to perform the impossible feat of stealing that name.
+      make_not_avid!
     end
-    # Forget the old name of self.
-    namespace.__forget__ self
-    # # Create a constant in the namespace.
-    # namespace.const_set ɴ, self
-    # Create an entry in to @instances.
-    namespace.__instances__.update self => ɴ
-    # Honor the second (instance's) naming hook when already named.
+    # Rename self by modifying the registry.
+    namespace.__instances__.update self => requested_new_name
+    # Honor instance's #exec_when_named hook.
     honor_exec_when_named
+    # Return the receiver.
+    return self
+  end
+
+  # Unnames the instance. Does not trigger #const_magic.
+  # 
+  def unname!
+    # Get the current name of the instance.
+    name = namespace.__instances__[ self ]
+    # If the instance is anonymous, we are done.
+    return if name.nil?
+    # Check whether unnaming instances is allowed at all.
+    fail NameError, "Unnaming and naming by a name already in " +
+      "use by another instance has been disallowed!" unless
+      unnaming_allowed?
+    # Honor class'es #exec_when_unnaming hook.
+    honor_exec_when_unnaming
+    # Unname the instance by deleting the name from the registry.
+    namespace.__instances__.update( self => nil )
+    # Honor instance's #exec_when_unnamed hook.
+    honor_exec_when_unnamed
+    # Return value is the previous name.
+    return name
   end
 
   # Is the instance avid? ("Avid" means that the instance is so
@@ -302,20 +332,44 @@ module NameMagic
   # 
   def make_not_avid!
     namespace.__avid_instances__.delete_if { |i| equal? i }
+    return nil
   end
 
-  # Registers a hook to execute upon instance naming. Instance's
-  # `#name_set_hook` Behaves analogically as namespace's
-  # `#name_set_hook`, and is executed right after the namespace's
-  # hook. Expects a block with a single argument, name of the
-  # instance. The return value of the block is not used and should
-  # be _nil_.  Without a block, this method acts as a getter.
+  # Is unnaming of the instance allowed? Note: This method just
+  # relies on class'es .permanent_names? method. Unnaming is not
+  # allowed when .permanent_names? is true.
+  # 
+  def unnaming_allowed?
+    ! self.class.permanent_names?
+  end
+
+  # Registers a block to execute as soon as the instance is named.
+  # (In other words, this method provides instance's naming hook.)
+  # The block is executed in the context of the instance. Return
+  # value of the block is unimportant. If no block is given, the
+  # method returns the previously defined block, if any, or a
+  # default block that does nothing.
   # 
   def exec_when_named &block
-    tap { @block_to_exec_when_named = block } if block
-    @block_to_exec_when_named ||= -> { }
+    @exec_when_named = block if block
+    @exec_when_named ||= -> { }
   end
-  # alias name_set_hook exec_when_named
+  # Note: This alias must stay while the dependencies need it.
+  alias name_set_hook exec_when_named
+
+  # Registers a block to execute right after the instance is
+  # unnamed. (In other words, this method provides instance's
+  # unnaming hook.) The block is executed in the context of the
+  # instance. Return value of the block is unimportant. If no block
+  # is given, the method returns the previously defined block, if
+  # any, or a default block that does nothing.
+  # 
+  def exec_when_unnamed &block
+    @exec_when_unnamed = block if block
+    @exec_when_unnamed ||= -> { }
+  end
+  # Note: This alias must stay while the dependencies need it.
+  alias name_set_hook exec_when_named
 
   # +NameMagic+ redefines #to_s method to show names.
   # name.
@@ -332,20 +386,33 @@ module NameMagic
 
   private
 
-  # Honors namespace hook Namespace#exec_when_naming. Takes 2
+  # Make the instance avid. Does not trigger const_magic. (Remark:
+  # Invoking this method on named instances is considered gross
+  # indecency.)
+  # 
+  def make_avid!
+    namespace.__avid_instances__ << self unless
+      namespace.__avid_instances__.include? self
+    return nil
+  end
+
+  # Honors the class'es hook #exec_when_naming. Takes 2
   # arguments, name and old name of this instance. Also calls
   # Namespace#validate_name method. Returns the final name to be
   # used.
   # 
-  def honor_exec_when_naming( suggested_name, old_name )
+  def honor_exec_when_naming( suggested_name )
     instance = self
+    previous_name = namespace.__instances__[ instance ]
     suggested_name = suggested_name.to_s
-    # Method Namespace#exec_when_naming, when called withou a
-    # block, returns the block defined earlier.
-    block = namespace.exec_when_naming
+    # Calling exec_when_naming without a block makes the method
+    # return the block defined earlier.
+    block = self.class.exec_when_naming
     # Execute the namespace hook in the context of the user class.
-    name = self.class.instance_exec( suggested_name, instance,
-                                     old_name, &block )
+    name = self.class.instance_exec( suggested_name,
+                                     instance,
+                                     previous_name,
+                                     &block )
     # The hook is supposed to return the name to be actually used.
     # But if the user used the block for other purposes and did
     # not bother to return a string or symbol (or anything that
@@ -355,17 +422,47 @@ module NameMagic
     name = begin; name.to_sym; rescue NoMethodError
              suggested_name
            end
-    # Finally, apply validate_name method.
+    # Finally, apply validate_name method and return the result.
     return self.class.validate_name( name ).to_sym
   end
 
-  # Honors instance's hook exec_when_named.
+  # Honors instance's hook #exec_when_named.
   # 
   def honor_exec_when_named
-    # Method #exec_when_named, when called withou a block, returns
+    # Method #exec_when_named, when called without a block, returns
     # the block defined earlier.
     block = exec_when_named
     # Block is executed within the context of this instance.
     instance_exec &block
+    # The method returns nil.
+    return nil
+  end
+
+  # Honors the class'es hook #exec_when_unnaming.
+  # 
+  def honor_exec_when_unnaming
+    instance = self
+    previous_name = namespace.__instances__[ instance ]
+    # Calling exec_when_unnaming without a block makes the method
+    # return the block defined earlier.
+    block = self.class.exec_when_unnaming
+    # Execute the namespace hook in the context of the user class.
+    name = self.class.instance_exec( instance,
+                                     previous_name,
+                                     &block )
+    # The method returns nil.
+    return nil
+  end
+
+  # Honors instance's hook #exec_when_unnamed.
+  # 
+  def honor_exec_when_unnamed
+    # Method #exec_when_unnamed, when called without a block,
+    # returns the block defined earlier.
+    block = exec_when_unnamed
+    # Block is executed within the context of this instance.
+    instance_exec &block
+    # The method returns nil.
+    return nil
   end
 end # module NameMagic

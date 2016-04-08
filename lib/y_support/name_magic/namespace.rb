@@ -176,6 +176,20 @@
 # while +#instances+ and +#forget+ do.
 # 
 module NameMagic::Namespace
+  # Orders the namespace to disallow unnaming instances. As a
+  # consequence, the instances' names will now be permanent.
+  # 
+  def permanent_names!
+    @permanent_names = true
+  end
+
+  # Inquirer whether unnaming instances has been disallowed in
+  # the namespace.
+  #
+  def permanent_names?
+    @permanent_names
+  end
+
   # Presents the instances registered in this namespace.
   #
   def instances *args
@@ -287,34 +301,61 @@ module NameMagic::Namespace
     #     const_get( sym ).is_a? self }
   end
 
-  # Registers a hook to execute upon instantiation. Expects a unary
-  # block, whose argument represents the new instance. It is called
-  # right after instantiation, but before instance naming. Without
-  # a block, it acts as a getter.
+  # Registers a block to execute when a new instance of the
+  # +NameMagic+ user class is created. (In other words, this method
+  # provides user class'es instantiation hook.) Expects a unary
+  # block, whose argument is the new instance. Return value of the
+  # block is unimportant. The block will be executed in the context
+  # of the user class. If no block is given, the method returns the
+  # previously defined block, if any, or a default block that does
+  # nothing.
   # 
   def instantiation_exec &block
-    @block_to_exec_upon_instantiation = block if block
-    @block_to_exec_upon_instantiation ||= -> instance { instance }
+    @instantiation_exec = block if block
+    @instantiation_exec ||= -> instance { }
   end
+  # Note: This alias must stay while the dependencies need it.
   alias new_instance_hook instantiation_exec
-  alias exec_when_new_instance instantiation_exec
 
-  # Sets a block to execute just prior to the instance naming. The
-  # block is supplied with three arguments: intended name,
-  # instance, and previous name of the instance (if any). The block
-  # should thus be ternary. The output of the block must always be
-  # the name that will finally be used to baptise the
-  # instance. This can be used to validate and censor the instance
-  # names. If no block is supplied, #exec_when_naming simply
-  # returns the block defined earlier (or the default block if none
-  # was defined).
+  # Registers a block to execute just prior to naming of an
+  # instance. (In other words, this method provides user class'es
+  # naming hook.) The block will be executed in the context of the
+  # user class and will be supplied three ordered arguments:
+  # suggested name, instance, and previous name. The block should
+  # thus be written as ternary, expecting these three arguments.
+  # The block can be used to validate / censor the suggested name
+  # and for this reason, it should return the censored name that
+  # will actually be requested for the instance. (Of course, just
+  # like there is no duty to use this hook, if you do use it, there
+  # is likewise no duty to censor the suggested name in it. You can
+  # just return the suggested name unchanged from the block.) The
+  # point is that the return value of the block will actually be
+  # used to name the instance. If no block is given, the method
+  # returns the previously defined block, if any, or a default
+  # block that does nothing and returns the suggested name without
+  # any changes.
   # 
   def exec_when_naming &block
-    @block_to_exec_when_naming = block if block
-    @block_to_exec_when_naming ||=
-      -> name, instance, old_name=nil { name }
+    @exec_when_naming = block if block
+    @exec_when_naming ||=
+      -> name, instance, previous_name=nil { name }
   end
+  # Note: This alias must stay while the dependencies need it.
   alias name_set_hook exec_when_naming
+
+  # Registers a block to execute just prior to unnaming of an
+  # instance. (In other words, this method provides user class'es
+  # unnaming hook.) The block will be executed in the context of
+  # the user class and will be supplied two ordered arguments:
+  # instance and its previous name. The block can thus be written
+  # as up to binary. Return value of the block is unimportant. If
+  # no block is given, the method returns the block defined
+  # earlier, if any, or a default block that does nothing.
+  # 
+  def exec_when_unnaming &block
+    @exec_when_unnaming = block if block
+    @exec_when_unnaming ||= -> instance, previous_name=nil { }
+  end
 
   # Checks whether a name is acceptable as a constant name.
   # 
@@ -335,6 +376,7 @@ module NameMagic::Namespace
       note "rejecting names with spaces"
       fail NameError if chars.include? ' '
     end
+    # Return value is the validated name.
     return name
   end
 
@@ -370,10 +412,13 @@ module NameMagic::Namespace
         # At this point, we have ascertained that the constant
         # we are looking at contains unnamed instance.
         if instance.avid? then
-          # Name it rudely.
-          instance.name! const_ß
-          # Remove the "avid" flag from the instance.
-          instance.make_not_avid!
+          begin
+            # Name it rudely.
+            instance.name! const_ß
+          ensure
+            # Remove the "avid" flag from the instance.
+            instance.make_not_avid!
+          end
         else
           # Avid flag is not set, name the instance politely.
           # 

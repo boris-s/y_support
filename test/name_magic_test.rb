@@ -699,51 +699,205 @@ describe NameMagic do
     end
 
     describe "new instance" do
+      before do
+        @test_class = @c.call
+        @test_instance = @test_class.new
+      end
+
       it "is created avid" do
-        skip
-        flunk "Test not written!"
+        assert @test_instance.avid?
       end
 
       it "can lose its avidity using #make_not_avid! method" do
-        skip
-        flunk "Test not written!"
+        @test_instance.make_not_avid!
+        refute @test_instance.avid?
       end
 
       it "also loses avidity by naming" do
-        skip
-        flunk "Test not written!"
+        @test_instance.name = :Joe
+        refute @test_instance.avid?
       end
     end
 
     describe "unnamed instance" do
+      before do
+        @test_class = @c.call
+        @test_instance = @test_class.new
+      end
+
       it "does not regain avidity it lost upon naming" do
-        skip
-        flunk "Test not written!"
+        assert @test_instance.avid?
+        @test_instance.name = :Jane
+        refute @test_instance.avid?
+        @test_instance.unname!.must_equal :Jane
+        refute @test_instance.avid?
       end
 
       it "does not raise repeated NameError if it is assigned" +
          "to some forgotten constant in the namespace" do
-        skip
-        flunk "Test not written!"
+        m, n = Module.new, Module.new
+        i, j = @test_class.new, @test_class.new
+        m::Jane = i
+        assert i.name == :Jane
+        n::Jane = j
+        assert i.name == nil
+        assert j.name == :Jane
+        i.send :make_avid!
+        assert i.avid?
+        assert i.name == :Jane
+        assert j.name == nil
+        refute i.avid?
+        refute j.avid?
       end
     end
   end
 
-  describe "how unnaming works" do
-    it "should treat unnaming as kind of naming" do
-      flunk "Unnaming should be better cared for in NameMagic." +
-            "Firstly, many user classes will want no unnaming" +
-            "at all to ever occur. Those should have something " +
-            "like #no_renaming! or #names_are_forever! switch " +
-            "available. Secondly, I have a choice of making " +
-            "unnaming (ie. setting the instance name to nil) " +
-            "behave exactly as naming, that is, honoring all " +
-            "naming hooks, or I can make it behave differenty. " +
-            "I might eg. introduce unnaming hook..."
+  describe "unnaming" do
+    before do
+      @test_class = @c.call
+      @test_instance = @test_class.new
+    end
+
+    describe "NameMagic#unname!" do
+      it "unnames the instance if unnaming is allowed" do
+        @test_instance.name = :Fred
+        @test_instance.unname!.must_equal :Fred
+        assert @test_instance.name.nil?
+      end
+    end
+
+    describe "NameMagic#unnaming_allowed?" do
+      it "depends on #permanent_names? method" do
+        assert @test_instance.unnaming_allowed?
+        @test_class.class_exec { permanent_names! }
+        refute @test_instance.unnaming_allowed?
+      end
+    end
+
+    describe "NameMagic#exec_when_unnamed" do
+      it "executes upon unnaming" do
+        reporter = []
+        @test_instance.exec_when_unnamed { reporter << object_id }
+        @test_instance.unname!
+        # The instance was anonymous to begin with, so no unnaming
+        # took place. Therefore, no change to the reporter.
+        reporter.must_equal []
+        @test_instance.name = :Fred
+        reporter.must_equal []
+        @test_instance.unname!
+        # Block was called only after the unnaming has happened.
+        reporter.must_equal [ @test_instance.object_id ]
+        @test_instance.name = :Fred
+        another_instance = @test_class.new
+        m = Module.new
+        # Here, unnaming of the former Fred should take place.
+        m::Fred = another_instance
+        # We have to invoke const_magic manually.
+        @test_class.const_magic
+        reporter.must_equal [ @test_instance.object_id ] * 2
+      end
+    end
+
+    describe "NameMagic::ClassMethods#exec_when_unnaming" do
+      it "executes just before unnaming the instance" do
+        reporter = []
+        @test_class.exec_when_unnaming do
+          reporter = instances.names
+        end
+        @test_instance.unname!.must_equal nil
+        reporter.must_equal []
+        @test_instance.name = :Fred
+        @test_instance.unname!.must_equal :Fred
+        reporter.must_equal [ :Fred ]
+        @test_class.instances.names.must_equal [ nil ]
+      end
+    end
+
+    describe "NameMagic::Namespace#exec_when_unnaming" do
+      it "executes just before unnaming the instance" do
+        m = Module.new
+        c = @c.call
+        c.namespace = m
+        reporter = []
+        m.exec_when_unnaming do |instance, former_name|
+          reporter << instance
+          reporter << former_name
+        end
+        i = c.new name: :Fred
+        j = c.new name!: :Fred
+        j.name.must_equal :Fred
+        i.name.must_equal nil
+        reporter.must_equal [ i, :Fred ]
+      end
+    end
+
+    describe "NameMagic::ClassMethods#permanent_names?" do
+      it "is selector of @permanent_names attribute" do
+        refute @test_class.permanent_names?
+        @test_class.class_exec { permanent_names! }
+        assert @test_class.permanent_names?
+      end
+    end
+
+    describe "NameMagic::ClassMethods#permanent_names!" do
+      it "should prohibit unnaming of the instances" do
+        c = @c.call
+        i = c.new name: :Fred
+        i.name.must_equal :Fred
+        i.unname!.must_equal :Fred
+        i.name = :Fred
+        c.instance_exec { permanent_names! }
+        -> { i.unname! }.must_raise NameError
+      end
+    end
+
+    describe "NameMagic::Namespace#permanent_names? and" +
+             "NameMagic::Namespace#permanent_names!" do
+      it "is selector of @permanent_names attribute" do
+        m = Module.new
+        c = @c.call
+        c.namespace = m
+        c.permanent_names!
+        assert m.permanent_names?
+        n = Module.new
+        c.namespace = n
+        # Shifting to a brand new namespace means that
+        # @permanent_names attribute will be reset to nil again.
+        # Fortunately, such operation is possible only when the
+        # instance registry is empty.
+        refute c.permanent_names?
+        refute n.permanent_names?
+        n.permanent_names!
+        assert c.permanent_names?
+        assert n.permanent_names?
+      end
     end
   end
 
   describe "how NameMagic can be included modules and classes" do
-    # This mainly tests NameMagic.included hook.
-  end
+    it "can be included directly" do
+      c = Class.new do include NameMagic end
+      i = c.new name: :Jane
+      c.instances.names.must_equal [ :Jane ]
+    end
+
+    it "can be included in a module first, which can be " +
+       "included in another module, and so on, until it is " +
+       "included in a class, which can be subclassed, and " +
+       "subclassed again, and it will still work as expected" do
+      m1 = Module.new do include NameMagic end
+      m2 = Module.new do include m1 end
+      m3 = Module.new do include m2 end
+      animal = Class.new do include m3 end
+      mammal = Class.new animal
+      human = Class.new mammal
+      animal.instances.must_equal []
+      human.new name!: :Jane
+      animal.instances.names.must_equal [ :Jane ]
+      mammal.new name: :Spot
+      animal.instances.names.must_equal [ :Jane, :Spot ]
+      mammal.instances.names.must_equal [ :Jane, :Spot ]
+      human.instances.names.must_equal [ :Jane ]
+   end
+end
 end # describe NameMagic
