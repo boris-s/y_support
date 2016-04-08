@@ -445,7 +445,7 @@ describe NameMagic do
     end
   end # describe NameMagic::Namespace
 
-  describe "instance methods" do
+  describe "NameMagic instance methods" do
     before do
       @human = @c.call
       @anon = @human.new
@@ -502,8 +502,27 @@ describe NameMagic do
         # Avid instance is an unnamed instance that is willing
         # to accept name even if this already belongs to another
         # instance, unregistering the conflicter in the process.
-        # FIXME: Consider making all of this avid stuff private
-        # to NameMagic, it only confuses the users.
+        assert @anon.avid?
+        @anon.name! :Fred
+        refute @anon.avid?
+      end
+    end
+
+    describe "#make_avid!" do
+      it "is a private method that makes the instance avid" do
+        @anon.name = :Fred
+        @anon.unname!
+        -> { @anon.make_avid! }.must_raise NoMethodError
+        @anon.send :make_avid!
+        assert @anon.avid?
+      end
+    end
+
+    describe "#make_not_avid!" do
+      it "removes the avid state from the instance" do
+        assert @anon.avid?
+        @anon.make_not_avid!
+        refute @anon.avid?
       end
     end
 
