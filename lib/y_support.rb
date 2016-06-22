@@ -2,4 +2,4 @@
 
 # YSupport is a collection of methods used  in Y gems.
 # 
-require "y_support/version"
+require_relative "y_support/version"

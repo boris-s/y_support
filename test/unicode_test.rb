@@ -5,7 +5,7 @@ require 'minitest/autorun'
 
 describe "y_support/unicode" do
   before do
-    require 'y_support/unicode'
+    require_relative '../lib/y_support/unicode'
   end
 
   it "should define a tiny number of Unicode aliases" do

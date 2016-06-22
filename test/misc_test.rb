@@ -361,7 +361,7 @@ end
 
 describe Symbol do
   before do
-    require './../lib/y_support/core_ext/symbol'
+    require_relative '../lib/y_support/core_ext/symbol'
   end
 
   it "should have #default! defaulter going through String#default!" do

@@ -396,7 +396,12 @@ module NameMagic::Namespace
         # Some constants cause unexpected problems. The line
         # below is the result of trial-and-error programming
         # and I am afraid to delete it quite yet.
-        next if ɱ == Object && const_ß == :Config
+        
+        ɱ == Object and case const_ß
+                        when :Config then next
+                        when :TimeoutError then next
+                        end
+          
         # Those constants that raise certain errors upon attempts
         # to access their contents are handled by this
         # begin-rescue-end statement.

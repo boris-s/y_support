@@ -1,4 +1,4 @@
-require 'y_support/core_ext/string'
+require_relative '../string'
 
 class Symbol
   # This method applies +String#default!+ method to the receiver converted to
