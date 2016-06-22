@@ -392,7 +392,7 @@ module NameMagic
   # 
   def make_avid!
     namespace.__avid_instances__ << self unless
-      namespace.__avid_instances__.include? self
+      namespace.__avid_instances__.any? { |i| i.equal? self }
     return nil
   end
 

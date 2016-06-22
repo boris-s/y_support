@@ -224,7 +224,7 @@ module NameMagic::Namespace
     # Get the list of all instances.
     ii = instances
     # If arg belongs to the list, just return it back.
-    return arg if ii.include? arg
+    return arg if ii.any? { |i| arg.equal? i }
     # Assume that arg is an instance name.
     name = arg.to_sym
     registry = __instances__
