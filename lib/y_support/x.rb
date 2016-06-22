@@ -1,9 +1,21 @@
-require 'gtk2'
 require_relative '../y_support'
+require 'gtk2'
 
 # Assets related to X windows control.
 # 
 module YSupport::X
+  # ==================================================================
+  # 
+  # Notice: Assets related to X windows control do not really belong
+  # to YSupport. I should keep them somewhere else. I will keep this
+  # file in YSupport 2.x for historical reasons. Module YSupport::X
+  # will be removed in YSupport 3.0, which will no longer cover tools
+  # for X windows control.
+  # 
+  warn "YSupport::X is obsolete!"
+  # 
+  # ==================================================================
+
   # Echo a string to the primary X clip; `xsel -b -i`.
   #
   def echo_primary_clipboard string
