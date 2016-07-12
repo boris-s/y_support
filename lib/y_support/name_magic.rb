@@ -2,7 +2,6 @@
 
 require_relative '../y_support'
 require_relative 'core_ext/hash/misc'
-require_relative 'literate'
 
 # Module NameMagic imitates Ruby constant magic and automates the
 # named argument :name, alias :ɴ (Character "ɴ", Unicode small

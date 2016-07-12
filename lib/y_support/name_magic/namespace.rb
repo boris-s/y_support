@@ -360,22 +360,11 @@ module NameMagic::Namespace
   # Checks whether a name is acceptable as a constant name.
   # 
   def validate_name name
-    # Note that the #try method (provided by 'y_support/literate')
-    # allows us to call the methods of name without mentioning
-    # it explicitly as the receiver, and it also allows us to
-    # raise errors without explicitly constructing the error
-    # messages. Thus, chars.first actually means name.chars.first.
-    # Error message (when error occurs) is constructed from
-    # the #try description and the #note strings, which act at
-    # the same time as code comments. End of advertisement for
-    # 'y_support/literate'.
-    # 
-    name.to_s.try "to validate the suggested instance name" do
-      note "rejecting non-capitalized names"
-      fail NameError unless ( ?A..?Z ) === chars.first
-      note "rejecting names with spaces"
-      fail NameError if chars.include? ' '
-    end
+    n = name.to_s
+    # rejecting non-capitalized names
+    fail NameError unless ( ?A..?Z ) === n.chars.first
+    # rejecting names with spaces
+    fail NameError if n.chars.include? ' '
     # Return value is the validated name.
     return name
   end
