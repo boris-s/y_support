@@ -3,11 +3,9 @@
 
 require 'minitest/autorun'
 
-describe "y_support/null_object" do
-  before do
-    require './../lib/y_support/null_object'
-  end
+require_relative '../../lib/y_support/misc/null_object'
 
+describe "y_support/null_object" do
   describe Object do
     it "should have #null_object? (alias #null?)" do
       assert ( class Koko < NullObject; self end ).new.null_object?

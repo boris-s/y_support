@@ -3,11 +3,9 @@
 
 require 'minitest/autorun'
 
-describe "InertRecorder"  do
-  before do
-    require './../lib/y_support/inert_recorder'
-  end
+require_relative '../../lib/y_support/misc/inert_recorder'
 
+describe "InertRecorder"  do
   describe "Object" do
     it "should have #InertRecorder() constructor" do
       assert_equal InertRecorder, InertRecorder( :bull ).class

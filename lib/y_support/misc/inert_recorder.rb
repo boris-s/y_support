@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require_relative '../y_support'
+require_relative '../../y_support'
 
 # Inert recorder is similar to a null object in the sense, that in response to
 # almost all messages it returns self. But in addition, it records received

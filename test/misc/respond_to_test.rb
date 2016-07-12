@@ -3,9 +3,9 @@
 
 require 'minitest/autorun'
 
-describe "y_support/typing" do
+describe "respond_to" do
   before do
-    require './../lib/y_support/respond_to'
+    require './../lib/y_support/misc/respond_to'
   end
 
   describe Object do

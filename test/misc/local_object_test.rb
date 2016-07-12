@@ -3,11 +3,9 @@
 
 require 'minitest/autorun'
 
-describe "LocalObject" do
-  before do
-    require './../lib/y_support/local_object'
-  end
+require_relative '../../lib/y_support/misc/local_object'
 
+describe "LocalObject" do
   describe "Object" do
     it "should have constructor #LocalObject, alias #L!" do
       assert_equal LocalObject, LocalObject().class
