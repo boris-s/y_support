@@ -1,6 +1,6 @@
-require 'y_support'
+require_relative '../y_support'
 
-require 'y_support/respond_to'
-require 'y_support/null_object'
-require 'y_support/inert_recorder'
-require 'y_support/local_object'
+require_relative 'y_support/misc/respond_to'
+require_relative 'y_support/misc/null_object'
+require_relative 'y_support/misc/inert_recorder'
+require_relative 'y_support/misc/local_object'
