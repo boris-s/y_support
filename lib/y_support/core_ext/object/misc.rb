@@ -89,7 +89,7 @@ class Object
   # New syntax for #param_class method for creating parametrized
   # subclasses.
   #
-  def has_subclass( name, of:, parametrized_by: {},
+  def owns_subclass( name, of:, parametrized_by: {},
                     named: proc do |**params|
                       param_str = params.empty? ? "" :
                                     "[#{params.pretty_print}]"
